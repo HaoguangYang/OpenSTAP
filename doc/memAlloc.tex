@@ -1,0 +1,97 @@
+
+\documentclass{ctexart}
+
+\usepackage{ifxetex}
+\ifxetex   \XeTeXinputencoding "cp936"  \fi
+
+\pdfpageheight\paperheight
+\pdfpagewidth\paperwidth
+
+\setlength{\textwidth}{\paperwidth}
+\addtolength{\textwidth}{-4cm}
+\setlength{\textheight}{\paperheight}
+\addtolength{\textheight}{-5cm}
+
+\setlength{\topmargin}{-1cm}
+\setlength{\oddsidemargin}{-0.5cm}
+\setlength{\evensidemargin}{-0.5cm}
+
+\begin{document}
+
+\title{内存管理模块memAllocate}
+\author{张雄}
+\maketitle 
+
+
+有限元分析的数据量很大，需要高效率地使用计算机的内存。目前大多数高级语
+言都提供了分配和删除动态数组的能力，但频繁地分配和删除动态数组，会导致
+大量的内存碎片，造成内存的浪费，降低操作系统的运行效率。因此，一般的大
+型有限元软件均不采用这类动态分配和删除数组的方法，而是在程序开始运行时
+向操作系统获取一定数量的连续内存区域，并自行管理这块区域，在程序的运行
+过程中不再向操作系统申请新的大块内存区域。
+
+STAP90提供了内存管理模块memAllocate，它定义了实型数组~A(MTOT)，
+从操作系统获取4*MTOT字节的连续内存区域，并对其进行管理。为了能够在这块
+区域同时存放各种类型的数据，定义了整型数组IA和双精度型数组DA，并且
+通过EQUIVALENCE语句使得它们和实型数组A共享同一个内存区域。用户可以
+利用模块memAllocate提供的子程序memAlloc(num, name, len, prec)在这块内存区域中创建
+整型数组、实型数组和双精度数组，其中num为创建的数组号，name为数组名(5个字符)，
+len为数组元素的总数，prec为数组类型(1为整型或单精度实型、2为双精度型)。例如
+
+{  \renewcommand {\baselinestretch} {0.9} \small
+\begin{verbatim}
+          CALL MEMALLOC(1, "ID   ", 3*NUMNP, 1)
+          CALL MEMALLOC(2, "X    ", NUMNP, ITWO)
+          CALL MEMALLOC(3, "Y    ", NUMNP, ITWO)
+          CALL MEMALLOC(4, "Z    ", NUMNP, ITWO)
+\end{verbatim}
+}
+\noindent
+分别创建了1号 $\sim$ 4号数组，其中1号数组为整型数组，名称为"ID   "，
+共有3*NUMNP个元素，用于存放各节点的标示数组；2号 $\sim$ 4号数组均为双
+精度数组，名称分别为"X    "、"Y    "和"Z    "，各有NUMNP个元素，用于存放
+各节点的x、y和z坐标。ITWO为模块memAllocate定义的一个整型常量，表示
+一个双精度变量占用几个单精度变量的空间。一般情况下，ITWO等于2。
+
+调用memAlloc子程序创建数组后，就可以通过指针数组np来获取所创建数组的
+第一个元素在数组A、IA或DA中的地址，且可以通过数组aname、alen和
+aprec分别获取该数组的名称、元素总数和数组类型。
+例如，STAP90中的结点信息读入子程序
+
+{  \renewcommand {\baselinestretch} {0.9} \small
+\begin{verbatim}
+      SUBROUTINE INPUT (ID,X,Y,Z,NUMNP,NEQ)
+      INTEGER :: NUMNP,NEQ,ID(3,NUMNP)
+      REAL(8) :: X(NUMNP),Y(NUMNP),Z(NUMNP)
+\end{verbatim}
+}
+\vspace{-0.2cm}
+\noindent
+要求调用它的程序为整型数组ID(3,NUMNP)和双精度型数组X(NUMNP)、
+Y(NUMNP)和Z(NUMNP)创建内存区域，这可以通过语句
+
+{  \renewcommand {\baselinestretch} {0.9} \small
+\begin{verbatim}
+      CALL INPUT (IA(NP(1)),DA(NP(2)),DA(NP(3)),DA(NP(4)),NUMNP,NEQ)
+\end{verbatim}
+}
+\vspace{-0.2cm}
+\noindent
+来实现。
+
+如果不再需要使用某个数组，可以调用memFree(num)子程序来删除它。memFree子程序会
+自动移动位于被删除数组后面的所有数组，以避免产生内存碎片。为了减少内存移动
+操作，应首先删除最后创建的数组，即尽可能按照与数组创建顺序相反的顺序来删除
+数组。另外，memAllocate模块还提供了子程序memFreeFrom(num) （删除
+从num开始的所有数组）和 memFreeFromTo(num1,num2)（删除num1至num2之间的
+所有数组）。
+
+为了便于程序调试，memAllocate模块提供了数组内容列表显示功能。
+memPrint(num)输出第num号数组的内容，memPrintPtr(ptr, len, atype)将内存区域A中
+从ptr所指向的位置开始，按照atype给定的格式(0为整型、1为实型、2为双精度型)，
+输出len个元素。例如，memPrint(1)或memPrintPtr(np(1), 3*NUMNP, 0)将输出
+数组ID的内容，而memPrint(2)或memPrintPtr((np(2)-1)*ITWO+1, NUMNP, 2)则输出
+数组X的内容。另外memInfo将列出所有已经创建的数组的信息，包括数组号、
+数组名称、元素总数、数组第一个元素的地址和数组类型等。
+
+\end{document}
