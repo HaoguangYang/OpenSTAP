@@ -45,7 +45,6 @@ module GLOBALS
 
    integer :: NFIRST
    integer :: NLAST
-   integer :: NUMEST
    integer :: MIDEST
    integer :: MAXEST
 

@@ -79,7 +79,7 @@ SUBROUTINE STRESS (AA)
 ! .                                                                   .
 ! . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-  USE GLOBALS, ONLY : IELMNT, NG, NUMEST, NPAR, NUMEG
+  USE GLOBALS, ONLY : IELMNT, NG, MIDEST, NPAR, NUMEG
 
   IMPLICIT NONE
   REAL :: AA(*)
@@ -92,7 +92,7 @@ SUBROUTINE STRESS (AA)
   DO N=1,NUMEG
      NG=N
 
-     READ (IELMNT) NUMEST,NPAR,(AA(I),I=1,NUMEST)
+     READ (IELMNT) MIDEST,NPAR,(AA(I),I=1,MIDEST)
 
      CALL ELEMNT
   END DO

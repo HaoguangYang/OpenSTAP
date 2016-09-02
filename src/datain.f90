@@ -32,7 +32,7 @@ SUBROUTINE INPUT (ID,X,Y,Z,NUMNP,NEQ)
   REAL(8) :: X(NUMNP),Y(NUMNP),Z(NUMNP)
   INTEGER :: I, J, N
 
-! Read and generate nodal point data
+! Read nodal point data
 
   N = 0
   DO WHILE (N.NE.NUMNP)

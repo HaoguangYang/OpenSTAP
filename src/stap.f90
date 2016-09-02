@@ -24,7 +24,6 @@ PROGRAM STAP90
 ! OPEN INPUT DATA FILE, RESULTS OUTPUT FILE AND TEMPORARY FILES
   CALL OPENFILES()
 
-  NUMEST=0
   MAXEST=0
 
 ! * * * * * * * * * * * * * * * * * * * * * *
@@ -32,11 +31,11 @@ PROGRAM STAP90
 ! * * * * * * * * * * * * * * * * * * * * * *
 
   WRITE(*,'("Input phase ... ")')
-  
+
   CALL SECOND (TIM(1))
 
 ! Read control information
-  
+
 !   HED    - The master heading informaiton for use in labeling the output
 !   NUMNP  - Total number of nodal points
 !            0 : program stop
@@ -45,7 +44,7 @@ PROGRAM STAP90
 !   MODEX  - Solution mode
 !            0 : data check only;
 !            1 : execution
-  
+
   READ (IIN,'(A80,/,4I5)') HED,NUMNP,NUMEG,NLCASE,MODEX
 
   IF (NUMNP.EQ.0) STOP   ! Data check mode
@@ -55,7 +54,7 @@ PROGRAM STAP90
      '      NUMBER OF NODAL POINTS',10(' .'),' (NUMNP)  = ',I5,/,   &
      '      NUMBER OF ELEMENT GROUPS',9(' .'),' (NUMEG)  = ',I5,/,  &
      '      NUMBER OF LOAD CASES',11(' .'),' (NLCASE) = ',I5,/,     &
-     '      SOLUTION MODE ',14(' .'),' (MODEX)  = ',I5,/,            &
+     '      SOLUTION MODE ',14(' .'),' (MODEX)  = ',I5,/,           &
      '         EQ.0, DATA CHECK',/,   &
      '         EQ.1, EXECUTION')") HED,NUMNP,NUMEG,NLCASE,MODEX
 
@@ -134,7 +133,7 @@ PROGRAM STAP90
 ! * * * * * * * * * * * * * * * * * * * * * *
 
   WRITE(*,'("Solution phase ... ")')
-  
+
 ! Assemble stiffness matrix
 
 ! ALLOCATE STORAGE
@@ -277,8 +276,7 @@ SUBROUTINE WRITED (DISP,ID,NEQ,NUMNP)
 
      DO I=1,3
         KK=ID(I,II)
-        IL=I
-        IF (KK.NE.0) D(IL)=DISP(KK)
+        IF (KK.NE.0) D(I)=DISP(KK)
      END DO
 
      WRITE (IOUT,'(1X,I3,8X,3E18.6)') II,D

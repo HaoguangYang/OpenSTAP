@@ -91,7 +91,7 @@ SUBROUTINE ASSEM (AA)
 ! .                                                                   .
 ! . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-  USE GLOBALS, ONLY : IELMNT, NUMEG, NUMEST, NPAR
+  USE GLOBALS, ONLY : IELMNT, NUMEG, MIDEST, NPAR
 
   IMPLICIT NONE
   REAL :: AA(*)
@@ -99,7 +99,7 @@ SUBROUTINE ASSEM (AA)
 
   REWIND IELMNT
   DO N=1,NUMEG
-     READ (IELMNT) NUMEST,NPAR,(AA(I),I=1,NUMEST)
+     READ (IELMNT) MIDEST,NPAR,(AA(I),I=1,MIDEST)
      CALL ELEMNT
   END DO
 
