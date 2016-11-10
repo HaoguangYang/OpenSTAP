@@ -24,21 +24,21 @@ SUBROUTINE ELCAL
   IMPLICIT NONE
   INTEGER :: N, I
 
-  REWIND ElementTmpFile
-  WRITE (OutputFile,"(//,' E L E M E N T   G R O U P   D A T A',//)")
+  REWIND IELMNT
+  WRITE (IOUT,"(//,' E L E M E N T   G R O U P   D A T A',//)")
 
 ! Loop over all element groups
 
-  DO N=1,NumberOfElementGroups
-     IF (N.NE.1) WRITE (OutputFile,'(1X)')
+  DO N=1,NUMEG
+     IF (N.NE.1) WRITE (IOUT,'(1X)')
 
-     READ (InputFile,'(10I5)') NPAR
+     READ (IIN,'(10I5)') NPAR
 
      CALL ELEMNT
 
-     IF (ElementGroupArraySize.GT.MaxElementGroupArraySize) MaxElementGroupArraySize = ElementGroupArraySize
+     IF (MIDEST.GT.MAXEST) MAXEST=MIDEST
 
-     WRITE (ElementTmpFile) ElementGroupArraySize,NPAR,(A(I),I=NFIRST,NLAST)
+     WRITE (IELMNT) MIDEST,NPAR,(A(I),I=NFIRST,NLAST)
 
   END DO
 
@@ -57,11 +57,11 @@ SUBROUTINE ELEMNT
   USE GLOBALS
 
   IMPLICIT NONE
-  INTEGER :: ElementType
+  INTEGER :: NPAR1
 
-  ElementType = NPAR(1)
+  NPAR1=NPAR(1)
 
-  IF (ElementType == 1) THEN
+  IF (NPAR1 == 1) THEN
      CALL TRUSS
   ELSE
 !    Other element types would be called here, identifying each
@@ -72,27 +72,27 @@ SUBROUTINE ELEMNT
 END SUBROUTINE ELEMNT
 
 
-SUBROUTINE STRESS (ElementGroupData)
+SUBROUTINE STRESS (AA)
 ! . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 ! .                                                                   .
 ! .   To call the element subroutine for the calculation of stresses  .
 ! .                                                                   .
 ! . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-  USE GLOBALS, ONLY : ElementTmpFile, CurrentElementGroup, ElementGroupArraySize, NPAR, NumberOfElementGroups
+  USE GLOBALS, ONLY : IELMNT, NG, MIDEST, NPAR, NUMEG
 
   IMPLICIT NONE
-  REAL :: ElementGroupData(*)
-  INTEGER:: N, I
+  REAL :: AA(*)
+  INTEGER N, I
 
 ! Loop over all element groups
 
-  REWIND ElementTmpFile
+  REWIND IELMNT
 
-  DO N = 1,NumberOfElementGroups
-     CurrentElementGroup = N
+  DO N=1,NUMEG
+     NG=N
 
-     READ (ElementTmpFile) ElementGroupArraySize,NPAR,(ElementGroupData(I),I=1,ElementGroupArraySize)
+     READ (IELMNT) MIDEST,NPAR,(AA(I),I=1,MIDEST)
 
      CALL ELEMNT
   END DO

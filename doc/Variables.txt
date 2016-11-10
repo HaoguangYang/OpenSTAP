@@ -1,0 +1,150 @@
+Original Variables
+
+A       - Working array defining the RAM range of the program, default data type: float
+AA      - Read of element group data in STRESS (A(NP(11)->AA)
+alen    - Length of each array
+amax    - Maximum number of arrays allowed (200)
+aprec   - Precision of each array
+AREA
+atype   - Type of the entries
+        0 - integer
+        1 - float
+        2 - double
+
+EX      - Input data file exist or not?
+
+HED     - The master heading informaiton used in labeling the output
+
+D       - Tempory container for displacement vector of nodal point #II used for output
+DA      - Double precision array storage in working array A
+DISP
+
+FileInp - Input data file name
+FLOAD   - Load magnitude for input, stored in DA(NP(8))
+
+I       - Iteration variable, index of DOF (1..3 for 3-D problems)
+IA      - Integer array storage in working array A
+IC      - Format control variable, reprint displacements title every 52 lines
+ID      - Identifier for whether freee or not in (DOF index, nodal point global index), fixed=1, free=0, modified to become location matrix in the program, stored in IA(NP(1))
+IDIRN   - Direction of load on node NOD(i), where i is iteration variable
+IELEMNT - Instrument ID sstoring element data (binary tmp file ID)
+II      - Iteration variable (global index of nodal points, in input files used to represent the left nodal points of each element)
+IIN     - Instrument ID used for input (file ID)
+ILOAD   - Instrument ID storing load vectors (binary tmp file ID)
+IND     - Solution phase indicator
+        1 - Read and generate element information
+		2 - Assemble structure stiffness matrix
+		3 - Stress calculations
+IOUT    - Instrument ID used for output (file ID)
+ITWO    - Double precision indicator
+        1 - Single precision arithmetic
+        2 - Double precision arithmetic
+J
+JJ
+KK      - Global index of nodal point #II at DOF #I
+KKK
+L       - Iteration variable for loads or load-cases
+LI      - Temporary direction index for query ID(LI,LN)
+LL      -
+LM
+LN      - Temporary node index for query ID(LI,LN)
+LS
+MAXA
+MAXEST  - Maximum length of an element group data (maxima of MIDEST)
+ME
+MHT
+MIDEST  - Length of an element group data taken in A in float
+MK      - Maximum half bandwidth
+MM      - Mean half bandwidth (=NWK/NEQ), used for output
+MODEX   - Solution mode
+        0 : data check only;
+        1 : execution
+MTOT    - RAM available for execution (10000*4bytes)
+
+N       - Index of nodal point, Iteration variable in ELCAL
+N10*    - Pointer index group
+        N101    - First pointer corresponding to the beginning of E data (N101=NFIRST)
+        N102    - Second pointer corresponding to the beginning of Area data
+        N103    - Third pointer corresponding to the beginning of LM data
+        N104    - Fourth pointer corresponding to the beginning of Coordinate data
+        N105    - Fifth pointer corresponding to the beginning of Material Type data
+        N106    - End of element group data
+ND      - Total number of DOFs.
+NEQ     - Number of equations
+NEQ1    - NEQ+1
+NFIRST  - Pointer to the first entry in the element group data array in the unit of float (NFIRST=NP(11))
+NLAST   - Pointer to end of an element group data
+NG
+NLAST
+NLCASE  - Number of load case (>0)
+NLOAD   - Number of concentrated loads in a load case
+NN
+NOD     - Global nodal point number in LOADS
+NP      - Pointer to each array, data is in unit of corresponding ITWO
+NPAR    - ELement group control data
+        NPAR(1) - Element type
+                    1 : Truss element
+        NPAR(2) - Number of elements
+        NPAR(3) - Number of different sets of material and cross-sectional constants
+npbase  - The last element address of the preceding array in float
+npfirst - Pointer to the first index of a new entry iin A (float)
+nplast  - Pointer to the allocated element in A (float)
+nplen   - Length of array in float pointed by np(num), rounded to even
+
+num     - Index number of certain element in NP (The basic index, all reference of aname, alen, aprec, np will start here)
+NUMMAT
+NUME
+NUMEG   - Total number of element group (>0)
+NUMNP   - Total number of nodal points
+        0 : program stop
+NWK     - Number of matrix elements
+P
+R       - Load and restrictive force vector written into file ID=ILOAD
+S
+SQRT
+ST
+STR
+TIM     - Timing information
+TT      - Total solution time
+U
+X       - X-coordinates storage, stored in DA(NP(2))
+XL
+XL2
+XX
+XYZ
+Y       - Y-coordinates storage, stored in DA(NP(3))
+YY
+Z       - Z-coordinates storage, stored in DA(NP(4))
+
+---------------------------------------------------------------------
+Memory Allocation
+
+    ID(3,NUMNP) : Boundary condition codes (0=free,1=deleted)
+    X(NUMNP)    : X coordinates
+    Y(NUMNP)    : Y coordinates
+    Z(NUMNP)    : Z coordinates
+    R(NEQ) : Load vector
+    LL    - Load case number
+    NLOAD - The number of concentrated loads applied in this load case
+    NOD(NLOAD)   : Node number to which this load is applied (1~NUMNP)
+    IDIRN(NLOAD) : Degree of freedom number for this load component
+                   1 : X-direction;
+                   2 : Y-direction;
+                   3 : Z-direction
+    FLOAD(NLOAD) : Magnitude of load
+
+
+MEMALLOC(1,"ID   ",3*NUMNP,1)
+MEMALLOC(2,"X    ",NUMNP,ITWO)
+MEMALLOC(3,"Y    ",NUMNP,ITWO)
+MEMALLOC(4,"Z    ",NUMNP,ITWO)
+MEMALLOC(5,"R    ",NEQ,ITWO)
+MEMALLOC(6,"NOD  ",NLOAD,1)
+MEMALLOC(7,"IDIRN",NLOAD,1)
+MEMALLOC(8,"FLOAD",NLOAD,ITWO)
+MEMFREE(6)
+MEMFREEFROMTO(2,4)
+MEMALLOC(2,"MAXA ",NEQ+1,1)
+MEMALLOC(3,"STFF ",NWK,ITWO)
+MEMALLOC(4,"R    ",NEQ,ITWO)
+MEMALLOC(11,"ELEGP",MAXEST,1)

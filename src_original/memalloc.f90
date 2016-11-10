@@ -21,7 +21,7 @@
 
 module memAllocate
 
-   integer, parameter :: MTOT = 40000  ! Speed storage available for execution
+   integer, parameter :: MTOT = 10000  ! Speed storage available for execution
    integer, parameter :: ITWO = 2      ! Double precision indicator
                                         !   1 - Single precision arithmetic
                                         !   2 - Double precision arithmetic
@@ -94,46 +94,10 @@ contains
       do i = npfirst, nplast
          A(i) = 0
       end do
+
    end subroutine memalloc
 
 
-   subroutine memmove(num1, num2)
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-!!       Pointing array pointer num2 to num1        !!
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    implicit none
-    integer:: num1, num2
-    
-    if (num1==num2) return
-    if (np(num2)>0) call memfree(num2)
-    np(num2)=np(num1)
-    aname(num2)=aname(num1)
-    alen(num2)=alen(num1)
-    aprec(num2)=aprec(num1)
-    
-    np(num1)    =0
-    aname(num1) =""
-    alen(num1)  =0
-    aprec(num1) =0
-   end subroutine memmove
-   
-   
-   subroutine memcopy(num1, num2)
-   implicit none
-   integer:: num1, num2
-   
-   if (num1==num2) then
-        print *,"target address is the same as source!"
-        return
-   end if
-   if (np(num2) .GT. 0) then
-        print *,"target address has already been allocated!"
-        return
-   end if 
-   !To be developed.
-   end subroutine memcopy
-   
-   
    subroutine memfree(num)
 ! -----------------------------------------------------------------------------
 ! -  Purpose                                                                  -
