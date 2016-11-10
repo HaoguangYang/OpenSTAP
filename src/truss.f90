@@ -29,7 +29,7 @@ SUBROUTINE TRUSS
 
 ! Allocate storage for element group data
   IF (SolutionPhase == 1) THEN
-      MM = 4 * NumberOfMaterials * ITWO + 7 * NumberOfElements + 6 * NumberOfElements * ITWO
+      MM = 4 * NumberOfMaterials * ITWO + 9 * NumberOfElements + 6 * NumberOfElements * ITWO
       CALL MEMALLOC(11,"ELEGP",MM,1)
   END IF
 
