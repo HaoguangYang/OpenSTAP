@@ -23,14 +23,15 @@ SUBROUTINE COLHT (ColumnHeight,ElementDOF,ElementLocationMatrix)
   INTEGER :: ElementDOF, ElementLocationMatrix(ElementDOF),ColumnHeight(NumberOfEquations)
   INTEGER :: I, SmallestIndex, CurrentIndex, IndexDisparity
 
-  !LS=HUGE(1)   ! The largest integer number
+  SmallestIndex=HUGE(1)   ! The largest integer number
 
-  !DO I=1,ND
-  !   IF (LM(I) .NE. 0) THEN
-  !      IF (LM(I)-LS .LT. 0) LS=LM(I)
-  !   END IF
-  !END DO
-  SmallestIndex=minval(ElementLocationMatrix(1:ElementDOF))
+  DO I=1,ElementDOF
+     IF (ElementLocationMatrix(I) .NE. 0) THEN
+        IF (ElementLocationMatrix(I)-SmallestIndex .LT. 0) SmallestIndex=ElementLocationMatrix(I)
+     END IF
+  END DO
+  
+  !SmallestIndex=minval(ElementLocationMatrix(1:ElementDOF))
 
   DO I=1,ElementDOF
      CurrentIndex = ElementLocationMatrix(I)
@@ -100,7 +101,7 @@ SUBROUTINE ASSEM (ElementStiffnessMatrix)
   REWIND ElementTmpFile
   DO N=1,NumberOfElementGroups
      READ (ElementTmpFile) ElementGroupArraySize,NPAR, &
-                           (ElementStiffnessMatrix(I),I=1,ElementGroupArraySize)
+                           (ElementStiffnessMatrix(I),I=1,ElementGroupArraySize)                      !Read Tmp File In.
      CALL ELEMNT                                    !IND=2 Entrance
   END DO
 
@@ -228,6 +229,9 @@ SUBROUTINE COLSOL (SkylineK, LoadToDisplacement, MAXA, NumberOfEquations, Number
             STOP
          END IF
       END DO
+      
+      !write (*,*) "Skyline",SkylineK
+      !write (*,*) "MAXA", MAXA
 
   ELSE IF (SolutionMode == 2) THEN
 
@@ -236,6 +240,9 @@ SUBROUTINE COLSOL (SkylineK, LoadToDisplacement, MAXA, NumberOfEquations, Number
        DO N=1,NumberOfEquations
          KL=MAXA(N) + 1
          KU=MAXA(N+1) - 1
+         
+         !write (*,*) "Load(",N,")",LoadToDisplacement(N)
+         
          IF (KU-KL .GE. 0) THEN
             !K=N
             !C=0.
@@ -243,7 +250,11 @@ SUBROUTINE COLSOL (SkylineK, LoadToDisplacement, MAXA, NumberOfEquations, Number
             !   K=K - 1
             !   C=C + SkylineK(KK)*LoadToDisplacement(K)
             !END DO
-			C = dot_product(SkylineK(KL:KU),LoadToDisplacement(N:N-(KU-KL)))
+            
+			C = dot_product(SkylineK(KL:KU),LoadToDisplacement(N-1:N-(KU-KL)-1:-1))
+			
+			!write (*,*) "C= dot_product(SkylineK(KL:KU),LoadToDisplacement(N:N-(KU-KL)))",C
+            
             LoadToDisplacement(N) = LoadToDisplacement(N) - C
          END IF
       END DO
