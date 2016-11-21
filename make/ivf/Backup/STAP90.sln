@@ -1,6 +1,6 @@
 ﻿
-Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2012
+Microsoft Visual Studio Solution File, Format Version 10.00
+# Visual Studio 2008
 Project("{6989167D-11E4-40FE-8C1A-2192A86A7E90}") = "STAP90", "STAP90.vfproj", "{AFE52EEE-C4F9-4257-BEB8-6E7615453D43}"
 EndProject
 Global

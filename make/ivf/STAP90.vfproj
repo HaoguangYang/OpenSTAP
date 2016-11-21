@@ -4,7 +4,7 @@
 		<Platform Name="Win32"/></Platforms>
 	<Configurations>
 		<Configuration Name="Debug|Win32">
-				<Tool Name="VFFortranCompilerTool" SuppressStartupBanner="true" DebugInformationFormat="debugEnabled" Optimization="optimizeDisabled" Interfaces="true" Traceback="true" BoundsCheck="true" RuntimeLibrary="rtMultiThreadedDebug"/>
+				<Tool Name="VFFortranCompilerTool" SuppressStartupBanner="true" DebugInformationFormat="debugEnabled" Optimization="optimizeDisabled" Traceback="true" BoundsCheck="true" RuntimeLibrary="rtMultiThreadedDebug" Interfaces="true"/>
 				<Tool Name="VFLinkerTool" LinkIncremental="linkIncrementalNo" SuppressStartupBanner="true" GenerateDebugInformation="true" SubSystem="subSystemConsole"/>
 				<Tool Name="VFResourceCompilerTool"/>
 				<Tool Name="VFMidlTool" SuppressStartupBanner="true"/>
@@ -32,7 +32,12 @@
 		<File RelativePath="..\..\src\elcal.f90"/>
 		<File RelativePath="..\..\src\globals.f90"/>
 		<File RelativePath="..\..\src\memalloc.f90"/>
+		<File RelativePath="..\..\src\4Q.f90"/>
 		<File RelativePath="..\..\src\stap.f90"/>
-		<File RelativePath="..\..\src\truss.f90"/></Filter>
+		<File RelativePath="..\..\data\STAP90.OUT"/>
+		<File RelativePath="..\..\data\truss.dat"/>
+		<File RelativePath="..\..\src\truss.f90"/>
+		<File RelativePath="..\..\data\truss4Q.dat"/>
+		<File RelativePath="..\..\data\truss4Q_test.dat"/></Filter>
 		<File RelativePath="..\Readme.txt"/></Files>
 	<Globals/></VisualStudioProject>
