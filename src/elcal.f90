@@ -61,11 +61,14 @@ SUBROUTINE ELEMNT
 
   ElementType = NPAR(1)
 
-  IF (ElementType == 1) THEN
+  IF      (ElementType == 1) THEN
      CALL TRUSS
-  ELSE
+  ELSE IF (ElementType == 2) THEN
+     CALL ELEMENT_4Q
 !    Other element types would be called here, identifying each
 !    element type by a different NPAR(1) parameter
+  ELSE IF (.TRUE.) THEN
+     stop "ELEMENT TYPE STILL UNDER DEVELOPMENT..."
   END IF
 
   RETURN
