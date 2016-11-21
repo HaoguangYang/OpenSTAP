@@ -1,0 +1,113 @@
+
+ Cables to test STAP90 for 4Q element test(1 element)                            
+
+ C O N T R O L   I N F O R M A T I O N
+
+      NUMBER OF NODAL POINTS . . . . . . . . . . (NUMNP)  =     4
+      NUMBER OF ELEMENT GROUPS . . . . . . . . . (NUMEG)  =     1
+      NUMBER OF LOAD CASES . . . . . . . . . . . (NLCASE) =     1
+      SOLUTION MODE  . . . . . . . . . . . . . . (MODEX)  =     1
+         EQ.0, DATA CHECK
+         EQ.1, EXECUTION
+
+
+ N O D A L   P O I N T   D A T A
+
+  NODE          BOUNDARY                         NODAL POINT
+ NUMBER     CONDITION  CODES                     COORDINATES
+               X    Y    Z               X            Y            Z
+    1          1    1    1              0.000        0.000        0.000
+    2          0    1    1              1.000        0.000        0.000
+    3          0    0    1              1.000        1.000        0.000
+    4          0    0    1              0.000        1.000        0.000
+
+
+ EQUATION NUMBERS
+
+   NODE         DEGREES OF FREEDOM
+  NUMBER
+     N             X    Y    Z
+     1             0    0    0
+     2             1    0    0
+     3             2    3    0
+     4             4    5    0
+
+
+ L O A D   C A S E   D A T A
+
+     LOAD CASE NUMBER . . . . . . . =     1
+     NUMBER OF CONCENTRATED LOADS . =     2
+
+    NODE       DIRECTION      LOAD
+   NUMBER                   MAGNITUDE
+      3            2       -0.20000E+02
+      4            2       -0.20000E+02
+
+
+ E L E M E N T   G R O U P   D A T A
+
+
+ E L E M E N T   D E F I N I T I O N
+
+ ELEMENT TYPE  . . . . . . . . . . . . .( NPAR(1) ) . . =    2
+     EQ.1, TRUSS ELEMENTS
+     EQ.2, ELEMENTS CURRENTLY
+     EQ.3, NOT AVAILABLE
+
+ NUMBER OF ELEMENTS. . . . . . . . . . .( NPAR(2) ) . . =    1
+
+ M A T E R I A L   D E F I N I T I O N
+
+ NUMBER OF DIFFERENT SETS OF MATERIAL
+ AND CROSS-SECTIONAL  CONSTANTS  . . . .( NPAR(3) ) . . =    1
+
+  SET       YOUNG'S     CROSS-SECTIONAL
+ NUMBER     MODULUS          AREA
+               E              A
+    1     0.30000E+08    0.300000E+00
+
+
+ E L E M E N T   I N F O R M A T I O N
+
+ ELEMENT     NODE     NODE       MATERIAL
+ NUMBER-N      I        J       SET NUMBER
+    1          1        2        3        4           1
+
+
+ TOTAL SYSTEM DATA
+
+     NUMBER OF EQUATIONS . . . . . . . . . . . . . .(NEQ) =     5
+     NUMBER OF MATRIX ELEMENTS . . . . . . . . . . .(NWK) =    15
+     MAXIMUM HALF BANDWIDTH  . . . . . . . . . . . .(MK ) =     5
+     MEAN HALF BANDWIDTH . . . . . . . . . . . . . .(MM ) =     3
+
+
+ LOAD CASE   1
+
+
+ D I S P L A C E M E N T S
+
+  NODE           X-DISPLACEMENT    Y-DISPLACEMENT    Z-DISPLACEMENT
+   1              0.000000E+00      0.000000E+00      0.000000E+00
+   2              0.400000E-06      0.000000E+00      0.000000E+00
+   3              0.400000E-06     -0.133333E-05      0.000000E+00
+   4              0.000000E+00     -0.133333E-05      0.000000E+00
+
+
+ S T R E S S  C A L C U L A T I O N S  F O R  E L E M E N T  G R O U P   1
+
+  ELEMENT          X-CORRD         Y-CORRD         STRESS_XX       STRESS_YY         STRESS_XY
+     1     0.211325E+00     0.211325E+00           -0.355271E-14    -0.400000E+02     0.610841E-15
+     1     0.788675E+00     0.211325E+00           -0.532907E-14    -0.400000E+02     0.183252E-14
+     1     0.211325E+00     0.788675E+00            0.177636E-14    -0.400000E+02    -0.244336E-14
+     1     0.788675E+00     0.788675E+00            0.000000E+00    -0.400000E+02     0.000000E+00
+
+
+ S O L U T I O N   T I M E   L O G   I N   S E C
+
+     TIME FOR INPUT PHASE  . . . . . . . . . . . . . . =        0.00
+     TIME FOR CALCULATION OF STIFFNESS MATRIX  . . . . =        0.00
+     TIME FOR FACTORIZATION OF STIFFNESS MATRIX  . . . =        0.00
+     TIME FOR LOAD CASE SOLUTIONS  . . . . . . . . . . =        0.00
+
+      T O T A L   S O L U T I O N   T I M E  . . . . . =        0.00

@@ -63,7 +63,11 @@ SUBROUTINE ELEMNT
 
   IF      (ElementType == 1) THEN
      CALL TRUSS
+<<<<<<< HEAD
   ELSE IF (ElementType == 2) THEN
+=======
+  ELSE IF (NPAR1 == 2) THEN
+>>>>>>> test_h
      CALL ELEMENT_4Q
 !    Other element types would be called here, identifying each
 !    element type by a different NPAR(1) parameter

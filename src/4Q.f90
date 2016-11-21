@@ -14,8 +14,12 @@
 !        4Q element                                                       -
 !        Qi He,(2016)                                                     -
 !        Tsinghua University                                              -
+<<<<<<< HEAD
 !                                                                         .
 !            Revised by Haoguang Yang                                     -
+=======
+!                                                                         -
+>>>>>>> test_h
 !                                                                         -
 !--------------------------------------------------------------------------
 
@@ -36,7 +40,11 @@ NUME = NPAR(2)
 NUMMAT = NPAR(3)
 
 ! Allocate storage for element group data
+<<<<<<< HEAD
   IF (SolutionPhase == 1) THEN
+=======
+  IF (IND == 1) THEN
+>>>>>>> test_h
       MM = 2*NUMMAT*ITWO + 9*NUME + 12*NUME*ITWO
       CALL MEMALLOC(11,"ELEGP",MM,1)
   END IF
@@ -58,7 +66,11 @@ NUMMAT = NPAR(3)
   N106=N105+NUME
   NLAST=N106
 
+<<<<<<< HEAD
   ElementGroupArraySize = NLAST - NFIRST
+=======
+  MIDEST=NLAST - NFIRST
+>>>>>>> test_h
 
   CALL ELEMENT_4Q_MAIN (IA(NP(1)),DA(NP(2)),DA(NP(3)),DA(NP(4)),DA(NP(4)),IA(NP(5)),   &
        A(N101),A(N102),A(N103),A(N104),A(N105))
@@ -96,6 +108,7 @@ SUBROUTINE ELEMENT_4Q_MAIN (ID,X,Y,Z,U,MHT,E,POISSON,LM,XYZ,MATP)
     END FUNCTION
   END INTERFACE
   
+
   INTEGER :: ID(3,NumberOfNodalPoints),LM(8,NPAR(2)),MATP(NPAR(2)),MHT(NumberOfEquations)
   REAL(8) :: X(NumberOfNodalPoints),Y(NumberOfNodalPoints),Z(NumberOfNodalPoints),   &
              E(NPAR(3)), POISSON(NPAR(3)), XYZ(12,NPAR(2)), U(NumberOfEquations), DST(8,1)
@@ -114,6 +127,7 @@ SUBROUTINE ELEMENT_4Q_MAIN (ID,X,Y,Z,U,MHT,E,POISSON,LM,XYZ,MATP)
   GP(2)=0.57735027
   W(1)=1.0
   W(2)=1.0
+
 
   ElementType  = NPAR(1)
   NUME   = NPAR(2)
@@ -153,6 +167,7 @@ SUBROUTINE ELEMENT_4Q_MAIN (ID,X,Y,Z,U,MHT,E,POISSON,LM,XYZ,MATP)
 
      N=0
      DO WHILE (N .NE. NUME)
+
         READ (InputFile,'(7I5)') N,I1,I2,I3,I4,MTYPE  ! Read in element information
 
 !       Save element information
@@ -280,7 +295,7 @@ SUBROUTINE ELEMENT_4Q_MAIN (ID,X,Y,Z,U,MHT,E,POISSON,LM,XYZ,MATP)
                 STRESS_XX(N,2*J+I-2) = STRESS(1,1)
                 STRESS_YY(N,2*J+I-2) = STRESS(2,1)
                 STRESS_XY(N,2*J+I-2) = STRESS(3,1)
-                
+
             WRITE (OutputFile,"(1X,I5,4X,E13.6,4X,E13.6,11X,E13.6,4X,E13.6,4X,E13.6)") &
             N,X_GUASS(2*J+I-2,1),X_GUASS(2*J+I-2,2),STRESS_XX(N,2*J+I-2),STRESS_YY(N,2*J+I-2),STRESS_XY(N,2*J+I-2)
                 
@@ -325,7 +340,8 @@ FUNCTION NmatElast2D(eta,psi)
   N(2,8)=N4
   
   NmatElast2D = N
-  
+
+
 END FUNCTION NmatElast2D
   
 FUNCTION BmatElast2D(eta,psi,C)
@@ -367,5 +383,3 @@ FUNCTION BmatElast2D(eta,psi,C)
     BmatElast2D = B
 END FUNCTION BmatElast2D
 
-
-  
