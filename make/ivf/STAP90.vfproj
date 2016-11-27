@@ -27,17 +27,17 @@
 		<Filter Name="Header Files" Filter="fi;fd"/>
 		<Filter Name="Resource Files" Filter="rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe"/>
 		<Filter Name="Source Files" Filter="f90;for;f;fpp;ftn;def;odl;idl">
+		<File RelativePath="..\..\src\4Q.f90"/>
+		<File RelativePath="..\..\src\9Q.f90"/>
 		<File RelativePath="..\..\src\assem.f90"/>
 		<File RelativePath="..\..\src\datain.f90"/>
 		<File RelativePath="..\..\src\elcal.f90"/>
+		<File RelativePath="..\..\data\ELEMENT_4Q_test.dat"/>
+		<File RelativePath="..\..\data\ELEMENT_9Q_test.dat"/>
 		<File RelativePath="..\..\src\globals.f90"/>
 		<File RelativePath="..\..\src\memalloc.f90"/>
-		<File RelativePath="..\..\src\4Q.f90"/>
 		<File RelativePath="..\..\src\stap.f90"/>
 		<File RelativePath="..\..\data\STAP90.OUT"/>
-		<File RelativePath="..\..\data\truss.dat"/>
-		<File RelativePath="..\..\src\truss.f90"/>
-		<File RelativePath="..\..\data\truss4Q.dat"/>
-		<File RelativePath="..\..\data\truss4Q_test.dat"/></Filter>
+		<File RelativePath="..\..\src\truss.f90"/></Filter>
 		<File RelativePath="..\Readme.txt"/></Files>
 	<Globals/></VisualStudioProject>
