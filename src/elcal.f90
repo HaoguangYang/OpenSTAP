@@ -69,6 +69,8 @@ SUBROUTINE ELEMNT
   ELSE IF (NPAR1 == 2) THEN
 >>>>>>> test_h
      CALL ELEMENT_4Q
+  ELSE IF (NPAR1 == 3) THEN
+     CALL ELEMENT_9Q
 !    Other element types would be called here, identifying each
 !    element type by a different NPAR(1) parameter
   ELSE IF (.TRUE.) THEN
