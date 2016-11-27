@@ -14,12 +14,8 @@
 !        4Q element                                                       -
 !        Qi He,(2016)                                                     -
 !        Tsinghua University                                              -
-<<<<<<< HEAD
 !                                                                         .
 !            Revised by Haoguang Yang                                     -
-=======
-!                                                                         -
->>>>>>> test_h
 !                                                                         -
 !--------------------------------------------------------------------------
 
@@ -40,11 +36,8 @@ NUME = NPAR(2)
 NUMMAT = NPAR(3)
 
 ! Allocate storage for element group data
-<<<<<<< HEAD
+
   IF (SolutionPhase == 1) THEN
-=======
-  IF (IND == 1) THEN
->>>>>>> test_h
       MM = 2*NUMMAT*ITWO + 9*NUME + 12*NUME*ITWO
       CALL MEMALLOC(11,"ELEGP",MM,1)
   END IF
@@ -66,11 +59,7 @@ NUMMAT = NPAR(3)
   N106=N105+NUME
   NLAST=N106
 
-<<<<<<< HEAD
   ElementGroupArraySize = NLAST - NFIRST
-=======
-  MIDEST=NLAST - NFIRST
->>>>>>> test_h
 
   CALL ELEMENT_4Q_MAIN (IA(NP(1)),DA(NP(2)),DA(NP(3)),DA(NP(4)),DA(NP(4)),IA(NP(5)),   &
        A(N101),A(N102),A(N103),A(N104),A(N105))

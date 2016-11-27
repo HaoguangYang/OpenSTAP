@@ -61,21 +61,20 @@ SUBROUTINE ELEMNT
 
   ElementType = NPAR(1)
 
-  IF      (ElementType == 1) THEN
+  Select case (ElementType)
+  case (1)
      CALL TRUSS
-<<<<<<< HEAD
-  ELSE IF (ElementType == 2) THEN
-=======
-  ELSE IF (NPAR1 == 2) THEN
->>>>>>> test_h
+  case (2)
      CALL ELEMENT_4Q
-  ELSE IF (NPAR1 == 3) THEN
+  case (3)
      CALL ELEMENT_9Q
+  case (4)
+     CALL HEXAHEDRAL
 !    Other element types would be called here, identifying each
 !    element type by a different NPAR(1) parameter
-  ELSE IF (.TRUE.) THEN
+  case (5:)
      stop "ELEMENT TYPE STILL UNDER DEVELOPMENT..."
-  END IF
+  END SELECT
 
   RETURN
 END SUBROUTINE ELEMNT

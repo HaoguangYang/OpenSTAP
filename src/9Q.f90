@@ -35,7 +35,7 @@ NUME = NPAR(2)
 NUMMAT = NPAR(3)
 
 ! Allocate storage for element group data
-  IF (IND == 1) THEN
+  IF (SolutionPhase == 1) THEN
       MM = 2*NUMMAT*ITWO + 19*NUME + 18*NUME*ITWO
       CALL MEMALLOC(11,"ELEGP",MM,1)
   END IF
@@ -57,7 +57,7 @@ NUMMAT = NPAR(3)
   N106=N105+NUME
   NLAST=N106
 
-  MIDEST=NLAST - NFIRST
+  ElementGroupArraySize=NLAST - NFIRST
 
   CALL ELEMENT_9Q_MAIN (IA(NP(1)),DA(NP(2)),DA(NP(3)),DA(NP(4)),DA(NP(4)),IA(NP(5)),   &
        A(N101),A(N102),A(N103),A(N104),A(N105))
@@ -95,9 +95,9 @@ SUBROUTINE ELEMENT_9Q_MAIN (ID,X,Y,Z,U,MHT,E,POISSON,LM,XY,MATP)
     END FUNCTION
   END INTERFACE
   
-  INTEGER :: ID(3,NUMNP),LM(18,NPAR(2)),MATP(NPAR(2)),MHT(NEQ)
-  REAL(8) :: X(NUMNP),Y(NUMNP),Z(NUMNP),E(NPAR(3)),POISSON(NPAR(3)),  &
-             XY(18,NPAR(2)),U(NEQ),DST(18,1)
+  INTEGER :: ID(3,NumberOfNodalPoints),LM(18,NPAR(2)),MATP(NPAR(2)),MHT(NumberOfEquations)
+  REAL(8) :: X(NumberOfNodalPoints),Y(NumberOfNodalPoints),Z(NumberOfNodalPoints), &
+             E(NPAR(3)),POISSON(NPAR(3)), XY(18,NPAR(2)),U(NumberOfEquations),DST(18,1)
   REAL(8) :: ETA,EPSILON
 
   INTEGER :: NPAR1, NUME, NUMMAT, ND, I1, I2, I3, I4, I5, I6, I7, I8, I9, L, N, I, J
@@ -136,9 +136,9 @@ SUBROUTINE ELEMENT_9Q_MAIN (ID,X,Y,Z,U,MHT,E,POISSON,LM,XY,MATP)
   ND=18
 
 ! Read and generate element information
-  IF (IND .EQ. 1) THEN
+  IF (SolutionPhase .EQ. 1) THEN
 
-     WRITE (IOUT,"(' E L E M E N T   D E F I N I T I O N',//,  &
+     WRITE (OutputFile,"(' E L E M E N T   D E F I N I T I O N',//,  &
                    ' ELEMENT TYPE ',13(' .'),'( NPAR(1) ) . . =',I5,/,   &
                    '     EQ.1, TRUSS ELEMENTS',/,      &
                    '     EQ.2, ELEMENTS CURRENTLY',/,  &
@@ -147,27 +147,27 @@ SUBROUTINE ELEMENT_9Q_MAIN (ID,X,Y,Z,U,MHT,E,POISSON,LM,XY,MATP)
 
      IF (NUMMAT.EQ.0) NUMMAT=1
 
-     WRITE (IOUT,"(' M A T E R I A L   D E F I N I T I O N',//,  &
+     WRITE (OutputFile,"(' M A T E R I A L   D E F I N I T I O N',//,  &
                    ' NUMBER OF DIFFERENT SETS OF MATERIAL',/,  &
                    ' AND CROSS-SECTIONAL  CONSTANTS ',         &
                    4 (' .'),'( NPAR(3) ) . . =',I5,/)") NUMMAT
 
-     WRITE (IOUT,"('  SET       YOUNG''S     CROSS-SECTIONAL',/,  &
+     WRITE (OutputFile,"('  SET       YOUNG''S     CROSS-SECTIONAL',/,  &
                    ' NUMBER     MODULUS',10X,'AREA',/,  &
                    15 X,'E',14X,'A')")
 
      DO I=1,NUMMAT
-        READ (IIN,'(I5,2F10.0)') N,E(N),POISSON(N)  ! Read material information
-        WRITE (IOUT,"(I5,4X,E12.5,2X,E14.6)") N,E(N),POISSON(N)
+        READ (InputFile,'(I5,2F10.0)') N,E(N),POISSON(N)  ! Read material information
+        WRITE (OutputFile,"(I5,4X,E12.5,2X,E14.6)") N,E(N),POISSON(N)
      END DO
 
-     WRITE (IOUT,"(//,' E L E M E N T   I N F O R M A T I O N',//,  &
+     WRITE (OutputFile,"(//,' E L E M E N T   I N F O R M A T I O N',//,  &
                       ' ELEMENT     NODE     NODE       MATERIAL',/,   &
                       ' NUMBER-N      I        J       SET NUMBER')")
 
      N=0
      DO WHILE (N .NE. NUME)
-        READ (IIN,'(11I5)') N,I1,I2,I3,I4,I5,I6,I7,I8,I9,MTYPE  ! Read in element information
+        READ (InputFile,'(11I5)') N,I1,I2,I3,I4,I5,I6,I7,I8,I9,MTYPE  ! Read in element information
 
 !       Save element information
         XY(1,N)=X(I1)  ! Coordinates of the element's 1st node
@@ -218,14 +218,14 @@ SUBROUTINE ELEMENT_9Q_MAIN (ID,X,Y,Z,U,MHT,E,POISSON,LM,XY,MATP)
 !       Update column heights and bandwidth
         CALL COLHT (MHT,ND,LM(1,N))   
 
-        WRITE (IOUT,"(I5,6X,I5,4X,I5,4X,I5,4X,I5,4X,I5,4X,I5,4X,I5,4X,I5,4X,I5,7X,I5)") N,I1,I2,I3,I4,I5,I6,I7,I8,I9,MTYPE
+        WRITE (OutputFile,"(I5,6X,I5,4X,I5,4X,I5,4X,I5,4X,I5,4X,I5,4X,I5,4X,I5,4X,I5,7X,I5)") N,I1,I2,I3,I4,I5,I6,I7,I8,I9,MTYPE
 
      END DO
 
      RETURN
 
 ! Assemble stucture stiffness matrix
-  ELSE IF (IND .EQ. 2) THEN
+  ELSE IF (SolutionPhase .EQ. 2) THEN
 
      DO N=1,NUME
         MTYPE=MATP(N)
@@ -259,16 +259,16 @@ SUBROUTINE ELEMENT_9Q_MAIN (ID,X,Y,Z,U,MHT,E,POISSON,LM,XY,MATP)
      RETURN
 
 ! Stress calculations
-  ELSE IF (IND .EQ. 3) THEN
+  ELSE IF (SolutionPhase .EQ. 3) THEN
 
      IPRINT=0
      DO N=1,NUME
         IPRINT=IPRINT + 1
         IF (IPRINT.GT.50) IPRINT=1
-        IF (IPRINT.EQ.1) WRITE (IOUT,"(//,' S T R E S S  C A L C U L A T I O N S  F O R  ',  &
+        IF (IPRINT.EQ.1) WRITE (OutputFile,"(//,' S T R E S S  C A L C U L A T I O N S  F O R  ',  &
                                            'E L E M E N T  G R O U P',I4,//,   &
                                            '  ELEMENT',9X,' X-CORRD',9X,'Y-CORRD',9X   &	
-                                           'STRESS_XX',7X,'STRESS_YY',9X,'STRESS_XY')") NG
+                                           'STRESS_XX',7X,'STRESS_YY',9X,'STRESS_XY')") CurrentElementGroup
         MTYPE=MATP(N)
         
         D(1,:)=E(MATP(N))/(1D0-POISSON(MATP(N))*POISSON(MATP(N)))*(/1D0,POISSON(MATP(N)),0D0/)
@@ -294,7 +294,8 @@ SUBROUTINE ELEMENT_9Q_MAIN (ID,X,Y,Z,U,MHT,E,POISSON,LM,XY,MATP)
                 
                 NMAT = NmatElast9Q(ETA,EPSILON)
                 
-                NA(1,:) = (/NMAT(1,1) , NMAT(1,3) , NMAT(1,5) , NMAT(1,7) , NMAT(1,9) , NMAT(1,11) , NMAT(1,13) , NMAT(1,15) , NMAT(1,17)/)
+                NA(1,:) = (/NMAT(1,1) , NMAT(1,3) , NMAT(1,5) , NMAT(1,7) , NMAT(1,9) , &
+                            NMAT(1,11) , NMAT(1,13) , NMAT(1,15) , NMAT(1,17)/)
                 
                 XY0 = MATMUL(NA,C)
                 X_GUASS(2*J+I-2,1) = XY0(1,1)
@@ -308,7 +309,8 @@ SUBROUTINE ELEMENT_9Q_MAIN (ID,X,Y,Z,U,MHT,E,POISSON,LM,XY,MATP)
                 STRESS_YY(N,2*J+I-2) = STRESS(2,1)
                 STRESS_XY(N,2*J+I-2) = STRESS(3,1)
                 
-            WRITE (IOUT,"(1X,I5,4X,E13.6,4X,E13.6,11X,E13.6,4X,E13.6,4X,E13.6)") N,X_GUASS(2*J+I-2,1),X_GUASS(2*J+I-2,2),STRESS_XX(N,2*J+I-2),STRESS_YY(N,2*J+I-2),STRESS_XY(N,2*J+I-2)
+            WRITE (OutputFile,"(1X,I5,4X,E13.6,4X,E13.6,11X,E13.6,4X,E13.6,4X, E13.6)") N, X_GUASS(2*J+I-2,1), &
+                   X_GUASS(2*J+I-2,2),STRESS_XX(N,2*J+I-2),STRESS_YY(N,2*J+I-2),STRESS_XY(N,2*J+I-2)
                 
             END DO
         END DO
@@ -407,8 +409,12 @@ FUNCTION BmatElast9Q(eta,psi,C)
     REAL(8),PARAMETER:: ZERO=0.0
     COMMON DETJ
     
-    GN(1,:)=(/(psi-0.5)*0.5*eta*(eta-1),(1-eta*eta)*(psi-0.5),0.5*eta*(eta+1)*(psi-0.5),0.5*eta*(eta+1)*(-2*psi),0.5*eta*(eta+1)*(psi+0.5),(1-eta*eta)*(psi+0.5),0.5*eta*(eta-1)*(psi+0.5),0.5*eta*(eta-1)*(-2*psi),(1-eta*eta)*(-2*psi)/)
-    GN(2,:)=(/(eta-0.5)*0.5*psi*(psi-1),(-2*eta)*0.5*psi*(psi-1),(eta+0.5)*0.5*psi*(psi-1),(eta+0.5)*(1-psi*psi),(eta+0.5)*0.5*psi*(psi+1),(-2*eta)*0.5*psi*(psi+1),(eta-0.5)*0.5*psi*(psi+1),(eta-0.5)*(1-psi*psi),(-2*eta)*(1-psi*psi)/)
+    GN(1,:)=(/(psi-0.5)*0.5*eta*(eta-1),(1-eta*eta)*(psi-0.5),0.5*eta*(eta+1)*(psi-0.5), &
+             0.5*eta*(eta+1)*(-2*psi),0.5*eta*(eta+1)*(psi+0.5),(1-eta*eta)*(psi+0.5),0.5*eta*(eta-1)*(psi+0.5), &
+             0.5*eta*(eta-1)*(-2*psi),(1-eta*eta)*(-2*psi)/)
+    GN(2,:)=(/(eta-0.5)*0.5*psi*(psi-1),(-2*eta)*0.5*psi*(psi-1),(eta+0.5)*0.5*psi*(psi-1), &
+              (eta+0.5)*(1-psi*psi),(eta+0.5)*0.5*psi*(psi+1),(-2*eta)*0.5*psi*(psi+1),(eta-0.5)*0.5*psi*(psi+1), &
+              (eta-0.5)*(1-psi*psi),(-2*eta)*(1-psi*psi)/)
     
     J = MATMUL(GN,C)
     DETJ = J(1,1)*J(2,2)-J(1,2)*J(2,1)
@@ -438,9 +444,12 @@ FUNCTION BmatElast9Q(eta,psi,C)
     B8y     = BB(2,8)
     B9y     = BB(2,9)
         
-    B(1,:) = (/B1x   ,   ZERO   ,  B2x  ,   ZERO   ,   B3x  ,  ZERO   ,   B4x   ,  ZERO   ,   B5x   ,  ZERO   ,   B6x   ,  ZERO   ,   B7x   ,  ZERO   ,   B8x   ,  ZERO   ,   B9x   ,  ZERO  /)
-    B(2,:) = (/  ZERO   ,  B1y  ,  ZERO  ,   B2y   ,   ZERO   ,  B3y   ,  ZERO    ,  B4y   ,  ZERO    ,  B5y   ,  ZERO    ,  B6y   ,  ZERO    ,  B7y   ,  ZERO    ,  B8y   ,  ZERO    ,  B9y/)
-    B(3,:) = (/B1y  ,   B1x  ,  B2y  ,  B2x  ,   B3y   , B3x  ,  B4y  ,   B4x  ,  B5y  ,   B5x  ,  B6y  ,   B6x  ,  B7y  ,   B7x  ,  B8y  ,   B8x  ,  B9y  ,   B9x/)
+    B(1,:) = (/B1x   ,   ZERO   ,  B2x  ,   ZERO   ,   B3x  ,  ZERO   ,   B4x   ,  ZERO   ,   B5x   ,&
+               ZERO   ,   B6x   ,  ZERO   ,   B7x   ,  ZERO   ,   B8x   ,  ZERO   ,   B9x   ,  ZERO  /)
+    B(2,:) = (/  ZERO   ,  B1y  ,  ZERO  ,   B2y   ,   ZERO   ,  B3y   ,  ZERO    ,  B4y   ,  ZERO  ,&
+               B5y   ,  ZERO    ,  B6y   ,  ZERO    ,  B7y   ,  ZERO    ,  B8y   ,  ZERO    ,  B9y/)
+    B(3,:) = (/B1y  ,   B1x  ,  B2y  ,  B2x  ,   B3y   , B3x  ,  B4y  ,   B4x  ,  B5y  ,   B5x  ,&
+               B6y  ,   B6x  ,  B7y  ,   B7x  ,  B8y  ,   B8x  ,  B9y  ,   B9x/)
     
     BmatElast9Q = B
 END FUNCTION BmatElast9Q
