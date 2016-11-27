@@ -1,5 +1,5 @@
-stap : stap.o datain.o elcal.o assem.o  globals.o truss.o memalloc.o 4Q.o
-	gfortran -o stap stap.o datain.o elcal.o assem.o  globals.o truss.o memalloc.o 4Q.o
+stap : stap.o datain.o elcal.o assem.o  globals.o truss.o memalloc.o 4Q.o mathkernel.o hexahedral.o
+	gfortran -o stap stap.o datain.o elcal.o assem.o  globals.o truss.o memalloc.o 4Q.o mathkernel.o hexahedral.o
 
 stap.o : ../../src/stap.f90 ../../src/globals.f90 globals.mod memallocate.mod
 	gfortran -c  ../../src/stap.f90
@@ -18,6 +18,9 @@ truss.o : ../../src/truss.f90 ../../src/globals.f90 globals.mod memallocate.mod
 	
 4Q.o : ../../src/4Q.f90 ../../src/globals.f90 globals.mod memallocate.mod
 	gfortran -c  ../../src/4Q.f90
+	
+hexahedral.o : ../../src/hexahedral.f90 ../../src/globals.f90 globals.mod memallocate.mod mathkernel.mod
+	gfortran -c  ../../src/hexahedral.f90
 
 globals.o : ../../src/globals.f90
 	gfortran -c  ../../src/globals.f90 
@@ -30,6 +33,12 @@ memalloc.o : ../../src/memalloc.f90
 
 memallocate.mod : ../../src/memalloc.f90
 	gfortran -c  ../../src/memalloc.f90
+	
+mathkernel.o : ../../src/mathkernel.f90
+	gfortran -c  ../../src/mathkernel.f90
+
+mathkernel.mod : ../../src/mathkernel.f90
+	gfortran -c  ../../src/mathkernel.f90
 
 clean : 
-	rm stap stap.o datain.o elcal.o assem.o globals.o globals.mod truss.o memalloc.o memallocate.mod 4Q.o
+	rm stap stap.o datain.o elcal.o assem.o globals.o globals.mod truss.o memalloc.o memallocate.mod 4Q.o hexahedral.o mathkernel.o mathkernel.mod
