@@ -174,9 +174,9 @@ SUBROUTINE COLSOL (SkylineK, LoadToDisplacement, MAXA, NumberOfEquations, Number
   USE GLOBALS, ONLY : OutputFile
 
   IMPLICIT NONE
+  INTEGER :: N,K,KN,KL,KU,KH,IC,KLT,KI,J, ElementDOF,KK,L
   INTEGER :: MAXA(NNM), NumberOfEquations, NumberOfMatrixElements, NNM, SolutionMode
   REAL(8) :: SkylineK(NumberOfMatrixElements), LoadToDisplacement(NumberOfEquations), C,B
-  INTEGER :: N,K,KN,KL,KU,KH,IC,KLT,KI,J, ElementDOF,KK,L
   INTEGER :: MIN0
 
 ! Perform L*D*L(T) factorization of stiffness matrix
