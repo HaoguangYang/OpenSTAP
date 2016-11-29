@@ -14,8 +14,7 @@
 !        4Q element                                                       -
 !        Qi He,(2016)                                                     -
 !        Tsinghua University                                              -
-!                                                                         .
-!            Revised by Haoguang Yang                                     -
+!                                                                         -
 !                                                                         -
 !--------------------------------------------------------------------------
 
@@ -36,7 +35,6 @@ NUME = NPAR(2)
 NUMMAT = NPAR(3)
 
 ! Allocate storage for element group data
-
   IF (SolutionPhase == 1) THEN
       MM = 2*NUMMAT*ITWO + 9*NUME + 12*NUME*ITWO
       CALL MEMALLOC(11,"ELEGP",MM,1)
@@ -97,13 +95,13 @@ SUBROUTINE ELEMENT_4Q_MAIN (ID,X,Y,Z,U,MHT,E,POISSON,LM,XYZ,MATP)
     END FUNCTION
   END INTERFACE
   
-
   INTEGER :: ID(3,NumberOfNodalPoints),LM(8,NPAR(2)),MATP(NPAR(2)),MHT(NumberOfEquations)
-  REAL(8) :: X(NumberOfNodalPoints),Y(NumberOfNodalPoints),Z(NumberOfNodalPoints),   &
-             E(NPAR(3)), POISSON(NPAR(3)), XYZ(12,NPAR(2)), U(NumberOfEquations), DST(8,1)
+  REAL(8) :: X(NumberOfNodalPoints),Y(NumberOfNodalPoints),Z(NumberOfNodalPoints),&
+             E(NPAR(3)),POISSON(NPAR(3)),  &
+             XYZ(12,NPAR(2)),U(NumberOfEquations),DST(8,1)
   REAL(8) :: ETA,EPSILON
 
-  INTEGER :: ElementType, NUME, NUMMAT, ND, I1, I2, I3, I4, L, N, I, J
+  INTEGER :: NPAR1, NUME, NUMMAT, ND, I1, I2, I3, I4, L, N, I, J
   INTEGER :: MTYPE, IPRINT
   REAL(8) :: GP(2),W(2),NMAT(2,8),BMAT(3,8),C(4,2),NA(1,4)
   REAL(8) :: KE(8,8),DETJ,D(3,3)
@@ -117,8 +115,7 @@ SUBROUTINE ELEMENT_4Q_MAIN (ID,X,Y,Z,U,MHT,E,POISSON,LM,XYZ,MATP)
   W(1)=1.0
   W(2)=1.0
 
-
-  ElementType  = NPAR(1)
+  NPAR1  = NPAR(1)
   NUME   = NPAR(2)
   NUMMAT = NPAR(3) 
 
@@ -132,7 +129,7 @@ SUBROUTINE ELEMENT_4Q_MAIN (ID,X,Y,Z,U,MHT,E,POISSON,LM,XYZ,MATP)
                    '     EQ.1, TRUSS ELEMENTS',/,      &
                    '     EQ.2, ELEMENTS CURRENTLY',/,  &
                    '     EQ.3, NOT AVAILABLE',//,      &
-                   ' NUMBER OF ELEMENTS.',10(' .'),'( NPAR(2) ) . . =',I5,/)") ElementType,NUME
+                   ' NUMBER OF ELEMENTS.',10(' .'),'( NPAR(2) ) . . =',I5,/)") NPAR1,NUME
 
      IF (NUMMAT.EQ.0) NUMMAT=1
 
@@ -156,7 +153,6 @@ SUBROUTINE ELEMENT_4Q_MAIN (ID,X,Y,Z,U,MHT,E,POISSON,LM,XYZ,MATP)
 
      N=0
      DO WHILE (N .NE. NUME)
-
         READ (InputFile,'(7I5)') N,I1,I2,I3,I4,MTYPE  ! Read in element information
 
 !       Save element information
@@ -220,6 +216,7 @@ SUBROUTINE ELEMENT_4Q_MAIN (ID,X,Y,Z,U,MHT,E,POISSON,LM,XYZ,MATP)
                 ETA = GP(I)
                 EPSILON = GP(J)
                 
+                NMAT = NmatElast2D(ETA,EPSILON)
                 BMAT = BmatElast2D(ETA,EPSILON,C)
                 
                 KE = KE + W(I)*W(J)*MATMUL(MATMUL(TRANSPOSE(BMAT),D),BMAT)*DETJ
@@ -230,7 +227,8 @@ SUBROUTINE ELEMENT_4Q_MAIN (ID,X,Y,Z,U,MHT,E,POISSON,LM,XYZ,MATP)
         CALL ADDBAN (DA(NP(3)),IA(NP(2)),KE,LM(1,N),ND)
 
      END DO
-
+        !write (*,*) "--------------------K--------------------"
+        !write (*,*) DA(NP(3): NP(3)+NumberOfMatrixElements-1)
      RETURN
 
 ! Stress calculations
@@ -283,9 +281,9 @@ SUBROUTINE ELEMENT_4Q_MAIN (ID,X,Y,Z,U,MHT,E,POISSON,LM,XYZ,MATP)
                 STRESS_XX(N,2*J+I-2) = STRESS(1,1)
                 STRESS_YY(N,2*J+I-2) = STRESS(2,1)
                 STRESS_XY(N,2*J+I-2) = STRESS(3,1)
-
-            WRITE (OutputFile,"(1X,I5,4X,E13.6,4X,E13.6,11X,E13.6,4X,E13.6,4X,E13.6)") &
-            N,X_GUASS(2*J+I-2,1),X_GUASS(2*J+I-2,2),STRESS_XX(N,2*J+I-2),STRESS_YY(N,2*J+I-2),STRESS_XY(N,2*J+I-2)
+                
+            WRITE (OutputFile,"(1X,I5,4X,E13.6,4X,E13.6,11X,E13.6,4X,E13.6,4X, E13.6)") N,X_GUASS(2*J+I-2,1), &
+            X_GUASS(2*J+I-2,2),STRESS_XX(N,2*J+I-2),STRESS_YY(N,2*J+I-2),STRESS_XY(N,2*J+I-2)
                 
             END DO
         END DO
@@ -327,9 +325,8 @@ FUNCTION NmatElast2D(eta,psi)
   N(2,7)=0.0
   N(2,8)=N4
   
-  NmatElast2D = N
-
-
+  NmatElast2D=N
+  
 END FUNCTION NmatElast2D
   
 FUNCTION BmatElast2D(eta,psi,C)

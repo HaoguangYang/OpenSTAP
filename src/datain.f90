@@ -25,7 +25,7 @@ SUBROUTINE INPUT (NodeIdentifier,X,Y,Z,NumberOfNodalPoints,NumberOfEquations)
 ! .                                                                       .
 ! . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-  USE GLOBALS, ONLY : InputFile, OutputFile
+  USE GLOBALS, ONLY : InputFile, OutputFile, NPAR
 
   IMPLICIT NONE
   INTEGER :: NumberOfNodalPoints, NumberOfEquations, NodeIdentifier(3,NumberOfNodalPoints)
@@ -35,8 +35,13 @@ SUBROUTINE INPUT (NodeIdentifier,X,Y,Z,NumberOfNodalPoints,NumberOfEquations)
 ! Read nodal point data
 
   N = 0
+  NodeIdentifier(:,:) = 1
+  X(:) = 0
+  Y(:) = 0
+  Z(:) = 0
+  
   DO WHILE (N.NE.NumberOfNodalPoints)
-     READ (InputFile,"(4I5,3F10.0,I5)") N,(NodeIdentifier(I,N),I=1,3),X(N),Y(N),Z(N)
+      READ (InputFile,"(4I5,3F10.0,I5)") N,(NodeIdentifier(I,N),I=1,3),X(N),Y(N),Z(N)
   END DO
 
 ! Write complete nodal data
@@ -102,19 +107,19 @@ SUBROUTINE LOADS (R, NodeOfLoad, LoadDirection, FLOAD, NodeIdentifier, L, Number
 
   IF (SolutionMode.EQ.0) RETURN
 
-  DO I=1,NumberOfEquations
-     R(I)=0.
-  END DO
+  !DO I=1,NumberOfEquations
+     R(:)=0.
+  !END DO
 
   DO I = 1,NumberOfConcentratedLoads
      LN = NodeOfLoad(I)
      LI = LoadDirection(I)
      II = NodeIdentifier(LI,LN)
-     IF (II > 0) R(II)=R(II) + FLOAD(L)
+     IF (II > 0) R(II)=R(II) + FLOAD(I)
   END DO
 
   WRITE (LoadTmpFile, Rec=L) R
-  !wRITE(*,*) R
+  !WRITE(*,*) "R",R
   RETURN
   
 END SUBROUTINE LOADS
