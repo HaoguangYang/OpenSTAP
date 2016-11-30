@@ -4,7 +4,7 @@ subroutine hexahedral
     
     implicit none
     integer :: NumberOfElements, NumberOfMaterials, ElementGroupSize, QuadratureOrder=2
-    integer :: N101, N102, N103, N104, N105, N106, N107, N108, N109, N110 !Pointers
+    integer :: N(10) !Pointers
     
     NPAR(5) = 8
     NPAR(6) = 8
@@ -13,7 +13,7 @@ subroutine hexahedral
     NumberOfMaterials = NPAR(3)
     
     !Preallocate Memory
-    NFIRST = NP(11)
+    
 !pointer lists
 ! Calculate the pointer to the arrays in the element group data
 ! N101: E(NumberOfMaterials)
@@ -23,40 +23,39 @@ subroutine hexahedral
 ! N105: LM(3*NPAR(5),NumberOfElements)
 ! N106: PositionData(3*NPAR(5),NumberOfElements)
 ! N107: MaterialData(NumberOfElements)
-! N108: BMat (NumberOfElements*3*NPAR(5))
-! N109: Jacobian(NumberOfElements*QuadratureOrder^2)
+! N108: BMat (NumberOfElements*18*NPAR(5)*8)
+! N109: Jacobian(NumberOfElements*QuadratureOrder^3)
 
-    N101 = NFIRST
-    N102 = N101+NumberOfMaterials*ITWO
-    N103 = N102+NumberOfMaterials*ITWO
+    N(1) = 0
+    N(2) = N(1)+NumberOfMaterials*ITWO
+    N(3) = N(2)+NumberOfMaterials*ITWO
     
     if (NPAR(4) .GT. 0) then
-        N104 = N103+NumberOfMaterials*ITWO
-        N105 = N104+NumberOfMaterials*ITWO
+        N(4) = N(3)+NumberOfMaterials*ITWO
+        N(5) = N(4)+NumberOfMaterials*ITWO
     else
-        N104 = N103
-        N105 = N104
+        N(4) = N(3)
+        N(5) = N(4)
     end if
     
-    N106 = N105 + 3*NPAR(5)*NumberOfElements
-    N107 = N106 + 3*NPAR(5)*NumberOfElements*ITWO
-    N108 = N107 + NumberOfElements
-    N109 = N108 + 18*NPAR(5)*NumberOfElements*QuadratureOrder**3*2
-    N110 = N109 + NumberOfElements*2*QuadratureOrder**3
-    NLAST = N110
+    N(6) = N(5) + 3*NPAR(5)*NumberOfElements
+    N(7) = N(6) + 3*NPAR(5)*NumberOfElements*ITWO
+    N(8) = N(7) + NumberOfElements
+    N(9) = N(8) + 18*NPAR(5)*NumberOfElements*QuadratureOrder**3*2
+    N(10)= N(9) + NumberOfElements*2*QuadratureOrder**3
     
-    ElementGroupArraySize = NLAST - NFIRST
+    ElementGroupArraySize = N(10)
     
     if (SolutionPhase .EQ. 1) then
-        ElementGroupSize = 5 * NumberOfMaterials * ITWO + (3*NPAR(5)+ 1 + (12*NPAR(5) + 2)*QuadratureOrder**3) * NumberOfElements &
-                           + 3*NPAR(5)*NumberOfElements*ITWO + 6  !Please Modify This
         call MemAlloc(11,"ELEGP",ElementGroupArraySize,1)
     end if
+    NFIRST = NP(11)
+    N(:) = N(:) + NFIRST
+    NLAST  = N(10)
     
     if ((NPAR(5) .EQ. 8) .AND. (NPAR(6) .EQ. 8)) call &
         HexEight (IA(NP(1)),DA(NP(2)),DA(NP(3)),DA(NP(4)),DA(NP(4)),IA(NP(5)),   &
-                  A(N101),A(N102),A(N103),A(N104),A(N105),A(N106),A(N107),A(N108),A(N109))
-    !Add 2D Advanced Elements Here.
+                  A(N(1)),A(N(2)),A(N(3)),A(N(4)),A(N(5)),A(N(6)),A(N(7)),A(N(8)),A(N(9)))
     
     !Reuse DA(NP(4)) at Solution Phase 3 as displacement U    
     return
@@ -74,11 +73,11 @@ subroutine HexEight (ID,X,Y,Z,U,MHT,E, PoissonRatio, Density, Gravity, LM, Posit
     integer ::  MaterialType, MaterialComp, ND, L, N, i, j, LM(24,NPAR(2)), ElementType, ind, iprint, k
     real(8) ::  X(NumberOfNodalPoints), Y(NumberOfNodalPoints), Z(NumberOfNodalPoints), U(NumberOfEquations), &
                 DetJ(2,2,2), E(NPAR(3)), PoissonRatio(NPAR(3)), &
-                BMat(NPAR(2)*18*NPAR(5)*2**3), ElementDisp(8)
+                BMat(NPAR(2)*18*NPAR(5)*2**3), ElementDisp(24)
     real(8) ::  BMatrix(6, 3*NPAR(5)), PositionData(3*NPAR(5), NPAR(2)), DMatrix(6,6), &
                 Transformed(3), W(2), Weight(2,2,2), GaussianPts(2), Jacobian(NPAR(2)*2**3)
-    real(8) ::  Young, v, S(2*NPAR(5),2*NPAR(5)), GaussianPtsPosit(3,2**3), Strain(6,2**3), Stress(6,2**3), &
-                Density, Gravity, NMatrix(3,3*NPAR(5)), NormalVec(3), Point(2*NPAR(5),2*NPAR(5))
+    real(8) ::  Young, v, S(3*NPAR(5),3*NPAR(5)), GaussianPtsPosit(3,2**3), Strain(6,2**3), Stress(6,2**3), &
+                Density, Gravity, NMatrix(3,3*NPAR(5)), NormalVec(3), Point(3*NPAR(5),3*NPAR(5))
                 
     ElementType         = NPAR(1)
     NumberOfElements    = NPAR(2)
@@ -138,13 +137,22 @@ subroutine HexEight (ID,X,Y,Z,U,MHT,E, PoissonRatio, Density, Gravity, LM, Posit
                     do k = 1, QuadratureOrder
                         Transformed = (/GaussianPts(i),GaussianPts(j),GaussianPts(k)/) 
                         CALL HexB(BMatrix, DetJ(i,j,k), ElementShapeNodes, Transformed, (/X(Node(:)), Y(Node(:)), Z(Node(:))/)) !Needs reshaping
-                        BMat(((n-1)*QuadratureOrder**3+ind-1)*6*ElementShapeNodes+1 : &
-                             ((n-1)*QuadratureOrder**3+ind)*6*ElementShapeNodes) = reshape(BMatrix, (/6*ElementShapeNodes/))
+                        BMat(((n-1)*QuadratureOrder**3+ind-1)*18*ElementShapeNodes+1 : &
+                             ((n-1)*QuadratureOrder**3+ind)*18*ElementShapeNodes) = reshape(BMatrix, (/18*ElementShapeNodes/))
                         ind = ind +1
+                        
+                        !write (*,*) ((n-1)*QuadratureOrder**3+ind-2)*18*ElementShapeNodes+1,'----------------------',& 
+                        !            ((n-1)*QuadratureOrder**3+ind-1)*18*ElementShapeNodes
+                        !write (*,*) BMatrix
+                        
                     end do
                 end do
             end do
+            Jacobian((n-1)*QuadratureOrder**3+1 : n*QuadratureOrder**3)=reshape(DetJ, (/QuadratureOrder**3/))
+            
+            !write (*,*) "DetJ",(n-1)*QuadratureOrder**3+1,'---',n*QuadratureOrder**3, DetJ
             !BMat((n-1)*6*ElementShapeNodes+1 : n*6*ElementShapeNodes)=reshape(BMatrix, (/6*ElementShapeNodes/))
+            
             CALL COLHT (MHT,ND,LM(:,N))
             WRITE (OutputFile,"(I7,5X,7(I7,1X),I7,4X,I5)") N,Node(1:ElementShapeNodes),MaterialType
             
@@ -167,6 +175,7 @@ subroutine HexEight (ID,X,Y,Z,U,MHT,E, PoissonRatio, Density, Gravity, LM, Posit
                 end do
             end do
         end do
+        
         MaterialComp = -1
         do n = 1, NumberOfElements
             S(:,:) = 0
@@ -178,20 +187,29 @@ subroutine HexEight (ID,X,Y,Z,U,MHT,E, PoissonRatio, Density, Gravity, LM, Posit
                 
                 MaterialComp = MaterialType
             end if
+            
             DetJ = reshape(Jacobian((n-1)*QuadratureOrder**3+1 : n*QuadratureOrder**3), &
                            (/QuadratureOrder, QuadratureOrder, QuadratureOrder/))
             ind  = 1
             do i = 1, QuadratureOrder
                 do j = 1, QuadratureOrder
                     do k = 1, QuadratureOrder
-                        BMatrix = reshape(BMat(((n-1)*QuadratureOrder**3+ind-1)*6*ElementShapeNodes+1 : &
-                                          ((n-1)*QuadratureOrder**3+ind)*6*ElementShapeNodes),(/3, 2*ElementShapeNodes/))
+                        BMatrix = reshape(BMat(((n-1)*QuadratureOrder**3+ind-1)*18*ElementShapeNodes+1 : &
+                                          ((n-1)*QuadratureOrder**3+ind)*18*ElementShapeNodes),(/6, 3*ElementShapeNodes/))
+                        
+                        !write (*,*) ((n-1)*QuadratureOrder**3+ind-2)*18*ElementShapeNodes+1,'----------------------',& 
+                        !            ((n-1)*QuadratureOrder**3+ind-1)*18*ElementShapeNodes
+                        !write (*,*) BMatrix
+                        
                         Point   = matmul(matmul(transpose(BMatrix),DMatrix),BMatrix)
                         S = S + (Weight(i,j,k)*DetJ(i,j,k))*Point
                         ind = ind + 1
                     end do
                 end do
             end do
+            
+            !write(*,*) "S",S
+            
             CALL ADDBAN (DA(NP(3)),IA(NP(2)),S,LM(:,N),ND)
         end do
         
@@ -203,9 +221,9 @@ subroutine HexEight (ID,X,Y,Z,U,MHT,E, PoissonRatio, Density, Gravity, LM, Posit
             IF (IPRINT.GT.50) IPRINT=1
             IF (IPRINT.EQ.1) WRITE (OutputFile,"(//,' S T R E S S  C A L C U L A T I O N S  F O R  ',  &
                                            'E L E M E N T  G R O U P',I4,//,   &
-            '  ELEMENT',13X, 'COORDINSTES',20X, 'Sigma_xx',10X, 'Sigma_yy',10X,'Sigma_zz',10X, &
-            'Sigma_xy',10X,'Sigma_yz',10X,'Sigma_xz', /, &
-            '  NUMBER', 11X,'X',9X,'Y',9X,'Z')") CurrentElementGroup
+            '  ELEMENT',13X, 'COORDINSTES',19X, 'Sigma_xx',9X, 'Sigma_yy',9X,'Sigma_zz',9X, &
+            'Sigma_xy',9X,'Sigma_yz',9X,'Sigma_xz', /, &
+            '  NUMBER', 8X,'X',10X,'Y',10X,'Z')") CurrentElementGroup
             MaterialType = MaterialData(N)
             Young        = E(MaterialType)
             v            = PoissonRatio(MaterialType)
@@ -224,9 +242,9 @@ subroutine HexEight (ID,X,Y,Z,U,MHT,E, PoissonRatio, Density, Gravity, LM, Posit
                         Transformed   = (/GaussianPts(i), GaussianPts(j), GaussianPts(k)/)
                         call HexN (NMatrix, ElementShapeNodes, Transformed)
                         GaussianPtsPosit(:,ind) = matmul(reshape(PositionData(:,N), (/3,ElementShapeNodes/)), &
-                                                         NMatrix(1, 1:2*ElementShapeNodes:2))
-                        BMatrix = reshape(BMat(((n-1)*QuadratureOrder**3+ind-1)*6*ElementShapeNodes+1 : &
-                                         ((n-1)*QuadratureOrder**3+ind)*6*ElementShapeNodes),(/6, 3*ElementShapeNodes/))
+                                                         NMatrix(1, 1:3*ElementShapeNodes:3))
+                        BMatrix = reshape(BMat(((n-1)*QuadratureOrder**3+ind-1)*18*ElementShapeNodes+1 : &
+                                         ((n-1)*QuadratureOrder**3+ind)*18*ElementShapeNodes),(/6, 3*ElementShapeNodes/))
                         Strain(:,ind) = matmul(BMatrix, ElementDisp)             
                         Stress(:,ind) = matmul(DMatrix, Strain(:,ind))
                         ind = ind + 1
@@ -286,16 +304,16 @@ subroutine HexB (BMatrix, DetJ, ElementShapeNodes, Transformed, Original)
         eta     = Transformed(2)
         zta     = Transformed(3)
         GradN   = 0.125*reshape((/-(1-eta)*(1-zta), -(1-xi)*(1-zta), -(1-xi)*(1-eta), &
-                                   (1-eta)*(1-zta), -(1-xi)*(1-zta), -(1-xi)*(1-eta), &
-                                   (1-eta)*(1-zta),  (1-xi)*(1-zta), -(1-xi)*(1-eta), &
-                                  -(1-eta)*(1-zta), +(1-xi)*(1-zta), -(1-xi)*(1-eta), &
-                                  -(1-eta)*(1-zta), -(1-xi)*(1-zta),  (1-xi)*(1-eta), &
-                                   (1-eta)*(1-zta), -(1-xi)*(1-zta),  (1-xi)*(1-eta), &
-                                   (1-eta)*(1-zta),  (1-xi)*(1-zta),  (1-xi)*(1-eta), &
-                                  -(1-eta)*(1-zta), +(1-xi)*(1-zta),  (1-xi)*(1-eta)/), &
+                                   (1-eta)*(1-zta), -(1+xi)*(1-zta), -(1+xi)*(1-eta), &
+                                   (1+eta)*(1-zta),  (1+xi)*(1-zta), -(1+xi)*(1+eta), &
+                                  -(1+eta)*(1-zta),  (1-xi)*(1-zta), -(1-xi)*(1+eta), &
+                                  -(1-eta)*(1+zta), -(1-xi)*(1+zta),  (1-xi)*(1-eta), &
+                                   (1-eta)*(1+zta), -(1+xi)*(1+zta),  (1+xi)*(1-eta), &
+                                   (1+eta)*(1+zta),  (1+xi)*(1+zta),  (1+xi)*(1+eta), &
+                                  -(1+eta)*(1+zta),  (1-xi)*(1+zta),  (1-xi)*(1+eta)/), &
                                 shape(GradN))
         J       = matmul(GradN, Original)
-        DetJ    = Det(J, 2)
+        DetJ    = Det(J, 3)
         call InvMat3(J, InvMatJ, OK_Flag)
         if (OK_Flag .EQV. .FALSE.) STOP "***ERROR*** Derivative Of Shape Function Is SINGULAR"
         DerivN  = matmul(InvMatJ,GradN)
