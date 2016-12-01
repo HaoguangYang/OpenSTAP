@@ -35,6 +35,7 @@
 		<File RelativePath="..\..\data\ELEMENT_9Q_test.dat"/>
 		<File RelativePath="..\..\data\STAP90.OUT"/>
 		<File RelativePath="..\..\data\truss.dat"/></Filter>
+		<File RelativePath="..\..\src\3T.f90"/>
 		<File RelativePath="..\..\src\4Q.f90"/>
 		<File RelativePath="..\..\src\9Q.f90"/>
 		<File RelativePath="..\..\src\assem.f90"/>
