@@ -44,10 +44,10 @@ subroutine hexahedral
     N(9) = N(8) + 18*NPAR(5)*NumberOfElements*QuadratureOrder**3*2
     N(10)= N(9) + NumberOfElements*2*QuadratureOrder**3
     
-    ElementGroupArraySize = N(10)
+    MIDEST = N(10)
     
-    if (SolutionPhase .EQ. 1) then
-        call MemAlloc(11,"ELEGP",ElementGroupArraySize,1)
+    if (IND .EQ. 1) then
+        call MemAlloc(11,"ELEGP",MIDEST,1)
     end if
     NFIRST = NP(11)
     N(:) = N(:) + NFIRST
@@ -69,9 +69,9 @@ subroutine HexEight (ID,X,Y,Z,U,MHT,E, PoissonRatio, Density, Gravity, LM, Posit
     implicit none
     integer ::  ElementShapeNodes, NumberOfMaterials, NumberOfElements
     integer ::  QuadratureOrder     = 2                     ! NPAR(6) -- Element Load Nodes
-    INTEGER ::  ID(3,NumberOfNodalPoints), MHT(NumberOfEquations), Node(NPAR(5)), MaterialData(NPAR(2))
-    integer ::  MaterialType, MaterialComp, ND, L, N, i, j, LM(24,NPAR(2)), ElementType, ind, iprint, k
-    real(8) ::  X(NumberOfNodalPoints), Y(NumberOfNodalPoints), Z(NumberOfNodalPoints), U(NumberOfEquations), &
+    INTEGER ::  ID(3,NUMNP), MHT(NEQ), Node(NPAR(5)), MaterialData(NPAR(2))
+    integer ::  MaterialType, MaterialComp, ND, L, N, i, j, LM(24,NPAR(2)), ElementType, ind1, iprint, k
+    real(8) ::  X(NUMNP), Y(NUMNP), Z(NUMNP), U(NEQ), &
                 DetJ(2,2,2), E(NPAR(3)), PoissonRatio(NPAR(3)), &
                 BMat(NPAR(2)*18*NPAR(5)*2**3), ElementDisp(24)
     real(8) ::  BMatrix(6, 3*NPAR(5)), PositionData(3*NPAR(5), NPAR(2)), DMatrix(6,6), &
@@ -84,9 +84,9 @@ subroutine HexEight (ID,X,Y,Z,U,MHT,E, PoissonRatio, Density, Gravity, LM, Posit
     NumberOfMaterials   = NPAR(3)
     ElementShapeNodes   = NPAR(5)                           !NPAR(5)=8
     ND = 24
-    SELECT CASE (SolutionPhase)
+    SELECT CASE (IND)
     CASE(1)
-        WRITE (OutputFile,"(' E L E M E N T   D E F I N I T I O N',//,  &
+        WRITE (IOUT,"(' E L E M E N T   D E F I N I T I O N',//,  &
                    ' ELEMENT TYPE ',13(' .'),'( NPAR(1) ) . . =',I5,/,   &
                    '     EQ.1, TRUSS ELEMENTS',/,       &
                    '     EQ.2, 2D TRIANGLE',/,          &
@@ -94,20 +94,20 @@ subroutine HexEight (ID,X,Y,Z,U,MHT,E, PoissonRatio, Density, Gravity, LM, Posit
                    '     EQ.4, 3D HEXAHEDRAL',//,       &
                    ' NUMBER OF ELEMENTS.',10(' .'),'( NPAR(2) ) . . =',I5,/)") ElementType, NumberOfElements
         IF (NumberOfMaterials.EQ.0) NumberOfMaterials=1
-        WRITE (OutputFile,"(' M A T E R I A L   D E F I N I T I O N',//,  &
+        WRITE (IOUT,"(' M A T E R I A L   D E F I N I T I O N',//,  &
                    ' NUMBER OF DIFFERENT SETS OF MATERIAL',/,  &
                    ' AND CROSS-SECTIONAL  CONSTANTS ',         &
                    4 (' .'),'( NPAR(3) ) . . =',I5,/)") NumberOfMaterials
         
-        WRITE (OutputFile,"('  SET       YOUNG''S    POISSON',/,  & 
+        WRITE (IOUT,"('  SET       YOUNG''S    POISSON',/,  & 
                             ' NUMBER     MODULUS      RATIO',/,  &
                    15 X,'E', 12 X, 'v')")
 
         DO I=1,NumberOfMaterials
-            READ (InputFile,'(I5,2F10.0)') N,E(N), PoissonRatio(N)      ! Read material information for 3D Homogeneous
-            WRITE (OutputFile,"(I5,4X,E12.5,2X,E14.6)") N,E(N), PoissonRatio(N)
+            READ (IIN,'(I5,2F10.0)') N,E(N), PoissonRatio(N)      ! Read material information for 3D Homogeneous
+            WRITE (IOUT,"(I5,4X,E12.5,2X,E14.6)") N,E(N), PoissonRatio(N)
         END DO
-        WRITE (OutputFile,"(//,' E L E M E N T   I N F O R M A T I O N',//,  &
+        WRITE (IOUT,"(//,' E L E M E N T   I N F O R M A T I O N',//,  &
                       ' ELEMENT        |------------------------- NODES -------------------------|       MATERIAL',/,   &
                       ' NUMBER-N        1       2       3       4       5       6       7       8       SET NUMBER')")
         N=0
@@ -115,7 +115,7 @@ subroutine HexEight (ID,X,Y,Z,U,MHT,E, PoissonRatio, Density, Gravity, LM, Posit
         CALL GaussianMask(GaussianPts, W, QuadratureOrder)
         
         DO WHILE (N .NE. NumberOfElements)
-            READ (InputFile,'(11I5)') N,Node(1:8),MaterialType          ! Read in element information
+            READ (IIN,'(11I5)') N,Node(1:8),MaterialType          ! Read in element information
 
     !       Save element information
             PositionData(1:ElementShapeNodes*3-1:3,N)=X(Node(:))        ! Coordinates of the element's nodes
@@ -131,15 +131,15 @@ subroutine HexEight (ID,X,Y,Z,U,MHT,E, PoissonRatio, Density, Gravity, LM, Posit
                 LM(L:ElementShapeNodes*3+L-2:3,N) = ID(L,Node(:))       ! Connectivity matrix
             END DO
             DetJ(:, :, :)=0
-            ind = 1
+            ind1 = 1
             do i = 1, QuadratureOrder
                 do j = 1, QuadratureOrder
                     do k = 1, QuadratureOrder
                         Transformed = (/GaussianPts(i),GaussianPts(j),GaussianPts(k)/) 
                         CALL HexB(BMatrix, DetJ(i,j,k), ElementShapeNodes, Transformed, (/X(Node(:)), Y(Node(:)), Z(Node(:))/)) !Needs reshaping
-                        BMat(((n-1)*QuadratureOrder**3+ind-1)*18*ElementShapeNodes+1 : &
-                             ((n-1)*QuadratureOrder**3+ind)*18*ElementShapeNodes) = reshape(BMatrix, (/18*ElementShapeNodes/))
-                        ind = ind +1
+                        BMat(((n-1)*QuadratureOrder**3+ind1-1)*18*ElementShapeNodes+1 : &
+                             ((n-1)*QuadratureOrder**3+ind1)*18*ElementShapeNodes) = reshape(BMatrix, (/18*ElementShapeNodes/))
+                        ind1 = ind1 +1
                         
                         !write (*,*) ((n-1)*QuadratureOrder**3+ind-2)*18*ElementShapeNodes+1,'----------------------',& 
                         !            ((n-1)*QuadratureOrder**3+ind-1)*18*ElementShapeNodes
@@ -154,14 +154,14 @@ subroutine HexEight (ID,X,Y,Z,U,MHT,E, PoissonRatio, Density, Gravity, LM, Posit
             !BMat((n-1)*6*ElementShapeNodes+1 : n*6*ElementShapeNodes)=reshape(BMatrix, (/6*ElementShapeNodes/))
             
             CALL COLHT (MHT,ND,LM(:,N))
-            WRITE (OutputFile,"(I7,5X,7(I7,1X),I7,4X,I5)") N,Node(1:ElementShapeNodes),MaterialType
+            WRITE (IOUT,"(I7,5X,7(I7,1X),I7,4X,I5)") N,Node(1:ElementShapeNodes),MaterialType
             
-            !write (OutputFile,*) 'MHT',MHT
-            !write (OutputFile,*) 'NormalVec',NormalVec
-            !write (OutputFile,*) 'Transformed',Transformed
-            !write (OutputFile,*) 'Flattened',Flattened
-            !write (OutputFile,*) 'BMat',BMat
-            !write (OutputFile,*) 'DetJ',Jacobian
+            !write (IOUT,*) 'MHT',MHT
+            !write (IOUT,*) 'NormalVec',NormalVec
+            !write (IOUT,*) 'Transformed',Transformed
+            !write (IOUT,*) 'Flattened',Flattened
+            !write (IOUT,*) 'BMat',BMat
+            !write (IOUT,*) 'DetJ',Jacobian
             
         enddo
         return
@@ -190,12 +190,12 @@ subroutine HexEight (ID,X,Y,Z,U,MHT,E, PoissonRatio, Density, Gravity, LM, Posit
             
             DetJ = reshape(Jacobian((n-1)*QuadratureOrder**3+1 : n*QuadratureOrder**3), &
                            (/QuadratureOrder, QuadratureOrder, QuadratureOrder/))
-            ind  = 1
+            ind1  = 1
             do i = 1, QuadratureOrder
                 do j = 1, QuadratureOrder
                     do k = 1, QuadratureOrder
-                        BMatrix = reshape(BMat(((n-1)*QuadratureOrder**3+ind-1)*18*ElementShapeNodes+1 : &
-                                          ((n-1)*QuadratureOrder**3+ind)*18*ElementShapeNodes),(/6, 3*ElementShapeNodes/))
+                        BMatrix = reshape(BMat(((n-1)*QuadratureOrder**3+ind1-1)*18*ElementShapeNodes+1 : &
+                                          ((n-1)*QuadratureOrder**3+ind1)*18*ElementShapeNodes),(/6, 3*ElementShapeNodes/))
                         
                         !write (*,*) ((n-1)*QuadratureOrder**3+ind-2)*18*ElementShapeNodes+1,'----------------------',& 
                         !            ((n-1)*QuadratureOrder**3+ind-1)*18*ElementShapeNodes
@@ -203,7 +203,7 @@ subroutine HexEight (ID,X,Y,Z,U,MHT,E, PoissonRatio, Density, Gravity, LM, Posit
                         
                         Point   = matmul(matmul(transpose(BMatrix),DMatrix),BMatrix)
                         S = S + (Weight(i,j,k)*DetJ(i,j,k))*Point
-                        ind = ind + 1
+                        ind1 = ind1 + 1
                     end do
                 end do
             end do
@@ -219,11 +219,11 @@ subroutine HexEight (ID,X,Y,Z,U,MHT,E, PoissonRatio, Density, Gravity, LM, Posit
         DO N=1,NumberOfElements
             IPRINT=IPRINT + 1
             IF (IPRINT.GT.50) IPRINT=1
-            IF (IPRINT.EQ.1) WRITE (OutputFile,"(//,' S T R E S S  C A L C U L A T I O N S  F O R  ',  &
+            IF (IPRINT.EQ.1) WRITE (IOUT,"(//,' S T R E S S  C A L C U L A T I O N S  F O R  ',  &
                                            'E L E M E N T  G R O U P',I4,//,   &
             '  ELEMENT',13X, 'COORDINSTES',19X, 'Sigma_xx',9X, 'Sigma_yy',9X,'Sigma_zz',9X, &
             'Sigma_xy',9X,'Sigma_yz',9X,'Sigma_xz', /, &
-            '  NUMBER', 8X,'X',10X,'Y',10X,'Z')") CurrentElementGroup
+            '  NUMBER', 8X,'X',10X,'Y',10X,'Z')") NG
             MaterialType = MaterialData(N)
             Young        = E(MaterialType)
             v            = PoissonRatio(MaterialType)
@@ -235,24 +235,24 @@ subroutine HexEight (ID,X,Y,Z,U,MHT,E, PoissonRatio, Density, Gravity, LM, Posit
                 if (LM(i,N) .NE. 0) ElementDisp(i)  =  U(LM(i,N))
             end do
             
-            ind = 1
+            ind1 = 1
             do i = 1,QuadratureOrder
                 do j = 1,QuadratureOrder
                     do k = 1,QuadratureOrder
                         Transformed   = (/GaussianPts(i), GaussianPts(j), GaussianPts(k)/)
                         call HexN (NMatrix, ElementShapeNodes, Transformed)
-                        GaussianPtsPosit(:,ind) = matmul(reshape(PositionData(:,N), (/3,ElementShapeNodes/)), &
+                        GaussianPtsPosit(:,ind1) = matmul(reshape(PositionData(:,N), (/3,ElementShapeNodes/)), &
                                                          NMatrix(1, 1:3*ElementShapeNodes:3))
-                        BMatrix = reshape(BMat(((n-1)*QuadratureOrder**3+ind-1)*18*ElementShapeNodes+1 : &
-                                         ((n-1)*QuadratureOrder**3+ind)*18*ElementShapeNodes),(/6, 3*ElementShapeNodes/))
-                        Strain(:,ind) = matmul(BMatrix, ElementDisp)             
-                        Stress(:,ind) = matmul(DMatrix, Strain(:,ind))
-                        ind = ind + 1
+                        BMatrix = reshape(BMat(((n-1)*QuadratureOrder**3+ind1-1)*18*ElementShapeNodes+1 : &
+                                         ((n-1)*QuadratureOrder**3+ind1)*18*ElementShapeNodes),(/6, 3*ElementShapeNodes/))
+                        Strain(:,ind1) = matmul(BMatrix, ElementDisp)             
+                        Stress(:,ind1) = matmul(DMatrix, Strain(:,ind1))
+                        ind1 = ind1 + 1
                     end do
                 end do
             end do
             
-            write (OutputFile,"(I6,3(3X, F10.4),6(4X, E13.6),/,7(6X, 3(3X, F10.4),6(4X, E13.6),/))") &
+            write (IOUT,"(I6,3(3X, F10.4),6(4X, E13.6),/,7(6X, 3(3X, F10.4),6(4X, E13.6),/))") &
                                N, (GaussianPtsPosit(:,I), Stress(:,I), I=1,QuadratureOrder**3)
         END DO
     END SELECT

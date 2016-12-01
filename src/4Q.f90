@@ -35,7 +35,7 @@ NUME = NPAR(2)
 NUMMAT = NPAR(3)
 
 ! Allocate storage for element group data
-  IF (SolutionPhase == 1) THEN
+  IF (IND == 1) THEN
       MM = 2*NUMMAT*ITWO + 9*NUME + 12*NUME*ITWO
       CALL MEMALLOC(11,"ELEGP",MM,1)
   END IF
@@ -57,7 +57,7 @@ NUMMAT = NPAR(3)
   N106=N105+NUME
   NLAST=N106
 
-  ElementGroupArraySize = NLAST - NFIRST
+  MIDEST = NLAST - NFIRST
 
   CALL ELEMENT_4Q_MAIN (IA(NP(1)),DA(NP(2)),DA(NP(3)),DA(NP(4)),DA(NP(4)),IA(NP(5)),   &
        A(N101),A(N102),A(N103),A(N104),A(N105))
@@ -95,10 +95,10 @@ SUBROUTINE ELEMENT_4Q_MAIN (ID,X,Y,Z,U,MHT,E,POISSON,LM,XYZ,MATP)
     END FUNCTION
   END INTERFACE
   
-  INTEGER :: ID(3,NumberOfNodalPoints),LM(8,NPAR(2)),MATP(NPAR(2)),MHT(NumberOfEquations)
-  REAL(8) :: X(NumberOfNodalPoints),Y(NumberOfNodalPoints),Z(NumberOfNodalPoints),&
+  INTEGER :: ID(3,NUMNP),LM(8,NPAR(2)),MATP(NPAR(2)),MHT(NEQ)
+  REAL(8) :: X(NUMNP),Y(NUMNP),Z(NUMNP),&
              E(NPAR(3)),POISSON(NPAR(3)),  &
-             XYZ(12,NPAR(2)),U(NumberOfEquations),DST(8,1)
+             XYZ(12,NPAR(2)),U(NEQ),DST(8,1)
   REAL(8) :: ETA,EPSILON
 
   INTEGER :: NPAR1, NUME, NUMMAT, ND, I1, I2, I3, I4, L, N, I, J
@@ -122,9 +122,9 @@ SUBROUTINE ELEMENT_4Q_MAIN (ID,X,Y,Z,U,MHT,E,POISSON,LM,XYZ,MATP)
   ND=8
 
 ! Read and generate element information
-  IF (SolutionPhase .EQ. 1) THEN
+  IF (IND .EQ. 1) THEN
 
-     WRITE (OutputFile,"(' E L E M E N T   D E F I N I T I O N',//,  &
+     WRITE (IOUT,"(' E L E M E N T   D E F I N I T I O N',//,  &
                    ' ELEMENT TYPE ',13(' .'),'( NPAR(1) ) . . =',I5,/,   &
                    '     EQ.1, TRUSS ELEMENTS',/,      &
                    '     EQ.2, ELEMENTS CURRENTLY',/,  &
@@ -133,27 +133,27 @@ SUBROUTINE ELEMENT_4Q_MAIN (ID,X,Y,Z,U,MHT,E,POISSON,LM,XYZ,MATP)
 
      IF (NUMMAT.EQ.0) NUMMAT=1
 
-     WRITE (OutputFile,"(' M A T E R I A L   D E F I N I T I O N',//,  &
+     WRITE (IOUT,"(' M A T E R I A L   D E F I N I T I O N',//,  &
                    ' NUMBER OF DIFFERENT SETS OF MATERIAL',/,  &
                    ' AND CROSS-SECTIONAL  CONSTANTS ',         &
                    4 (' .'),'( NPAR(3) ) . . =',I5,/)") NUMMAT
 
-     WRITE (OutputFile,"('  SET       YOUNG''S     CROSS-SECTIONAL',/,  &
+     WRITE (IOUT,"('  SET       YOUNG''S     CROSS-SECTIONAL',/,  &
                    ' NUMBER     MODULUS',10X,'AREA',/,  &
                    15 X,'E',14X,'A')")
 
      DO I=1,NUMMAT
-        READ (InputFile,'(I5,2F10.0)') N,E(N),POISSON(N)  ! Read material information
-        WRITE (OutputFile,"(I5,4X,E12.5,2X,E14.6)") N,E(N),POISSON(N)
+        READ (IIN,'(I5,2F10.0)') N,E(N),POISSON(N)  ! Read material information
+        WRITE (IOUT,"(I5,4X,E12.5,2X,E14.6)") N,E(N),POISSON(N)
      END DO
 
-     WRITE (OutputFile,"(//,' E L E M E N T   I N F O R M A T I O N',//,  &
+     WRITE (IOUT,"(//,' E L E M E N T   I N F O R M A T I O N',//,  &
                       ' ELEMENT     NODE     NODE       MATERIAL',/,   &
                       ' NUMBER-N      I        J       SET NUMBER')")
 
      N=0
      DO WHILE (N .NE. NUME)
-        READ (InputFile,'(7I5)') N,I1,I2,I3,I4,MTYPE  ! Read in element information
+        READ (IIN,'(7I5)') N,I1,I2,I3,I4,MTYPE  ! Read in element information
 
 !       Save element information
         XYZ(1,N)=X(I1)  ! Coordinates of the element's 1st node
@@ -188,14 +188,14 @@ SUBROUTINE ELEMENT_4Q_MAIN (ID,X,Y,Z,U,MHT,E,POISSON,LM,XYZ,MATP)
 !       Update column heights and bandwidth
         CALL COLHT (MHT,ND,LM(1,N))   
 
-        WRITE (OutputFile,"(I5,6X,I5,4X,I5,4X,I5,4X,I5,7X,I5)") N,I1,I2,I3,I4,MTYPE
+        WRITE (IOUT,"(I5,6X,I5,4X,I5,4X,I5,4X,I5,7X,I5)") N,I1,I2,I3,I4,MTYPE
 
      END DO
 
      RETURN
 
 ! Assemble stucture stiffness matrix
-  ELSE IF (SolutionPhase .EQ. 2) THEN
+  ELSE IF (IND .EQ. 2) THEN
 
      DO N=1,NUME
         MTYPE=MATP(N)
@@ -232,16 +232,16 @@ SUBROUTINE ELEMENT_4Q_MAIN (ID,X,Y,Z,U,MHT,E,POISSON,LM,XYZ,MATP)
      RETURN
 
 ! Stress calculations
-  ELSE IF (SolutionPhase .EQ. 3) THEN
+  ELSE IF (IND .EQ. 3) THEN
 
      IPRINT=0
      DO N=1,NUME
         IPRINT=IPRINT + 1
         IF (IPRINT.GT.50) IPRINT=1
-        IF (IPRINT.EQ.1) WRITE (OutputFile,"(//,' S T R E S S  C A L C U L A T I O N S  F O R  ',  &
+        IF (IPRINT.EQ.1) WRITE (IOUT,"(//,' S T R E S S  C A L C U L A T I O N S  F O R  ',  &
                                            'E L E M E N T  G R O U P',I4,//,   &
                                            '  ELEMENT',9X,' X-CORRD',9X,'Y-CORRD',9X   &	
-                                           'STRESS_XX',7X,'STRESS_YY',9X,'STRESS_XY')") CurrentElementGroup
+                                           'STRESS_XX',7X,'STRESS_YY',9X,'STRESS_XY')") NG
         MTYPE=MATP(N)
         
         D(1,:)=E(MATP(N))/(1D0-POISSON(MATP(N))*POISSON(MATP(N)))*(/1D0,POISSON(MATP(N)),0D0/)
@@ -282,7 +282,7 @@ SUBROUTINE ELEMENT_4Q_MAIN (ID,X,Y,Z,U,MHT,E,POISSON,LM,XYZ,MATP)
                 STRESS_YY(N,2*J+I-2) = STRESS(2,1)
                 STRESS_XY(N,2*J+I-2) = STRESS(3,1)
                 
-            WRITE (OutputFile,"(1X,I5,4X,E13.6,4X,E13.6,11X,E13.6,4X,E13.6,4X, E13.6)") N,X_GUASS(2*J+I-2,1), &
+            WRITE (IOUT,"(1X,I5,4X,E13.6,4X,E13.6,11X,E13.6,4X,E13.6,4X, E13.6)") N,X_GUASS(2*J+I-2,1), &
             X_GUASS(2*J+I-2,2),STRESS_XX(N,2*J+I-2),STRESS_YY(N,2*J+I-2),STRESS_XY(N,2*J+I-2)
                 
             END DO
@@ -291,7 +291,7 @@ SUBROUTINE ELEMENT_4Q_MAIN (ID,X,Y,Z,U,MHT,E,POISSON,LM,XYZ,MATP)
      END DO
 
   ELSE 
-     STOP "*** ERROR *** Invalid SolutionPhase value."
+     STOP "*** ERROR *** Invalid IND value."
   END IF
 
 END SUBROUTINE ELEMENT_4Q_MAIN

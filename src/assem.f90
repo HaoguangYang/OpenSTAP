@@ -11,33 +11,31 @@
 ! .                                                                       .
 ! . . . . . . . . . . . . . .  . . .  . . . . . . . . . . . . . . . . . . .
 
-SUBROUTINE COLHT (ColumnHeight,ElementDOF,ElementLocationMatrix)
+SUBROUTINE COLHT (MHT,ND,LM)
 ! . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 ! .                                                                   .
 ! .   To calculate column heights                                     .
 ! .                                                                   .
 ! . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-  USE GLOBALS, ONLY : NumberOfEquations
+  USE GLOBALS, ONLY : NEQ
   IMPLICIT NONE
-  INTEGER :: ElementDOF, ElementLocationMatrix(ElementDOF),ColumnHeight(NumberOfEquations)
-  INTEGER :: I, SmallestIndex, CurrentIndex, IndexDisparity
+  INTEGER :: ND, LM(ND),MHT(NEQ)
+  INTEGER :: I, LS, II, ME
 
-  SmallestIndex=HUGE(1)   ! The largest integer number
+  LS=HUGE(1)   ! The largest integer number
 
-  DO I=1,ElementDOF
-     IF (ElementLocationMatrix(I) .NE. 0) THEN
-        IF (ElementLocationMatrix(I)-SmallestIndex .LT. 0) SmallestIndex=ElementLocationMatrix(I)
+  DO I=1,ND
+     IF (LM(I) .NE. 0) THEN
+        IF (LM(I)-LS .LT. 0) LS=LM(I)
      END IF
   END DO
-  
-  !SmallestIndex=minval(ElementLocationMatrix(1:ElementDOF))
 
-  DO I=1,ElementDOF
-     CurrentIndex = ElementLocationMatrix(I)
-     IF (CurrentIndex.NE.0) THEN
-        IndexDisparity = CurrentIndex - SmallestIndex
-        IF (IndexDisparity.GT.ColumnHeight(CurrentIndex)) ColumnHeight(CurrentIndex) = IndexDisparity
+  DO I=1,ND
+     II=LM(I)
+     IF (II.NE.0) THEN
+        ME=II - LS
+        IF (ME.GT.MHT(II)) MHT(II)=ME
      END IF
   END DO
 
@@ -45,46 +43,47 @@ SUBROUTINE COLHT (ColumnHeight,ElementDOF,ElementLocationMatrix)
 END SUBROUTINE COLHT
 
 
-SUBROUTINE ADDRES (MAXA,ColumnHeight)
+SUBROUTINE ADDRES (MAXA,MHT)
 ! . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 ! .                                                                   .
 ! .   To calculate addresses of diagonal elements in banded           .
 ! .   matrix whose column heights are known                           .
 ! .                                                                   .
-! .   ColumnHeight  = Active column heights                           .
+! .   MHT  = Active column heights                                    .
 ! .   MAXA = Addresses of diagonal elements                           .
 ! .                                                                   .
 ! . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-  USE GLOBALS, ONLY : NumberOfEquations, MaxHalfBandwidth, NumberOfMatrixElements
+  USE GLOBALS, ONLY : NEQ, MK, NWK
 
   IMPLICIT NONE
-  INTEGER :: MAXA(NumberOfEquations+1),ColumnHeight(NumberOfEquations)
-  INTEGER :: I
+  INTEGER :: MAXA(NEQ+1),MHT(NEQ)
+  INTEGER :: NN, I
 
 ! Clear array maxa
 
-  DO I=1,NumberOfEquations + 1
+  NN=NEQ + 1
+  DO I=1,NN
      MAXA(I)=0.0
   END DO
 
   MAXA(1)=1
   MAXA(2)=2
-  MaxHalfBandwidth=0
-  IF (NumberOfEquations.GT.1) THEN
-     DO I=2,NumberOfEquations
-        IF (ColumnHeight(I).GT.MaxHalfBandwidth) MaxHalfBandwidth = ColumnHeight(I)
-        MAXA(I+1)=MAXA(I) + ColumnHeight(I) + 1
+  MK=0
+  IF (NEQ.GT.1) THEN
+     DO I=2,NEQ
+        IF (MHT(I).GT.MK) MK=MHT(I)
+        MAXA(I+1)=MAXA(I) + MHT(I) + 1
      END DO
   END IF
-  MaxHalfBandwidth = MaxHalfBandwidth + 1       !+1 to correctly output max half bandwidth
-  NumberOfMatrixElements = MAXA(NumberOfEquations+1) - MAXA(1)
+  MK=MK + 1
+  NWK=MAXA(NEQ+1) - MAXA(1)
 
   RETURN
 END SUBROUTINE ADDRES
 
 
-SUBROUTINE ASSEM (ElementStiffnessMatrix)
+SUBROUTINE ASSEM (AA)
 ! . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 ! .                                                                   .
 ! .   To call element subroutines for assemblage of the               .
@@ -92,51 +91,50 @@ SUBROUTINE ASSEM (ElementStiffnessMatrix)
 ! .                                                                   .
 ! . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-  USE GLOBALS, ONLY : ElementTmpFile, NumberOfElementGroups, ElementGroupArraySize, NPAR
+  USE GLOBALS, ONLY : IELMNT, NUMEG, MIDEST, NPAR
 
   IMPLICIT NONE
-  REAL :: ElementStiffnessMatrix(*)
+  REAL :: AA(*)
   INTEGER :: N, I
 
-  REWIND ElementTmpFile
-  DO N=1,NumberOfElementGroups
-     READ (ElementTmpFile) ElementGroupArraySize,NPAR, &
-                           (ElementStiffnessMatrix(I),I=1,ElementGroupArraySize)                      !Read Tmp File In.
-     CALL ELEMNT                                    !IND=2 Entrance
+  REWIND IELMNT
+  DO N=1,NUMEG
+     READ (IELMNT) MIDEST,NPAR,(AA(I),I=1,MIDEST)
+     CALL ELEMNT
   END DO
 
   RETURN
 END SUBROUTINE ASSEM
 
 
-SUBROUTINE ADDBAN (SkylineK,MAXA,S,ElementLocationMatrix,ElementDOF)
+SUBROUTINE ADDBAN (A,MAXA,S,LM,ND)
 ! . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 ! .                                                                   .
 ! .   To assemble element stiffness into compacted global stiffness   .
 ! .                                                                   .
-! .      SkylineK = GLOBAL STIFFNESS (1D skyline storage)                    .
+! .      A = GLOBAL STIFFNESS (1D skyline storage)                    .
 ! .      S = ELEMENT STIFFNESS                                        .
-! .      ElementDOF = DEGREES OF FREEDOM IN ELEMENT STIFFNESS                 .
+! .      ND = DEGREES OF FREEDOM IN ELEMENT STIFFNESS                 .
 ! .                                                                   .
 ! . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-  USE GLOBALS, ONLY : NumberOfMatrixElements, NumberOfEquations
+  USE GLOBALS, ONLY : NWK, NEQ
   IMPLICIT NONE
-  REAL(8) :: SkylineK(NumberOfMatrixElements),S(ElementDOF,ElementDOF)
-  INTEGER :: MAXA(NumberOfEquations+1),ElementLocationMatrix(ElementDOF)
-  INTEGER :: ElementDOF, I, J, IndexI, IndexJ, SkylineIndex
+  REAL(8) :: A(NWK),S(ND,ND)
+  INTEGER :: MAXA(NEQ+1),LM(ND)
+  INTEGER :: ND, I, J, II, JJ, KK
   
-  DO J=1,ElementDOF
-     IndexJ = ElementLocationMatrix(J)
-     IF (IndexJ .GT. 0) THEN
+  DO J=1,ND
+     JJ=LM(J)
+     IF (JJ .GT. 0) THEN
         DO I=1,J
-           IndexI = ElementLocationMatrix(I)
-           IF (IndexI .GT. 0) THEN
-              IF (IndexJ .GE. IndexI) THEN
-                 SkylineIndex= MAXA(IndexJ) + IndexJ - IndexI
+           II=LM(I)
+           IF (II .GT. 0) THEN
+              IF (JJ .GE. II) THEN
+                 KK= MAXA(JJ) + JJ - II
               ELSE
-                 SkylineIndex= MAXA(IndexI) + IndexI - IndexJ
+                 KK= MAXA(II) + II - JJ
               END IF              
-              SkylineK(SkylineIndex)=SkylineK(SkylineIndex) + S(I,J)
+              A(KK)=A(KK) + S(I,J)
            END IF
         END DO
      END IF
@@ -146,44 +144,44 @@ SUBROUTINE ADDBAN (SkylineK,MAXA,S,ElementLocationMatrix,ElementDOF)
 END SUBROUTINE ADDBAN
 
 
-SUBROUTINE COLSOL (SkylineK, LoadToDisplacement, MAXA, NumberOfEquations, NumberOfMatrixElements , NNM, SolutionMode)
+SUBROUTINE COLSOL (A,V,MAXA,NN,NWK,NNM,KKK)
 ! . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 ! .                                                                   .
 ! .   To solve finite element static equilibrium equations in         .
 ! .   core, using compacted storage and column reduction scheme       .
 ! .                                                                   .
 ! .  - - Input variables - -                                          .
-! .        SkylineK(NumberOfMatrixElements)    = Stiffness matrix stored in compacted form.
-! .        LoadToDisplacement(NumberOfEquations)     = Right-hand-side load vector                    .
+! .        A(NWK)    = Stiffness matrix stored in compacted form      .
+! .        V(NN)     = Right-hand-side load vector                    .
 ! .        MAXA(NNM) = Vector containing addresses of diagonal        .
 ! .                    elements of stiffness matrix in a              .
-! .        NumberOfEquations        = Number of equations                            .
-! .        NumberOfMatrixElements       = Number of elements below skyline of matrix     .
-! .        NNM       = NumberOfEquations + 1                                         .
-! .        SolutionMode    = Input flag                                     .
+! .        NN        = Number of equations                            .
+! .        NWK       = Number of elements below skyline of matrix     .
+! .        NNM       = NN + 1                                         .
+! .        KKK       = Input flag                                     .
 ! .            EQ. 1   Triangularization of stiffness matrix          .
 ! .            EQ. 2   Reduction and back-substitution of load vector .
-! .        OutputFile      = UNIT used for output                           .
+! .        IOUT      = UNIT used for output                           .
 ! .                                                                   .
 ! .  - - OUTPUT - -                                                   .
-! .        SkylineK(NumberOfMatrixElements)    = D and L - Factors of stiffness matrix.
-! .        LoadToDisplacement(NumberOfEquations)     = Displacement vector                            .
+! .        A(NWK)    = D and L - Factors of stiffness matrix          .
+! .        V(NN)     = Displacement vector                            .
 ! .                                                                   .
 ! . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-  USE GLOBALS, ONLY : OutputFile
+  USE GLOBALS, ONLY : IOUT
 
   IMPLICIT NONE
-  INTEGER :: N,K,KN,KL,KU,KH,IC,KLT,KI,J, ElementDOF,KK,L
-  INTEGER :: MAXA(NNM), NumberOfEquations, NumberOfMatrixElements, NNM, SolutionMode
-  REAL(8) :: SkylineK(NumberOfMatrixElements), LoadToDisplacement(NumberOfEquations), C,B
+  INTEGER :: MAXA(NNM),NN,NWK,NNM,KKK
+  REAL(8) :: A(NWK),V(NN),C,B
+  INTEGER :: N,K,KN,KL,KU,KH,IC,KLT,KI,J,ND,KK,L
   INTEGER :: MIN0
 
 ! Perform L*D*L(T) factorization of stiffness matrix
 
-  IF (SolutionMode == 1) THEN
+  IF (KKK == 1) THEN
 
-      DO N=1,NumberOfEquations
+      DO N=1,NN
          KN=MAXA(N)
          KL=KN + 1
          KU=MAXA(N+1) - 1
@@ -197,14 +195,14 @@ SUBROUTINE COLSOL (SkylineK, LoadToDisplacement, MAXA, NumberOfEquations, Number
                 IC=IC + 1
                 KLT=KLT - 1
                 KI=MAXA(K)
-                ElementDOF=MAXA(K+1) - KI - 1
-                IF (ElementDOF .GT. 0) THEN
-                   KK=MIN0(IC,ElementDOF)
+                ND=MAXA(K+1) - KI - 1
+                IF (ND .GT. 0) THEN
+                   KK=MIN0(IC,ND)
                    C=0.
                    DO L=1,KK
-                      C=C + SkylineK(KI+L) * SkylineK(KLT+L)
+                      C=C + A(KI+L)*A(KLT+L)
                    END DO
-                   SkylineK(KLT)=SkylineK(KLT) - C
+                   A(KLT)=A(KLT) - C
                 END IF
                 K=K + 1
              END DO
@@ -216,70 +214,59 @@ SUBROUTINE COLSOL (SkylineK, LoadToDisplacement, MAXA, NumberOfEquations, Number
              DO KK=KL,KU
                 K=K - 1
                 KI=MAXA(K)
-                C=SkylineK(KK)/SkylineK(KI)
-                B=B + C*SkylineK(KK)
-                SkylineK(KK)=C
+                C=A(KK)/A(KI)
+                B=B + C*A(KK)
+                A(KK)=C
              END DO
-             SkylineK(KN)=SkylineK(KN) - B
+             A(KN)=A(KN) - B
          ENDIF
 
-         IF (SkylineK(KN) .LE. 0) THEN
-            WRITE (OutputFile,"(//' STOP - STIFFNESS MATRIX NOT POSITIVE DEFINITE',//,  &
-                            ' NONPOSITIVE PIVOT FOR EQUATION ',I8,//,' PIVOT = ',E20.12 )") N,SkylineK(KN)
+         IF (A(KN) .LE. 0) THEN
+            WRITE (IOUT,"(//' STOP - STIFFNESS MATRIX NOT POSITIVE DEFINITE',//,  &
+                            ' NONPOSITIVE PIVOT FOR EQUATION ',I8,//,' PIVOT = ',E20.12 )") N,A(KN)
             STOP
          END IF
       END DO
-      
-      !write (*,*) "Skyline",SkylineK
-      !write (*,*) "MAXA", MAXA
 
-  ELSE IF (SolutionMode == 2) THEN
+  ELSE IF (KKK == 2) THEN
 
 ! REDUCE RIGHT-HAND-SIDE LOAD VECTOR
 
-       DO N=1,NumberOfEquations
+       DO N=1,NN
          KL=MAXA(N) + 1
          KU=MAXA(N+1) - 1
-         
-         !write (*,*) "Load(",N,")",LoadToDisplacement(N)
-         
          IF (KU-KL .GE. 0) THEN
-            !K=N
-            !C=0.
-            !DO KK=KL,KU
-            !   K=K - 1
-            !   C=C + SkylineK(KK)*LoadToDisplacement(K)
-            !END DO
-            
-			C = dot_product(SkylineK(KL:KU),LoadToDisplacement(N-1:N-(KU-KL)-1:-1))
-			
-			!write (*,*) "C= dot_product(SkylineK(KL:KU),LoadToDisplacement(N:N-(KU-KL)))",C
-            
-            LoadToDisplacement(N) = LoadToDisplacement(N) - C
+            K=N
+            C=0.
+            DO KK=KL,KU
+               K=K - 1
+               C=C + A(KK)*V(K)
+            END DO
+            V(N)=V(N) - C
          END IF
       END DO
 
 ! BACK-SUBSTITUTE
 
-      DO N=1,NumberOfEquations
+      DO N=1,NN
          K=MAXA(N)
-         LoadToDisplacement(N) = LoadToDisplacement(N) / SkylineK(K)
+         V(N)=V(N)/A(K)
       END DO
 
-      IF (NumberOfEquations.EQ.1) RETURN
+      IF (NN.EQ.1) RETURN
 
-      N=NumberOfEquations
-      DO L=2,NumberOfEquations
+      N=NN
+      DO L=2,NN
          KL=MAXA(N) + 1
          KU=MAXA(N+1) - 1
          IF (KU-KL .GE. 0) THEN
             K=N
             DO KK=KL,KU
                K=K - 1
-               LoadToDisplacement(K) = LoadToDisplacement(K) - SkylineK(KK) * LoadToDisplacement(N)
+               V(K)=V(K) - A(KK)*V(N)
             END DO
          END IF
-         N = N - 1
+         N=N - 1
       END DO
 
   END IF
