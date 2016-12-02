@@ -113,7 +113,8 @@ SUBROUTINE BEAMELE (ID,X,Y,Z,U,MHT,E,G,AREA,I_X,I_Y,I_Z,J_X,J_Y,J_Z,LM,XYZ,MATP)
 
      DO I=1,NUMMAT
         READ (IIN,'(I5,9F10.0)') N,E(N),G(N),AREA(N),I_X(N),I_Y(N),I_Z(N),J_X(N),J_Y(N),J_Z(N)  ! Read material information
-        WRITE (IOUT,"(I5,1X,E12.5,1X,E12.5,1X,E12.5,1X,E12.5,1X,E12.5,1X,E12.5,1X,E12.5,1X,E12.5,1X,E12.5)")  N,E(N),G(N),AREA(N),I_X(N),I_Y(N),I_Z(N),J_X(N),J_Y(N),J_Z(N)
+        WRITE (IOUT,"(I5,1X,E12.5,1X,E12.5,1X,E12.5,1X,E12.5,1X,E12.5,1X, E12.5,1X,E12.5, 1X,E12.5,1X,E12.5)") &
+        N,E(N),G(N),AREA(N),I_X(N),I_Y(N),I_Z(N),J_X(N),J_Y(N),J_Z(N)
      END DO
 
      WRITE (IOUT,"(//,' E L E M E N T   I N F O R M A T I O N',//,  &
@@ -262,8 +263,9 @@ SUBROUTINE BEAMELE (ID,X,Y,Z,U,MHT,E,G,AREA,I_X,I_Y,I_Z,J_X,J_Y,J_Z,LM,XYZ,MATP)
         IPRINT=IPRINT + 1
         IF (IPRINT.GT.50) IPRINT=1
         IF (IPRINT.EQ.1) WRITE (IOUT,"(//,' S T R E S S  C A L C U L A T I O N S  F O R  ',  &
-                                           'E L E M E N T  G R O U P',I4,//,   &
-                                           '  ELEMENT',2X,'FORCE_X1',3X,'FORCE_Y1',3X,'FORCE_Z1',3X,'MOMENT_X1',3X,'MOMENT_Y1',3X,'MOMENT_Z1',3X,'FORCE_X2',3X,'FORCE_Y2',3X,'FORCE_Z2',3X,'MOMENT_X2',3X,'MOMENT_Y2',3X,'MOMENT_Z2',/,'  NUMBER')") NG
+              'E L E M E N T  G R O U P',I4,//,   &
+              '  ELEMENT',2X,'FORCE_X1',3X,'FORCE_Y1',3X,'FORCE_Z1',3X,'MOMENT_X1',3X,'MOMENT_Y1',3X, 'MOMENT_Z1',3X, &
+              'FORCE_X2',3X,'FORCE_Y2',3X,'FORCE_Z2',3X,'MOMENT_X2',3X,'MOMENT_Y2',3X,'MOMENT_Z2',/,'  NUMBER')") NG
         MTYPE=MATP(N)
         
         !CALCULATE THE LENGTH OF THE ELEMENT
