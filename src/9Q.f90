@@ -140,9 +140,11 @@ SUBROUTINE ELEMENT_9Q_MAIN (ID,X,Y,Z,U,MHT,E,POISSON,LM,XY,MATP)
 
      WRITE (IOUT,"(' E L E M E N T   D E F I N I T I O N',//,  &
                    ' ELEMENT TYPE ',13(' .'),'( NPAR(1) ) . . =',I5,/,   &
-                   '     EQ.1, TRUSS ELEMENTS',/,      &
-                   '     EQ.2, ELEMENTS CURRENTLY',/,  &
-                   '     EQ.3, NOT AVAILABLE',//,      &
+                   '     EQ.1, TRUSS ELEMENTS',/,   &
+                   '     EQ.2, 4Q ELEMENTS',/,      &
+                   '     EQ.3, 9Q ELEMENTS',//,     &
+                   '     EQ.4, 8H ELEMENTS',//,     &
+                   '     EQ.5, 3T ELEMENTS',//,     & 
                    ' NUMBER OF ELEMENTS.',10(' .'),'( NPAR(2) ) . . =',I5,/)") NPAR1,NUME
 
      IF (NUMMAT.EQ.0) NUMMAT=1

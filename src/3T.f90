@@ -81,53 +81,67 @@ SUBROUTINE ELEMENT_3T_MAIN (ID,X,Y,Z,U,MHT,E,POISSON,LM,XYZ,MATP)
 
   
   INTERFACE
-    FUNCTION NmatElast3T(eta,psi)
+    FUNCTION NmatElast3T(EPSILON,ETA)
         IMPLICIT NONE
-        REAL(8):: eta
-        REAL(8):: psi
-        REAL(8):: NmatElast3T(2,8)
+        REAL(8):: EPSILON,ETA
+        REAL(8):: NmatElast3T(1,3)
     END FUNCTION
-    FUNCTION BmatElast3T(eta,psi,C)
+    FUNCTION BmatElast3T(X,Y)
         IMPLICIT NONE
-        REAL(8):: eta,psi
-        REAL(8):: C(4,2)
-        REAL(8):: BmatElast3T(3,8)
+        REAL(8):: X(3,1),Y(3,1)
+        REAL(8):: BmatElast3T(3,6)
     END FUNCTION
   END INTERFACE
   
-  INTEGER :: ID(3,NUMNP),LM(8,NPAR(2)),MATP(NPAR(2)),MHT(NEQ)
+  INTEGER :: ID(3,NUMNP),LM(6,NPAR(2)),MATP(NPAR(2)),MHT(NEQ)
   REAL(8) :: X(NUMNP),Y(NUMNP),Z(NUMNP),E(NPAR(3)),POISSON(NPAR(3)),  &
-             XYZ(12,NPAR(2)),U(NEQ),DST(8,1)
+             XYZ(9,NPAR(2)),U(NEQ),DST(6,1)
   REAL(8) :: ETA,EPSILON
 
-  INTEGER :: NPAR1, NUME, NUMMAT, ND, I1, I2, I3, I4, L, N, I, J
+  INTEGER :: NPAR1, NUME, NUMMAT, ND, I1, I2, I3, L, N, I, J
   INTEGER :: MTYPE, IPRINT
-  REAL(8) :: GP(2),W(2),NMAT(2,8),BMAT(3,8),C(4,2),NA(1,4)
-  REAL(8) :: KE(8,8),DETJ,D(3,3)
-  REAL(8) :: X_GUASS(4,2),XY(1,2)
-  REAL(8) :: STRESS_XX(NPAR(2),4),STRESS_YY(NPAR(2),4),STRESS_XY(NPAR(2),4),STRESS(3,1)
+  INTEGER,PARAMETER:: GUASS_N=3
+  REAL(8),ALLOCATABLE:: GP1(:),GP2(:),W(:)
+  REAL(8) :: NMAT(1,3),BMAT(3,6),C(3,2)
+  REAL(8) :: KE(6,6),DETJ,D(3,3),XY(1,2)
+  REAL(8),ALLOCATABLE:: STRESS_XX(:,:),STRESS_YY(:,:),STRESS_XY(:,:),STRESS(:,:)
   COMMON DETJ
   
   !定义gauss积分常数
-  GP(1)=-0.57735027
-  GP(2)=0.57735027
-  W(1)=1.0
-  W(2)=1.0
+  
+  ALLOCATE(GP1(GUASS_N),GP2(GUASS_N),W(GUASS_N))
+  ALLOCATE(STRESS_XX(NPAR(2),GUASS_N),STRESS_YY(NPAR(2),GUASS_N),STRESS_XY(NPAR(2),GUASS_N),STRESS(GUASS_N,1))
+  
+  IF (GUASS_N == 3) THEN
+      GP1(1)=0.16666666666
+      GP1(2)=0.66666666666
+      GP1(3)=0.16666666666
+      GP2(1)=0.16666666666
+      GP2(2)=0.16666666666
+      GP2(3)=0.66666666666
+      W(1)=0.16666666666
+      W(2)=0.16666666666
+      W(3)=0.16666666666
+  ELSE 
+      WRITE(*,*) 'YOU NEED TO CHANGE THE PROGRAM FILE IN 3T.F90'
+  END IF 
 
   NPAR1  = NPAR(1)
   NUME   = NPAR(2)
   NUMMAT = NPAR(3) 
 
-  ND=8
+  ND=6
 
 ! Read and generate element information
   IF (IND .EQ. 1) THEN
 
      WRITE (IOUT,"(' E L E M E N T   D E F I N I T I O N',//,  &
                    ' ELEMENT TYPE ',13(' .'),'( NPAR(1) ) . . =',I5,/,   &
-                   '     EQ.1, TRUSS ELEMENTS',/,      &
-                   '     EQ.2, ELEMENTS CURRENTLY',/,  &
-                   '     EQ.3, NOT AVAILABLE',//,      &
+                   '     EQ.1, TRUSS ELEMENTS',/,   &
+                   '     EQ.2, 4Q ELEMENTS',/,      &
+                   '     EQ.3, 9Q ELEMENTS',//,     &
+                   '     EQ.4, 8H ELEMENTS',//,     &
+                   '     EQ.5, 3T ELEMENTS',//,     & 
                    ' NUMBER OF ELEMENTS.',10(' .'),'( NPAR(2) ) . . =',I5,/)") NPAR1,NUME
 
      IF (NUMMAT.EQ.0) NUMMAT=1
@@ -152,7 +166,7 @@ SUBROUTINE ELEMENT_3T_MAIN (ID,X,Y,Z,U,MHT,E,POISSON,LM,XYZ,MATP)
 
      N=0
      DO WHILE (N .NE. NUME)
-        READ (IIN,'(7I5)') N,I1,I2,I3,I4,MTYPE  ! Read in element information
+        READ (IIN,'(7I5)') N,I1,I2,I3,MTYPE  ! Read in element information
 
 !       Save element information
         XYZ(1,N)=X(I1)  ! Coordinates of the element's 1st node
@@ -166,14 +180,10 @@ SUBROUTINE ELEMENT_3T_MAIN (ID,X,Y,Z,U,MHT,E,POISSON,LM,XYZ,MATP)
         XYZ(7,N)=X(I3)  ! Coordinates of the element's 3rd node
         XYZ(8,N)=Y(I3)
         XYZ(9,N)=Z(I3)
-        
-        XYZ(10,N)=X(I4) ! Coordinates of the element's 4th node
-        XYZ(11,N)=Y(I4)
-        XYZ(12,N)=Z(I4)
 
         MATP(N)=MTYPE  ! Material type
 
-        DO L=1,8
+        DO L=1,6
            LM(L,N)=0
         END DO
 
@@ -181,13 +191,12 @@ SUBROUTINE ELEMENT_3T_MAIN (ID,X,Y,Z,U,MHT,E,POISSON,LM,XYZ,MATP)
            LM(L,N)=ID(L,I1)     ! Connectivity matrix
            LM(L+2,N)=ID(L,I2)
            LM(L+4,N)=ID(L,I3)
-           LM(L+6,N)=ID(L,I4)
         END DO
 
 !       Update column heights and bandwidth
         CALL COLHT (MHT,ND,LM(1,N))   
 
-        WRITE (IOUT,"(I5,6X,I5,4X,I5,4X,I5,4X,I5,7X,I5)") N,I1,I2,I3,I4,MTYPE
+        WRITE (IOUT,"(I5,6X,I5,4X,I5,4X,I5,7X,I5)") N,I1,I2,I3,MTYPE
 
      END DO
 
@@ -206,25 +215,14 @@ SUBROUTINE ELEMENT_3T_MAIN (ID,X,Y,Z,U,MHT,E,POISSON,LM,XYZ,MATP)
         C(1,:) = (/XYZ(1,N),XYZ(2,N)/)
         C(2,:) = (/XYZ(4,N),XYZ(5,N)/)
         C(3,:) = (/XYZ(7,N),XYZ(8,N)/)
-        C(4,:) = (/XYZ(10,N),XYZ(11,N)/)
         
         KE = 0
-
-        DO I=1,2
-            DO J=1,2
-                ETA = GP(I)
-                EPSILON = GP(J)
-                
-                NMAT = NmatElast3T(ETA,EPSILON)
-                BMAT = BmatElast3T(ETA,EPSILON,C)
-                
-                KE = KE + W(I)*W(J)*MATMUL(MATMUL(TRANSPOSE(BMAT),D),BMAT)*DETJ
-                
-            END DO
-         END DO       
-
-        CALL ADDBAN (DA(NP(3)),IA(NP(2)),KE,LM(1,N),ND)
-
+        
+        BMAT = BmatElast3T(C(:,1),C(:,2))
+        KE = W(I)*W(J)*MATMUL(MATMUL(TRANSPOSE(BMAT),D),BMAT)*DETJ
+        
+        CALL ADDBAN (DA(NP(3)),IA(NP(2)),KE,LM(1,N),ND)   
+        
      END DO
 
      RETURN
@@ -249,9 +247,8 @@ SUBROUTINE ELEMENT_3T_MAIN (ID,X,Y,Z,U,MHT,E,POISSON,LM,XYZ,MATP)
         C(1,:) = (/XYZ(1,N),XYZ(2,N)/)
         C(2,:) = (/XYZ(4,N),XYZ(5,N)/)
         C(3,:) = (/XYZ(7,N),XYZ(8,N)/)
-        C(4,:) = (/XYZ(10,N),XYZ(11,N)/)
         
-        DO I=1,8
+        DO I=1,6
             IF (LM(I,N)==0) THEN
                 DST(I,1)=0
             ELSE
@@ -259,30 +256,22 @@ SUBROUTINE ELEMENT_3T_MAIN (ID,X,Y,Z,U,MHT,E,POISSON,LM,XYZ,MATP)
             END IF
         END DO
         
-        DO I=1,2
-            DO J=1,2
-                ETA = GP(I)
-                EPSILON = GP(J)
+        DO I=1,GUASS_N
+                ETA = GP1(I)
+                EPSILON = GP2(J)
                 
                 NMAT = NmatElast3T(ETA,EPSILON)
                 
-                NA(1,:) = (/NMAT(1,1) , NMAT(1,3) , NMAT(1,5) , NMAT(1,7)/)
+                XY = MATMUL(NMAT,C)
                 
-                XY = MATMUL(NA,C)
-                X_GUASS(2*J+I-2,1) = XY(1,1)
-                X_GUASS(2*J+I-2,2) = XY(1,2)
-                
-
-                BMAT = BmatElast3T(ETA,EPSILON,C)
+                BMAT = BmatElast3T(C(:,1),C(:,2))
                 STRESS = MATMUL(D,MATMUL(BMAT,DST))
                 
-                STRESS_XX(N,2*J+I-2) = STRESS(1,1)
-                STRESS_YY(N,2*J+I-2) = STRESS(2,1)
-                STRESS_XY(N,2*J+I-2) = STRESS(3,1)
+            WRITE (IOUT,"(1X,I5,4X,E13.6,4X,E13.6,11X,E13.6,4X,E13.6,4X,E13.6)") &
+                    &  N , XY(1,1) , XY(1,2) &
+                    &  , STRESS(1,1) , STRESS(2,1) , STRESS(3,1)
                 
-            WRITE (IOUT,"(1X,I5,4X,E13.6,4X,E13.6,11X,E13.6,4X,E13.6,4X,E13.6)") N,X_GUASS(2*J+I-2,1),X_GUASS(2*J+I-2,2),STRESS_XX(N,2*J+I-2),STRESS_YY(N,2*J+I-2),STRESS_XY(N,2*J+I-2)
-                
-            END DO
+            
         END DO
                 
      END DO
@@ -293,67 +282,51 @@ SUBROUTINE ELEMENT_3T_MAIN (ID,X,Y,Z,U,MHT,E,POISSON,LM,XYZ,MATP)
 
 END SUBROUTINE ELEMENT_3T_MAIN
     
-FUNCTION NmatElast3T(eta,psi)
+FUNCTION NmatElast3T(ETA,EPSILON)
   IMPLICIT NONE
-  REAL(8):: eta
-  REAL(8):: psi
-  REAL(8):: NmatElast3T(2,8),N(2,8)
-  REAL(8):: N1,N2,N3,N4
+  REAL(8):: EPSILON,ETA
+  REAL(8):: X1,X2,X3,Y1,Y2,Y3
+  REAL(8):: NmatElast3T(1,3),N(1,3)
+  REAL(8):: N1,N2,N3
   
-  N1 = 0.25*(1.0-psi)*(1.0-eta)
-  N2 = 0.25*(1.0+psi)*(1.0-eta) 
-  N3 = 0.25*(1.0+psi)*(1.0+eta) 
-  N4 = 0.25*(1.0-psi)*(1.0+eta)
+  X1=1.0
+  X2=0.0
+  X3=0.0
+  Y1=0.0
+  Y2=1.0
+  Y3=0.0
   
-  N(1,1)=N1
-  N(1,2)=0.0
-  N(1,3)=N2
-  N(1,4)=0.0
-  N(1,5)=N3
-  N(1,6)=0.0
-  N(1,7)=N4
-  N(1,8)=0.0
-  N(2,1)=0.0
-  N(2,2)=N1
-  N(2,3)=0.0
-  N(2,4)=N2
-  N(2,5)=0.0
-  N(2,6)=N3
-  N(2,7)=0.0
-  N(2,8)=N4
+  N1 = (x2*y3-x3*y2)+(y2-y3)*EPSILON+(x3-x2)*ETA
+  N2 = (x3*y1-x1*y3)+(y3-y1)*EPSILON+(x1-x3)*ETA
+  N3 = (x1*y2-x2*y1)+(y1-y2)*EPSILON+(x2-x1)*ETA
   
+  N(1,:) = (/N1,N2,N3/)
   NmatElast3T=N
   
 END FUNCTION NmatElast3T
   
 FUNCTION BmatElast3T(X,Y)
     IMPLICIT NONE
-    REAL(8):: X(3),Y(3)
+    REAL(8):: X(3,1),Y(3,1)
     REAL(8):: X1,X2,X3,Y1,Y2,Y3
     REAL(8):: J(2,2)
     REAL(8):: DETJ
-!   REAL(8):: INVJ(2,2),BB(2,3)
     REAL(8):: B1x,B2x,B3x,B1y,B2y,B3y
     REAL(8):: B(3,6),BmatElast3T(3,6)
     REAL(8):: ZERO
     COMMON DETJ
     
-    X1 = X(1)
-    X2 = X(2)
-    X3 = X(3)
-    Y1 = Y(1)
-    Y2 = Y(2)
-    Y3 = Y(3)
+    X1 = X(1,1)
+    X2 = X(2,1)
+    X3 = X(3,1)
+    Y1 = Y(1,1)
+    Y2 = Y(2,1)
+    Y3 = Y(3,1)
     
     J(1,:) = (/X1-X3,Y1-Y3/)
     J(2,:) = (/X2-X3,Y2-Y3/)
     
     DETJ = J(1,1)*J(2,2)-J(1,2)*J(2,1)
-    
-!   INVJ(1,:)=1/DETJ*(/J(2,2),-J(1,2)/)
-!   INVJ(2,:)=1/DETJ*(/-J(2,1),J(1,1)/)
-    
-!   BB= MATMUL(INVJ,GN)
     
     B1x     = y2-y3
     B2x     = y3-y1
@@ -363,12 +336,9 @@ FUNCTION BmatElast3T(X,Y)
     B3y     = x2-x1
     ZERO    = 0.0
     
-    B(1,:) = (/B1x   ,   ZERO   ,  B2x  ,   ZERO   ,   B3x  ,  ZERO   /)
-    B(2,:) = (/  ZERO   ,  B1y  ,  ZERO  ,   B2y   ,   ZERO   ,  B3y  /)
-    B(3,:) = (/B1y  ,   B1x  ,  B2y  ,  B2x  ,   B3y   , B3x /)
+    B(1,:) =1/DETJ* (/B1x   ,  ZERO ,  B2x   ,   ZERO  ,   B3x   ,  ZERO /)
+    B(2,:) =1/DETJ* (/ZERO  ,  B1y  ,  ZERO  ,   B2y   ,   ZERO  ,  B3y  /)
+    B(3,:) =1/DETJ* (/B1y   ,  B1x  ,  B2y   ,   B2x   ,   B3y   ,  B3x  /)
     
     BmatElast3T = B
 END FUNCTION BmatElast3T
-
-
-  
