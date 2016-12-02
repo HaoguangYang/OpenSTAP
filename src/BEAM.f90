@@ -3,6 +3,7 @@ SUBROUTINE BEAM
 ! .                                                                   .
 ! .   To set up storage and call the BEAMELE element subroutine
 ! .   CALCULATED THE BEAM ELEMENT STIFFNESS MATRIX
+!.    POSTPROCESSING FOR THE BEAM ELEMENT
 !     DONE BY LIUCHANGWU                     .
 ! . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
@@ -65,8 +66,9 @@ END SUBROUTINE BEAM
 SUBROUTINE BEAMELE (ID,X,Y,Z,U,MHT,E,G,AREA,I_X,I_Y,I_Z,J_X,J_Y,J_Z,LM,XYZ,MATP)
 ! . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 ! .                                                                   .
-! .   TRUSS element subroutine                                        .
-! .                                                                   .
+! .   BEAM ELEMENT subroutine                                        .
+! .   
+! .   OUTPUT: S(12,12) THE ELEMENT STIFFNESS MATRIX  
 ! . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
   USE GLOBALS
@@ -76,11 +78,11 @@ SUBROUTINE BEAMELE (ID,X,Y,Z,U,MHT,E,G,AREA,I_X,I_Y,I_Z,J_X,J_Y,J_Z,LM,XYZ,MATP)
   INTEGER :: ID(6,NUMNP),LM(12,NPAR(2)),MATP(NPAR(2)),MHT(NEQ)
   REAL(8) :: X(NUMNP),Y(NUMNP),Z(NUMNP),E(NPAR(3)),G(NPAR(3)),AREA(NPAR(3)),  &
              I_X(NPAR(3)),I_Y(NPAR(3)),I_Z(NPAR(3)),J_X(NPAR(3)),J_Y(NPAR(3)),J_Z(NPAR(3)),XYZ(6,NPAR(2)),U(NEQ)
-  REAL(8) :: S(12,12),D(3)
+  REAL(8) :: S(12,12),D(3),UELE(12),FORCE(12),SIGMA   !UELE: THE DISPLACEMENT OF ELEMENT N; FORCE: THE INTERNAL FORCE AND MOMENT FOR ELEMENT N
 
   INTEGER :: NPAR1, NUME, NUMMAT, ND, I, J, L, N
   INTEGER :: MTYPE, IPRINT
-  REAL(8) :: XL2, XL ,CXX,CXY,CXZ,CYX,CYY,CYZ,CZX,CZY,CZZ,T(12,12)
+  REAL(8) :: XL2, XL ,CXX,CXY,CXZ,CYX,CYY,CYZ,CZX,CZY,CZZ,T(12,12)!TRANSLATION MATRIX
 
   NPAR1  = NPAR(1)
   NUME   = NPAR(2)
@@ -95,7 +97,7 @@ SUBROUTINE BEAMELE (ID,X,Y,Z,U,MHT,E,G,AREA,I_X,I_Y,I_Z,J_X,J_Y,J_Z,LM,XYZ,MATP)
                    ' ELEMENT TYPE ',13(' .'),'( NPAR(1) ) . . =',I5,/,   &
                    '     EQ.1, TRUSS ELEMENTS',/,      &
                    '     EQ.2, ELEMENTS CURRENTLY',/,  &
-                   '     EQ.3, 3D BEAM',//,      &
+                   '     EQ.5, 3D BEAM',//,      &
                    ' NUMBER OF ELEMENTS.',10(' .'),'( NPAR(2) ) . . =',I5,/)") NPAR1,NUME
 
      IF (NUMMAT.EQ.0) NUMMAT=1
@@ -157,12 +159,14 @@ SUBROUTINE BEAMELE (ID,X,Y,Z,U,MHT,E,G,AREA,I_X,I_Y,I_Z,J_X,J_Y,J_Z,LM,XYZ,MATP)
      DO N=1,NUME
         MTYPE=MATP(N)
 
+        !CALCULATE THE LENGTH OF THE ELEMENT
+        
         XL2=0.
         DO L=1,3
            D(L)=XYZ(L,N) - XYZ(L+3,N)
            XL2=XL2 + D(L)*D(L)
         END DO
-        XL=SQRT(XL2)   ! Length of element N
+        XL=SQRT(XL2)  
         
         ! COORDINATE TRANSLATION MATRIX T
         
@@ -172,6 +176,7 @@ SUBROUTINE BEAMELE (ID,X,Y,Z,U,MHT,E,G,AREA,I_X,I_Y,I_Z,J_X,J_Y,J_Z,LM,XYZ,MATP)
             ENDDO
         ENDDO
         
+        !ASSUME THE DIRECTION FOR PRINCIPLE AXIS        
         CXX=(XYZ(4,N)-XYZ(1,N))/XL
         CXY=(XYZ(5,N)-XYZ(2,N))/XL
         CXZ=(XYZ(6,N)-XYZ(3,N))/XL
@@ -258,16 +263,125 @@ SUBROUTINE BEAMELE (ID,X,Y,Z,U,MHT,E,G,AREA,I_X,I_Y,I_Z,J_X,J_Y,J_Z,LM,XYZ,MATP)
         IF (IPRINT.GT.50) IPRINT=1
         IF (IPRINT.EQ.1) WRITE (IOUT,"(//,' S T R E S S  C A L C U L A T I O N S  F O R  ',  &
                                            'E L E M E N T  G R O U P',I4,//,   &
-                                           '  ELEMENT',13X,'FORCE',12X,'STRESS',/,'  NUMBER')") NG
+                                           '  ELEMENT',2X,'FORCE_X1',3X,'FORCE_Y1',3X,'FORCE_Z1',3X,'MOMENT_X1',3X,'MOMENT_Y1',3X,'MOMENT_Z1',3X,'FORCE_X2',3X,'FORCE_Y2',3X,'FORCE_Z2',3X,'MOMENT_X2',3X,'MOMENT_Y2',3X,'MOMENT_Z2',/,'  NUMBER')") NG
         MTYPE=MATP(N)
-
+        
+        !CALCULATE THE LENGTH OF THE ELEMENT
+        
         XL2=0.
         DO L=1,3
            D(L) = XYZ(L,N) - XYZ(L+3,N)
            XL2=XL2 + D(L)*D(L)
         END DO
+        
+         XL=SQRT(XL2)  
+        
+        ! COORDINATE TRANSLATION MATRIX T
+        
+        DO I=1,12
+            DO J=1,12
+                T(I,J)=0
+            ENDDO
+        ENDDO
+        
+        !ASSUME THE DIRECTION FOR PRINCIPLE AXIS
+        
+        CXX=(XYZ(4,N)-XYZ(1,N))/XL
+        CXY=(XYZ(5,N)-XYZ(2,N))/XL
+        CXZ=(XYZ(6,N)-XYZ(3,N))/XL
+        CYX=-CXX*CXZ/SQRT(CXX*CXX+CXY*CXY)
+        CYY=-CXY*CXZ/SQRT(CXX*CXX+CXY*CXY)
+        CYZ=SQRT(CXX*CXX+CXY*CXY)
+        CZX=CXY/SQRT(CXX*CXX+CXY*CXY)
+        CZY=-CXX/SQRT(CXX*CXX+CXY*CXY)
+        CZZ=0.0
+        
+        T(1,1)=CXX
+        T(1,2)=CXY
+        T(1,3)=CXZ
+        T(2,1)=CYX
+        T(2,2)=CYY
+        T(2,3)=CYZ
+        T(3,1)=CZX
+        T(3,2)=CZY
+        T(3,3)=CZZ
+        
+        DO I=1,3
+           DO J=1,3
+              T(I+3,J+3)=T(I,J)
+              T(I+6,J+6)=T(I,J)
+              T(I+9,J+9)=T(I,J)
+           ENDDO
+        ENDDO
+        
+        !CALCULATE ELEMENT STIFFNESS MATRIX
+        
+        DO I=1,12
+           DO J=1,12
+              S(I,J)=0
+           ENDDO
+        ENDDO
+        
+        S(1,1)=E(MTYPE)*AREA(MTYPE)/XL
+        S(2,2)=12.0*E(MTYPE)*I_Z(MTYPE)/(XL*XL*XL)
+        S(3,3)=12.0*E(MTYPE)*I_Y(MTYPE)/(XL*XL*XL)
+        S(4,4)=G(MTYPE)*J_Z(MTYPE)/XL
+        S(5,5)=4.0*E(MTYPE)*I_Y(MTYPE)/XL
+        S(6,6)=4.0*E(MTYPE)*I_Z(MTYPE)/XL
+        S(7,7)=E(MTYPE)*AREA(MTYPE)/XL
+        S(8,8)=12.0*E(MTYPE)*I_Z(MTYPE)/(XL*XL*XL)
+        S(9,9)=12.0*E(MTYPE)*I_Y(MTYPE)/(XL*XL*XL)
+        S(10,10)=G(MTYPE)*J_Z(MTYPE)/XL
+        S(11,11)=4.0*E(MTYPE)*I_Y(MTYPE)/XL
+        S(12,12)=4.0*E(MTYPE)*I_Z(MTYPE)/XL
+        S(5,3)=-6.0*E(MTYPE)*I_Z(MTYPE)/(XL*XL)
+        S(6,2)=6.0*E(MTYPE)*I_Z(MTYPE)/(XL*XL)
+        S(7,1)=-E(MTYPE)*AREA(MTYPE)/XL
+        S(8,2)=-12.0*E(MTYPE)*I_Z(MTYPE)/(XL*XL*XL)
+        S(8,6)=-6.0*E(MTYPE)*I_Z(MTYPE)/(XL*XL)
+        S(9,3)=-12.0*E(MTYPE)*I_Y(MTYPE)/(XL*XL*XL)
+        S(9,5)=6.0*E(MTYPE)*I_Y(MTYPE)/(XL*XL)
+        S(10,4)=-G(MTYPE)*J_X(MTYPE)/XL
+        S(11,3)=-6.0*E(MTYPE)*I_Y(MTYPE)/(XL*XL)
+        S(11,5)=2.0*E(MTYPE)*I_Y(MTYPE)/XL
+        S(11,9)=6.0*E(MTYPE)*I_Y(MTYPE)/(XL*XL)
+        S(12,2)=6.0*E(MTYPE)*I_Z(MTYPE)/(XL*XL)
+        S(12,6)=2.0*E(MTYPE)*I_Z(MTYPE)/XL
+        S(12,8)=-6.0*E(MTYPE)*I_Z(MTYPE)/(XL*XL)
+        
+        DO I=1,11
+           DO J=I+1,12
+               S(I,J)=S(J,I)
+           ENDDO
+        ENDDO
 
-      
+        S=MATMUL(TRANSPOSE(T),MATMUL(S,T))
+
+     !GET THE DISPLACEMENT FOR ELEMENT N   
+        DO L=1,12
+           UELE(L)=0.0
+        ENDDO
+        DO L=1,12
+           I=LM(L,N)
+           IF (I .GT. 0)THEN
+               UELE(L)=U(I)
+           ENDIF
+        ENDDO
+        
+      !CALCULATE FORCE AND MOMENT OF THE ELEMENT
+         
+        DO I=1,12
+           SIGMA=0.0
+           DO J=1,12
+               SIGMA=SIGMA+UELE(J)*S(I,J)
+           ENDDO
+           FORCE(I)=SIGMA
+        ENDDO
+        
+       !PRINT THE RESULTS FOR POSTPROCESSING
+       
+       WRITE (IOUT,"(1X,I5,1X,12(E12.6,1X))") N,(FORCE(I),I=1,12)
+        
      END DO
 
   ELSE 
@@ -283,7 +397,8 @@ SUBROUTINE BEAMELE (ID,X,Y,Z,U,MHT,E,G,AREA,I_X,I_Y,I_Z,J_X,J_Y,J_Z,LM,XYZ,MATP)
 ! .   To calculate equation numbers and store them in id arrray           .
 ! .                                                                       .
 ! .      N = Element number                                               .
-! .      ID = Boundary condition codes (0=free,1=deleted)                 .
+! .      ID = Boundary condition codes (0=free,1=deleted)
+! .      ATTENTION: ID ARRAY FOR BEAM HAS 6 LINES.
 ! .      X,Y,Z = Coordinates                                              .
 ! .      KN = Generation code                                             .
 ! .           i.e. increment on nodal point number                        .
@@ -382,7 +497,7 @@ END SUBROUTINE LOADSBEAM
 SUBROUTINE WRITEDBEAM (DISP,ID,NEQ,NUMNP)
 ! . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 ! .                                                                   .
-! .   To print displacements                                          .
+! .   To PRINT DISPLACEMENT AND ANGLES                                          .
 ! . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
   USE GLOBALS, ONLY : IOUT
