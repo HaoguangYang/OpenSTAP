@@ -98,9 +98,9 @@ SUBROUTINE LOADS (R,NOD,IDIRN,FLOAD,ID,NLOAD,NEQ)
 
   IF (MODEX.EQ.0) RETURN
 
-  DO I=1,NEQ
-     R(I)=0.
-  END DO
+  !DO I=1,NEQ
+     R(:)=0.
+  !END DO
 
   DO L=1,NLOAD
      LN=NOD(L)

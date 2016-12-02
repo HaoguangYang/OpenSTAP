@@ -228,11 +228,11 @@ PROGRAM STAP90
 
   WRITE (IOUT,"(//,  &
      ' S O L U T I O N   T I M E   L O G   I N   S E C',//,   &
-     '     TIME FOR INPUT PHASE ',14(' .'),' =',F12.2,/,     &
-     '     TIME FOR CALCULATION OF STIFFNESS MATRIX  . . . . =',F12.2, /,   &
-     '     TIME FOR FACTORIZATION OF STIFFNESS MATRIX  . . . =',F12.2, /,   &
-     '     TIME FOR LOAD CASE SOLUTIONS ',10(' .'),' =',F12.2,//,   &
-     '      T O T A L   S O L U T I O N   T I M E  . . . . . =',F12.2)") (TIM(I),I=1,4),TT
+     '     TIME FOR INPUT PHASE ',14(' .'),' =',F15.5,/,     &
+     '     TIME FOR CALCULATION OF STIFFNESS MATRIX  . . . . =',F15.5, /,   &
+     '     TIME FOR FACTORIZATION OF STIFFNESS MATRIX  . . . =',F15.5, /,   &
+     '     TIME FOR LOAD CASE SOLUTIONS ',10(' .'),' =',F15.5,//,   &
+     '      T O T A L   S O L U T I O N   T I M E  . . . . . =',F15.5)") (TIM(I),I=1,4),TT
   STOP
 
 END PROGRAM STAP90
