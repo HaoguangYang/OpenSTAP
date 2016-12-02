@@ -62,6 +62,7 @@ PROGRAM STAP90
 
 ! ALLOCATE STORAGE
 !   ID(3,NUMNP) : Boundary condition codes (0=free,1=deleted)
+!   IDBEAM(6,NUMNP) : Boundary condition codes for beam (0=free,1=fixed)
 !   X(NUMNP)    : X coordinates
 !   Y(NUMNP)    : Y coordinates
 !   Z(NUMNP)    : Z coordinates
@@ -118,8 +119,12 @@ PROGRAM STAP90
      CALL MEMALLOC(6,"NOD  ",NLOAD,1)
      CALL MEMALLOC(7,"IDIRN",NLOAD,1)
      CALL MEMALLOC(8,"FLOAD",NLOAD,ITWO)
-
-     CALL LOADS (DA(NP(5)),IA(NP(6)),IA(NP(7)),DA(NP(8)),IA(NP(1)),NLOAD,NEQ)
+     
+     IF (HED .EQ. 'BEAM') THEN
+         CALL LOADSBEAM (DA(NP(5)),IA(NP(6)),IA(NP(7)),DA(NP(8)),IA(NP(1)),NLOAD,NEQ)
+      ELSE
+         CALL LOADS (DA(NP(5)),IA(NP(6)),IA(NP(7)),DA(NP(8)),IA(NP(1)),NLOAD,NEQ)
+     ENDIF
 
   END DO
 
@@ -197,7 +202,12 @@ PROGRAM STAP90
         CALL COLSOL (DA(NP(3)),DA(NP(4)),IA(NP(2)),NEQ,NWK,NEQ1,2)
 
         WRITE (IOUT,"(//,' LOAD CASE ',I3)") L
-        CALL WRITED (DA(NP(4)),IA(NP(1)),NEQ,NUMNP)  ! Print displacements
+        
+        IF (NPAR(1) .EQ. 5) THEN
+            CALL WRITEDBEAM (DA(NP(4)),IA(NP(1)),NEQ,NUMNP)  ! Print displacements
+          ELSE 
+            CALL WRITED (DA(NP(4)),IA(NP(1)),NEQ,NUMNP)  ! Print displacements
+        ENDIF
 
 !       Calculation of stresses
         CALL STRESS (A(NP(11)))
