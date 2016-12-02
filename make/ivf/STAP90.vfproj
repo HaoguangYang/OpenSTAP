@@ -30,6 +30,7 @@
 		<File RelativePath="..\..\src\4Q.f90"/>
 		<File RelativePath="..\..\src\9Q.f90"/>
 		<File RelativePath="..\..\src\assem.f90"/>
+		<File RelativePath="..\..\src\BEAM.f90"/>
 		<File RelativePath="..\..\src\datain.f90"/>
 		<File RelativePath="..\..\src\elcal.f90"/>
 		<File RelativePath="..\..\data\ELEMENT_4Q_test.dat"/>
