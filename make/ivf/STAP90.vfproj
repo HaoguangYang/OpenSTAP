@@ -35,6 +35,8 @@
 		<File RelativePath="..\..\data\ELEMENT_4Q_test.dat"/>
 		<File RelativePath="..\..\data\ELEMENT_9Q_test.dat"/>
 		<File RelativePath="..\..\src\globals.f90"/>
+		<File RelativePath="..\..\src\hexahedral.f90"/>
+		<File RelativePath="..\..\src\mathkernel.f90"/>
 		<File RelativePath="..\..\src\memalloc.f90"/>
 		<File RelativePath="..\..\src\stap.f90"/>
 		<File RelativePath="..\..\data\STAP90.OUT"/>
