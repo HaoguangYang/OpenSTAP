@@ -11,7 +11,7 @@
 ! .                                                                       .
 ! . . . . . . . . . . . . . .  . . .  . . . . . . . . . . . . . . . . . . .
     
-SUBROUTINE SHELL
+SUBROUTINE SHELL8Q
 ! . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 ! .                                                                   .
 ! .   To set up storage and call the PLATE element subroutine         .
@@ -58,15 +58,15 @@ SUBROUTINE SHELL
 
   MIDEST=NLAST - NFIRST
 
-  CALL SHELL4Q (IA(NP(1)),DA(NP(2)),DA(NP(3)),DA(NP(4)),DA(NP(4)),IA(NP(5)),   &
+  CALL SHELL8 (IA(NP(1)),DA(NP(2)),DA(NP(3)),DA(NP(4)),DA(NP(4)),IA(NP(5)),   &
        A(N101),A(N102),A(N103),A(N104),A(N105), A(N106))
 
   RETURN
 
-END SUBROUTINE SHELL
+END SUBROUTINE SHELL8Q
 
 
-SUBROUTINE SHELL4Q (ID,X,Y,Z,U,MHT,E,POSSION,LM,XYZ,MATP, THICK)
+SUBROUTINE SHELL8 (ID,X,Y,Z,U,MHT,E,POSSION,LM,XYZ,MATP, THICK)
 ! . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 ! .                                                                   .
 ! .   TRUSS element subroutine                                        .
@@ -79,7 +79,7 @@ SUBROUTINE SHELL4Q (ID,X,Y,Z,U,MHT,E,POSSION,LM,XYZ,MATP, THICK)
   IMPLICIT NONE
   INTEGER :: ID(5,NUMNP),LM(20,NPAR(2)),MATP(NPAR(2)),MHT(NEQ)
   REAL(8) :: X(NUMNP),Y(NUMNP),Z(NUMNP),E(NPAR(3)),POSSION(NPAR(3)),  &
-             XYZ(12,NPAR(2)),THICK(NPAR(2)),U(NEQ)
+             XYZ(12,NPAR(2)),THICK(NPAR(2)),U(NEQ), DISP(20,1)=0
   
   REAL(8) :: DE(20,1)
   INTEGER :: NPAR1, NUME, NUMMAT, ND, I, J, K, L, M, N
@@ -323,4 +323,4 @@ SUBROUTINE SHELL4Q (ID,X,Y,Z,U,MHT,E,POSSION,LM,XYZ,MATP, THICK)
      STOP "*** ERROR *** Invalid IND value."
   END IF
 
-END SUBROUTINE SHELL4Q
+END SUBROUTINE SHELL8

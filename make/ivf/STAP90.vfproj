@@ -40,7 +40,9 @@
 		<File RelativePath="..\..\src\mathkernel.f90"/>
 		<File RelativePath="..\..\src\memalloc.f90"/>
 		<File RelativePath="..\..\src\plate.f90"/>
+		<File RelativePath="..\..\src\plate8Q.f90"/>
 		<File RelativePath="..\..\src\shell.f90"/>
+		<File RelativePath="..\..\src\shell8Q.f90"/>
 		<File RelativePath="..\..\src\stap.f90"/>
 		<File RelativePath="..\..\data\STAP90.OUT"/>
 		<File RelativePath="..\..\src\truss.f90"/></Filter>

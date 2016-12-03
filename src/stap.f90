@@ -67,7 +67,7 @@ PROGRAM STAP90
 !   Y(NUMNP)    : Y coordinates
 !   Z(NUMNP)    : Z coordinates
 
-  IF (HED .EQ. 'PLATE') THEN
+  IF ((HED .EQ. 'PLATE') .OR. (HED .EQ. 'PLATE8Q')) THEN
       DIM = 3
   ELSEIF (HED .EQ. 'SHELL') THEN
       DIM = 5
