@@ -99,3 +99,17 @@
 
            TAU_xx        TAU_yy        TAU_xy         TAU_xz       TAU_yz
 ELEMENT  1
+          -0.81E+05     -0.29E+05     -0.15E+05     -0.21E+07     -0.52E+06
+          -0.86E+05     -0.44E+05     -0.35E+05     -0.21E+07     -0.52E+06
+          -0.22E+05     -0.12E+05     -0.94E+04     -0.21E+07     -0.52E+06
+          -0.27E+05     -0.27E+05     -0.30E+05     -0.21E+07     -0.52E+06
+
+
+ S O L U T I O N   T I M E   L O G   I N   S E C
+
+     TIME FOR INPUT PHASE  . . . . . . . . . . . . . . =        0.00000
+     TIME FOR CALCULATION OF STIFFNESS MATRIX  . . . . =        0.00000
+     TIME FOR FACTORIZATION OF STIFFNESS MATRIX  . . . =        0.00000
+     TIME FOR LOAD CASE SOLUTIONS  . . . . . . . . . . =        0.00000
+
+      T O T A L   S O L U T I O N   T I M E  . . . . . =        0.00000

@@ -44,7 +44,8 @@ SUBROUTINE SHELL
 ! N103: LM(20,NUME)
 ! N104: XYZ(12,NUME)
 ! N105: MTAP(NUME)
-! N106: NLAST
+! N106: THICK(NUME
+! N107: NLAST
   
   N101=NFIRST
   N102=N101+NUMMAT*ITWO
@@ -58,7 +59,7 @@ SUBROUTINE SHELL
   MIDEST=NLAST - NFIRST
 
   CALL SHELL4Q (IA(NP(1)),DA(NP(2)),DA(NP(3)),DA(NP(4)),DA(NP(4)),IA(NP(5)),   &
-       A(N101),A(N102),A(N103),A(N104),A(N105), A(106))
+       A(N101),A(N102),A(N103),A(N104),A(N105), A(N106))
 
   RETURN
 
@@ -268,8 +269,7 @@ SUBROUTINE SHELL4Q (ID,X,Y,Z,U,MHT,E,POSSION,LM,XYZ,MATP, THICK)
         Cb(3,3) = (1-Ptemp)/2
         Cb = Cb*Etemp/12.0/(1-Ptemp*Ptemp)*5.0/6.0
 
-        Cc = Cb*Etemp/12.0/(1-Ptemp*Ptemp)*5.0/6.0
-        Cb = Cb*Etemp/12.0/(1-Ptemp*Ptemp)*5.0/6.0
+        Cc = Cb
         
         Cs = Etemp/(2*(1+Ptemp))
 ! Gauss 积分常数
