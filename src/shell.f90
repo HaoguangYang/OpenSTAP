@@ -236,7 +236,7 @@ SUBROUTINE SHELL4Q (ID,X,Y,Z,U,MHT,E,POSSION,LM,XYZ,MATP, THICK)
 
 ! Stress calculations
   ELSE IF (IND .EQ. 3) THEN
-
+    
   ELSE 
      STOP "*** ERROR *** Invalid IND value."
   END IF
