@@ -30,6 +30,7 @@
 		<Filter Name="Data">
 		<File RelativePath="..\..\data\4Q_Patch.OUT"/>
 		<File RelativePath="..\..\data\8H_Patch.OUT"/>
+		<File RelativePath="..\..\data\ELEMENT_3T.dat"/>
 		<File RelativePath="..\..\data\ELEMENT_4Q.dat"/>
 		<File RelativePath="..\..\data\ELEMENT_4Q_test.dat"/>
 		<File RelativePath="..\..\data\ELEMENT_9Q_test.dat"/>

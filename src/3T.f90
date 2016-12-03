@@ -59,7 +59,7 @@ NUMMAT = NPAR(3)
 
   MIDEST=NLAST - NFIRST
 
-  CALL ELEMENT_4Q_MAIN (IA(NP(1)),DA(NP(2)),DA(NP(3)),DA(NP(4)),DA(NP(4)),IA(NP(5)),   &
+  CALL ELEMENT_3T_MAIN (IA(NP(1)),DA(NP(2)),DA(NP(3)),DA(NP(4)),DA(NP(4)),IA(NP(5)),   &
        A(N101),A(N102),A(N103),A(N104),A(N105))
 
   RETURN
@@ -166,7 +166,7 @@ SUBROUTINE ELEMENT_3T_MAIN (ID,X,Y,Z,U,MHT,E,POISSON,LM,XYZ,MATP)
 
      N=0
      DO WHILE (N .NE. NUME)
-        READ (IIN,'(7I5)') N,I1,I2,I3,MTYPE  ! Read in element information
+        READ (IIN,'(5I5)') N,I1,I2,I3,MTYPE  ! Read in element information
 
 !       Save element information
         XYZ(1,N)=X(I1)  ! Coordinates of the element's 1st node
@@ -208,9 +208,9 @@ SUBROUTINE ELEMENT_3T_MAIN (ID,X,Y,Z,U,MHT,E,POISSON,LM,XYZ,MATP)
      DO N=1,NUME
         MTYPE=MATP(N)
               
-        D(1,:)=E(MATP(N))/(1D0-POISSON(MATP(N))*POISSON(MATP(N)))*(/1D0,POISSON(MATP(N)),0D0/)
-        D(2,:)=E(MATP(N))/(1D0-POISSON(MATP(N))*POISSON(MATP(N)))*(/POISSON(MATP(N)),1D0,0D0/)
-        D(3,:)=E(MATP(N))/(1D0-POISSON(MATP(N))*POISSON(MATP(N)))*(/0D0,0D0,(1D0-POISSON(MATP(N)))/2D0/)
+        D(1,:)=E(MTYPE)/(1D0-POISSON(MTYPE)*POISSON(MTYPE))*(/1D0,POISSON(MTYPE),0D0/)
+        D(2,:)=E(MTYPE)/(1D0-POISSON(MTYPE)*POISSON(MTYPE))*(/POISSON(MTYPE),1D0,0D0/)
+        D(3,:)=E(MTYPE)/(1D0-POISSON(MTYPE)*POISSON(MTYPE))*(/0D0,0D0,(1D0-POISSON(MTYPE))/2D0/)
         
         C(1,:) = (/XYZ(1,N),XYZ(2,N)/)
         C(2,:) = (/XYZ(4,N),XYZ(5,N)/)
@@ -219,7 +219,7 @@ SUBROUTINE ELEMENT_3T_MAIN (ID,X,Y,Z,U,MHT,E,POISSON,LM,XYZ,MATP)
         KE = 0
         
         BMAT = BmatElast3T(C(:,1),C(:,2))
-        KE = W(I)*W(J)*MATMUL(MATMUL(TRANSPOSE(BMAT),D),BMAT)*DETJ
+        KE = 1.0/2*MATMUL(MATMUL(TRANSPOSE(BMAT),D),BMAT)*DETJ
         
         CALL ADDBAN (DA(NP(3)),IA(NP(2)),KE,LM(1,N),ND)   
         
@@ -258,7 +258,7 @@ SUBROUTINE ELEMENT_3T_MAIN (ID,X,Y,Z,U,MHT,E,POISSON,LM,XYZ,MATP)
         
         DO I=1,GUASS_N
                 ETA = GP1(I)
-                EPSILON = GP2(J)
+                EPSILON = GP2(I)
                 
                 NMAT = NmatElast3T(ETA,EPSILON)
                 
