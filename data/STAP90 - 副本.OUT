@@ -1,0 +1,33 @@
+
+ SHELL                                                                           
+
+ C O N T R O L   I N F O R M A T I O N
+
+      NUMBER OF NODAL POINTS . . . . . . . . . . (NUMNP)  =     4
+      NUMBER OF ELEMENT GROUPS . . . . . . . . . (NUMEG)  =     1
+      NUMBER OF LOAD CASES . . . . . . . . . . . (NLCASE) =     1
+      SOLUTION MODE  . . . . . . . . . . . . . . (MODEX)  =     1
+         EQ.0, DATA CHECK
+         EQ.1, EXECUTION
+
+
+ N O D A L   P O I N T   D A T A
+
+  NODE          BOUNDARY                         NODAL POINT
+ NUMBER     CONDITION  CODES                     COORDINATES
+               X    Y    Z               X            Y            Z
+    1          1    1    1    1    1              0.000        1.000        0.000
+    2          1    1    1    1    1              0.000        0.000        0.000
+    3          0    0    0    0    0              1.000        0.000        0.000
+    4          0    0    0    0    0              1.000        1.000        0.000
+
+
+ EQUATION NUMBERS
+
+   NODE         DEGREES OF FREEDOM
+  NUMBER
+     N             X    Y    Z
+     1             0    0    0    0    0
+     2             0    0    0    0    0
+     3             1    2    3    4    5
+     4             6    7    8    9   10
