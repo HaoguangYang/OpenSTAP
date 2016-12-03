@@ -74,9 +74,13 @@ SUBROUTINE ELEMNT
      CALL HEXAHEDRAL
   case (5)
      CALL BEAM
+  case (6)
+     CALL PLATE
+  case (7)
+     CALL SHELL
 !    Other element types would be called here, identifying each
 !    element type by a different NPAR(1) parameter
-  case (6:)
+  case (8:)
      stop "ELEMENT TYPE STILL UNDER DEVELOPMENT..."
   END SELECT
 

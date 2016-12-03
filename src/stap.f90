@@ -67,11 +67,19 @@ PROGRAM STAP90
 !   Y(NUMNP)    : Y coordinates
 !   Z(NUMNP)    : Z coordinates
 
+  IF (HED .EQ. 'PLATE') THEN
+      DIM = 3
+  ELSEIF (HED .EQ. 'SHELL') THEN
+      DIM = 5
+  ELSE
+      DIM = 3
+  ENDIF
+  
   IF (HED .EQ. 'BEAM') THEN    !ATTENTION: 'IDBEAN' IS THE ID ARRAY USED FOR BEAM ONLY,  BECAUSE EVERY NODE HAS 6 DEGREE OF FREEDOM
      CALL MEMALLOC(1,"IDBEAM",6*NUMNP,1)
-    ELSE
-     CALL MEMALLOC(1,"ID   ",3*NUMNP,1)  !OTHER SITUATIONS EXCEPT BEAM (THE FORMER ONE)
-    ENDIF
+  ELSE
+     CALL MEMALLOC(1,"ID   ",DIM*NUMNP,1)  !OTHER SITUATIONS EXCEPT BEAM (THE FORMER ONE)
+  ENDIF
     
   CALL MEMALLOC(2,"X    ",NUMNP,ITWO)
   CALL MEMALLOC(3,"Y    ",NUMNP,ITWO)
@@ -79,7 +87,7 @@ PROGRAM STAP90
 
   IF (HED .EQ. 'BEAM') THEN    !ATTENTION: 'INPUTBEAM' IS THE INPUT SUBROUTINE ONLY FOR BEAM, BECAUSE THE SHAPE OF ID IS 'ID(6,NUMNP)'
      CALL INPUTBEAM (IA(NP(1)),DA(NP(2)),DA(NP(3)),DA(NP(4)),NUMNP,NEQ)
-    ELSE
+  ELSE
      CALL INPUT (IA(NP(1)),DA(NP(2)),DA(NP(3)),DA(NP(4)),NUMNP,NEQ)   !OTHER SITUATIONS EXCEPT BEAM(THE FORMER ONE)
   ENDIF
 
@@ -258,41 +266,65 @@ SUBROUTINE WRITED (DISP,ID,NEQ,NUMNP)
 ! .   To print displacements                                          .
 ! . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-  USE GLOBALS, ONLY : IOUT
+  USE GLOBALS, ONLY : IOUT, HED, DIM
 
   IMPLICIT NONE
-  INTEGER :: NEQ,NUMNP,ID(3,NUMNP)
-  REAL(8) :: DISP(NEQ),D(3)
+  INTEGER :: NEQ,NUMNP,ID(DIM,NUMNP)
+  REAL(8) :: DISP(NEQ),D(DIM)
   INTEGER :: IC,II,I,KK     !IL
 
 ! Print displacements
+  IF (HED == 'SHELL') THEN
+    WRITE (IOUT,"(//,' D I S P L A C E M E N T S',//,'  NODE ',10X,   &
+                    'W          BETA_X          BETA_Y          U         V')")
 
-  WRITE (IOUT,"(//,' D I S P L A C E M E N T S',//,'  NODE ',10X,   &
+    IC=4
+
+    DO II=1,NUMNP
+       IC=IC + 1
+       IF (IC.GE.56) THEN
+          WRITE (IOUT,"(//,' D I S P L A C E M E N T S',//,'  NODE ',10X,   &
+                          'W          BETA_X        BETA_Y          U         V')")
+          IC=4
+       END IF
+
+       DO I=1,DIM
+          D(I)=0.
+       END DO
+
+       DO I=1,DIM
+          KK=ID(I,II)
+          IF (KK.NE.0) D(I)=DISP(KK)
+       END DO
+
+       WRITE (IOUT,'(1X,I3,4X,<DIM>E14.4)') II,D
+    END DO
+  ELSE
+    WRITE (IOUT,"(//,' D I S P L A C E M E N T S',//,'  NODE ',10X,   &
                     'X-DISPLACEMENT    Y-DISPLACEMENT    Z-DISPLACEMENT')")
+    
+    IC=4
 
-  IC=4
-
-  DO II=1,NUMNP
-     IC=IC + 1
-     IF (IC.GE.56) THEN
-        WRITE (IOUT,"(//,' D I S P L A C E M E N T S',//,'  NODE ',10X,   &
+    DO II=1,NUMNP
+       IC=IC + 1
+       IF (IC.GE.56) THEN
+          WRITE (IOUT,"(//,' D I S P L A C E M E N T S',//,'  NODE ',10X,   &
                           'X-DISPLACEMENT    Y-DISPLACEMENT    Z-DISPLACEMENT')")
-        IC=4
-     END IF
+          IC=4
+       END IF
 
-     DO I=1,3
-        D(I)=0.
-     END DO
+       DO I=1,3
+          D(I)=0.
+       END DO
 
-     DO I=1,3
-        KK=ID(I,II)
-        IF (KK.NE.0) D(I)=DISP(KK)
-     END DO
+       DO I=1,3
+          KK=ID(I,II)
+          IF (KK.NE.0) D(I)=DISP(KK)
+       END DO
 
-     WRITE (IOUT,'(1X,I3,8X,3E18.6)') II,D
-
-  END DO
-
+       WRITE (IOUT,'(1X,I3,8X,<DIM>E18.6)') II,D
+   END DO
+  ENDIF
   RETURN
 
 END SUBROUTINE WRITED
@@ -318,19 +350,19 @@ SUBROUTINE OPENFILES()
 !    call GETARG(1,FileInp)
 !  end if
 
-  if(COMMAND_ARGUMENT_COUNT().ne.1) then
-     stop 'Usage: STAP90 InputFileName'
-  else
-     call GET_COMMAND_ARGUMENT(1,FileInp)
-  end if
+  !if(COMMAND_ARGUMENT_COUNT().ne.1) then
+  !   stop 'Usage: STAP90 InputFileName'
+  !else
+  !   call GET_COMMAND_ARGUMENT(1,FileInp)
+  !end if
 
-  INQUIRE(FILE = FileInp, EXIST = EX)
-  IF (.NOT. EX) THEN
-     PRINT *, "*** STOP *** FILE STAP90.IN DOES NOT EXIST !"
-     STOP
-  END IF
+  !INQUIRE(FILE = FileInp, EXIST = EX)
+  !IF (.NOT. EX) THEN
+  !   PRINT *, "*** STOP *** FILE STAP90.IN DOES NOT EXIST !"
+  !   STOP
+  !END IF
 
-  OPEN(IIN   , FILE = FileInp,  STATUS = "OLD")
+  OPEN(IIN   , FILE = "STAP90.IN",  STATUS = "OLD")
   OPEN(IOUT  , FILE = "STAP90.OUT", STATUS = "REPLACE")
 
   OPEN(IELMNT, FILE = "ELMNT.TMP",  FORM = "UNFORMATTED")
