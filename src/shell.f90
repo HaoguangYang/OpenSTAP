@@ -22,7 +22,7 @@ SUBROUTINE SHELL
   USE MEMALLOCATE
 
   IMPLICIT NONE
-  INTEGER :: NUME, NUMMAT, MM, N101, N102, N103, N104, N105, N106
+  INTEGER :: NUME, NUMMAT, MM, N101, N102, N103, N104, N105, N106, N107
 
   NUME = NPAR(2)
   NUMMAT = NPAR(3)
@@ -31,7 +31,7 @@ SUBROUTINE SHELL
 ! 此处材料要求每一种提供E, Possion
 ! 每个element需要
   IF (IND == 1) THEN
-      MM = 2*NUMMAT*ITWO + 21*NUME + 12*NUME*ITWO
+      MM = 2*NUMMAT*ITWO + 22*NUME + 12*NUME*ITWO
       CALL MEMALLOC(11,"ELEGP",MM,1)
   END IF
 
@@ -52,19 +52,20 @@ SUBROUTINE SHELL
   N104=N103+20*NUME
   N105=N104+12*NUME*ITWO
   N106=N105+NUME
-  NLAST=N106
+  N107=N106+NUME*ITWO
+  NLAST=N107
 
   MIDEST=NLAST - NFIRST
 
   CALL SHELL4Q (IA(NP(1)),DA(NP(2)),DA(NP(3)),DA(NP(4)),DA(NP(4)),IA(NP(5)),   &
-       A(N101),A(N102),A(N103),A(N104),A(N105))
+       A(N101),A(N102),A(N103),A(N104),A(N105), A(106))
 
   RETURN
 
 END SUBROUTINE SHELL
 
 
-SUBROUTINE SHELL4Q (ID,X,Y,Z,U,MHT,E,POSSION,LM,XYZ,MATP)
+SUBROUTINE SHELL4Q (ID,X,Y,Z,U,MHT,E,POSSION,LM,XYZ,MATP, THICK)
 ! . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 ! .                                                                   .
 ! .   TRUSS element subroutine                                        .
@@ -77,7 +78,7 @@ SUBROUTINE SHELL4Q (ID,X,Y,Z,U,MHT,E,POSSION,LM,XYZ,MATP)
   IMPLICIT NONE
   INTEGER :: ID(5,NUMNP),LM(20,NPAR(2)),MATP(NPAR(2)),MHT(NEQ)
   REAL(8) :: X(NUMNP),Y(NUMNP),Z(NUMNP),E(NPAR(3)),POSSION(NPAR(3)),  &
-             XYZ(12,NPAR(2)),U(NEQ), DISP(20,1)=0
+             XYZ(12,NPAR(2)),THICK(NPAR(2)),U(NEQ), DISP(20,1)=0
 
   INTEGER :: NPAR1, NUME, NUMMAT, ND, I, J, K, L, M, N
   INTEGER :: MTYPE, IPRINT
@@ -124,7 +125,7 @@ SUBROUTINE SHELL4Q (ID,X,Y,Z,U,MHT,E,POSSION,LM,XYZ,MATP)
      N=0
      LM = 0
      DO WHILE (N .NE. NUME)
-        READ (IIN,'(7I5)') N,I,J,K,L,MTYPE  ! Read in element information
+        READ (IIN,'(6I5, F10.0, I5)') N,I,J,K,L,MTYPE,THICK(N)  ! Read in element information
 
 !       Save element information
         XYZ(1,N)=X(I)  

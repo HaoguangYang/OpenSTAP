@@ -31,7 +31,7 @@ SUBROUTINE PLATE
 ! 此处材料要求每一种提供E, Possion
 ! 每个element需要
   IF (IND == 1) THEN
-      MM = 2*NUMMAT*ITWO + 13*NUME + 12*NUME*ITWO
+      MM = 2*NUMMAT*ITWO + 15*NUME + 12*NUME*ITWO
       CALL MEMALLOC(11,"ELEGP",MM,1)
   END IF
 
@@ -44,7 +44,8 @@ SUBROUTINE PLATE
 ! N103: LM(12,NUME)
 ! N104: XYZ(12,NUME)
 ! N105: MTAP(NUME)
-! N106: NLAST
+! N106: THICK(NUME)
+! N107: NLAST
   
   N101=NFIRST
   N102=N101+NUMMAT*ITWO
@@ -52,19 +53,20 @@ SUBROUTINE PLATE
   N104=N103+12*NUME
   N105=N104+12*NUME*ITWO
   N106=N105+NUME
-  NLAST=N106
+  N107=N106+NUME*ITWO
+  NLAST=N107
 
   MIDEST=NLAST - NFIRST
 
   CALL PLATE4Q (IA(NP(1)),DA(NP(2)),DA(NP(3)),DA(NP(4)),DA(NP(4)),IA(NP(5)),   &
-       A(N101),A(N102),A(N103),A(N104),A(N105))
+       A(N101),A(N102),A(N103),A(N104),A(N105),A(N106))
 
   RETURN
 
 END SUBROUTINE PLATE
 
 
-SUBROUTINE PLATE4Q (ID,X,Y,Z,U,MHT,E,POSSION,LM,XYZ,MATP)
+SUBROUTINE PLATE4Q (ID,X,Y,Z,U,MHT,E,POSSION,LM,XYZ,MATP,THICK)
 ! . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 ! .                                                                   .
 ! .   TRUSS element subroutine                                        .
@@ -77,7 +79,7 @@ SUBROUTINE PLATE4Q (ID,X,Y,Z,U,MHT,E,POSSION,LM,XYZ,MATP)
   IMPLICIT NONE
   INTEGER :: ID(3,NUMNP),LM(12,NPAR(2)),MATP(NPAR(2)),MHT(NEQ)
   REAL(8) :: X(NUMNP),Y(NUMNP),Z(NUMNP),E(NPAR(3)),POSSION(NPAR(3)),  &
-             XYZ(12,NPAR(2)),U(NEQ), DISP(12,1)=0
+             XYZ(12,NPAR(2)),THICK(NPAR(2)),U(NEQ), DISP(12,1)=0
 
   INTEGER :: NPAR1, NUME, NUMMAT, ND, I, J, K, L, M, N
   INTEGER :: MTYPE, IPRINT
@@ -124,7 +126,7 @@ SUBROUTINE PLATE4Q (ID,X,Y,Z,U,MHT,E,POSSION,LM,XYZ,MATP)
      N=0
      LM = 0
      DO WHILE (N .NE. NUME)
-        READ (IIN,'(7I5)') N,I,J,K,L,MTYPE  ! Read in element information
+        READ (IIN,'(6I5, F10.0, I5)') N,I,J,K,L,MTYPE,THICK(N)  ! Read in element information
 
 !       Save element information
         XYZ(1,N)=X(I)  
@@ -214,7 +216,7 @@ SUBROUTINE PLATE4Q (ID,X,Y,Z,U,MHT,E,POSSION,LM,XYZ,MATP)
                     By(2,3*K)   = -1
                 END DO
  ! 这里不要忘了还要乘上z方向积分
-                S = S + (matmul(matmul(transpose(Bk), Cb), Bk)/12.0 + 5.0/6.0*Cs*matmul(transpose(By), By))*abs(det)
+                S = S + (matmul(matmul(transpose(Bk), Cb), Bk)*THICK(N)*THICK(N)*THICK(N)/12.0 + 5.0/6.0*Cs*matmul(transpose(By), By))*abs(det)*THICK(N)
             END DO
         END DO
 
