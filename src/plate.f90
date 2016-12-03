@@ -81,7 +81,7 @@ SUBROUTINE PLATE4Q (ID,X,Y,Z,U,MHT,E,POSSION,LM,XYZ,MATP,THICK)
   REAL(8) :: X(NUMNP),Y(NUMNP),Z(NUMNP),E(NPAR(3)),POSSION(NPAR(3)),  &
              XYZ(12,NPAR(2)),THICK(NPAR(2)),U(NEQ), DISP(12,1)=0
 
-  REAL(8) :: DE(12,1), temp(3,1)
+  REAL(8) :: DE(12,1)
   INTEGER :: NPAR1, NUME, NUMMAT, ND, I, J, K, L, M, N
   INTEGER :: MTYPE, IPRINT
 
@@ -230,7 +230,7 @@ SUBROUTINE PLATE4Q (ID,X,Y,Z,U,MHT,E,POSSION,LM,XYZ,MATP,THICK)
 
 ! Stress calculations
   ELSE IF (IND .EQ. 3) THEN
-     WRITE (IOUT,"(//,' E L E M E N T   I N F O R M A T I O N',//,  &
+     WRITE (IOUT,"(//,' S T R E S S   I N F O R M A T I O N',//,  &
                   '           TAU_xx        TAU_yy        TAU_xy         TAU_xz       TAU_yz')")
      DO N=1,NUME
         WRITE (IOUT,"('ELEMENT', I3)") N
@@ -241,7 +241,7 @@ SUBROUTINE PLATE4Q (ID,X,Y,Z,U,MHT,E,POSSION,LM,XYZ,MATP,THICK)
             X_Y(L,1) = XYZ(3*L-2, N)
             X_Y(L,2) = XYZ(3*L-1, N)
         END DO
-        DO L = 1,12
+        DO L = 1,ND
             IF(LM(L,N) == 0) THEN
                 DE(L,1) = 0
             ELSE
@@ -293,9 +293,8 @@ SUBROUTINE PLATE4Q (ID,X,Y,Z,U,MHT,E,POSSION,LM,XYZ,MATP,THICK)
                     By(2,3*K-2) = BB(2,K)
                     By(2,3*K)   = -1
                 END DO
- ! 这里不要忘了还要乘上z方向积分
-            temp = matmul(Bk,DE)
-            STR1 = -THICK(N)*matmul(Cb,matmul(Bk,DE))
+
+            STR1 = -THICK(N)/2*matmul(Cb,matmul(Bk,DE))
             STR2 = Cs*matmul(By, DE)
             WRITE (IOUT,"(5X,5E14.2)") STR1, STR2
             END DO
