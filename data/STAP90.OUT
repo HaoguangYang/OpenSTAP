@@ -1,0 +1,105 @@
+
+ SHELL                                                                           
+
+ C O N T R O L   I N F O R M A T I O N
+
+      NUMBER OF NODAL POINTS . . . . . . . . . . (NUMNP)  =     4
+      NUMBER OF ELEMENT GROUPS . . . . . . . . . (NUMEG)  =     1
+      NUMBER OF LOAD CASES . . . . . . . . . . . (NLCASE) =     1
+      SOLUTION MODE  . . . . . . . . . . . . . . (MODEX)  =     1
+         EQ.0, DATA CHECK
+         EQ.1, EXECUTION
+
+
+ N O D A L   P O I N T   D A T A
+
+  NODE          BOUNDARY                         NODAL POINT
+ NUMBER     CONDITION  CODES                     COORDINATES
+               X    Y    Z               X            Y            Z
+    1          1    1    1    1    1              0.000        2.000        0.000
+    2          1    1    1    1    1              0.000        0.000        0.000
+    3          0    0    0    0    0              2.000        0.000        0.000
+    4          0    0    0    0    0              2.000        2.000        0.000
+
+
+ EQUATION NUMBERS
+
+   NODE         DEGREES OF FREEDOM
+  NUMBER
+     N             X    Y    Z
+     1             0    0    0    0    0
+     2             0    0    0    0    0
+     3             1    2    3    4    5
+     4             6    7    8    9   10
+
+
+ L O A D   C A S E   D A T A
+
+     LOAD CASE NUMBER . . . . . . . =     1
+     NUMBER OF CONCENTRATED LOADS . =     4
+
+    NODE       DIRECTION      LOAD
+   NUMBER                   MAGNITUDE
+      3            1        0.10000E+12
+      4            1        0.10000E+12
+      3            4        0.10000E+12
+      4            4        0.10000E+12
+
+
+ E L E M E N T   G R O U P   D A T A
+
+
+ E L E M E N T   D E F I N I T I O N
+
+ ELEMENT TYPE  . . . . . . . . . . . . .( NPAR(1) ) . . =    7
+     EQ.1, TRUSS ELEMENTS
+     EQ.2, ELEMENTS CURRENTLY
+     EQ.3, NOT AVAILABLE
+
+ NUMBER OF ELEMENTS. . . . . . . . . . .( NPAR(2) ) . . =    1
+
+ M A T E R I A L   D E F I N I T I O N
+
+ NUMBER OF DIFFERENT SETS OF MATERIAL
+ AND CROSS-SECTIONAL  CONSTANTS  . . . .( NPAR(3) ) . . =    1
+
+  SET       YOUNG'S     CROSS-SECTIONAL
+ NUMBER     MODULUS          AREA
+    1     0.10000E+11    0.300000E+00
+
+
+ E L E M E N T   I N F O R M A T I O N
+
+ ELEMENT     NODE     NODE     NODE     NODE       MATERIAL
+ NUMBER-N      I        J        K        L       SET NUMBER
+    1          1        2        3        4           1
+
+
+ TOTAL SYSTEM DATA
+
+     NUMBER OF EQUATIONS . . . . . . . . . . . . . .(NEQ) =    10
+     NUMBER OF MATRIX ELEMENTS . . . . . . . . . . .(NWK) =    55
+     MAXIMUM HALF BANDWIDTH  . . . . . . . . . . . .(MK ) =    10
+     MEAN HALF BANDWIDTH . . . . . . . . . . . . . .(MM ) =     5
+
+
+ LOAD CASE   1
+
+
+ D I S P L A C E M E N T S
+
+  NODE           W          BETA_X          BETA_Y          U         V
+   1        0.0000E+00    0.0000E+00    0.0000E+00    0.0000E+00    0.0000E+00
+   2        0.0000E+00    0.0000E+00    0.0000E+00    0.0000E+00    0.0000E+00
+   3        0.5371E+05    0.1341E+05    0.2775E+04    0.2794E+03    0.5781E+02
+   4        0.5371E+05    0.1341E+05   -0.2775E+04    0.2794E+03   -0.5781E+02
+
+
+ S O L U T I O N   T I M E   L O G   I N   S E C
+
+     TIME FOR INPUT PHASE  . . . . . . . . . . . . . . =        0.01562
+     TIME FOR CALCULATION OF STIFFNESS MATRIX  . . . . =        0.00000
+     TIME FOR FACTORIZATION OF STIFFNESS MATRIX  . . . =        0.00000
+     TIME FOR LOAD CASE SOLUTIONS  . . . . . . . . . . =        0.00000
+
+      T O T A L   S O L U T I O N   T I M E  . . . . . =        0.01562

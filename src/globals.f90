@@ -20,6 +20,7 @@ module GLOBALS
    integer, parameter :: IIN=5		! Unit used for input
    integer, parameter :: IOUT=6		! Unit used for output
 
+   integer :: DIM       ! Dimension of the problem
    integer :: NUMNP		! Total number of nodal points
 						! = 0 : Program stop
    integer :: NEQ		! Number of equations
@@ -33,6 +34,8 @@ module GLOBALS
    integer :: NPAR(10)	! Element group control data
 						!   NPAR(1) - Element type
 						!             1 : Truss element
+                        !             2 : 4Q
+                        !  
 						!   NPAR(2) - Number of elements
 						!   NPAR(3) - Number of different sets of material and 
 						!             cross-sectional  constants
