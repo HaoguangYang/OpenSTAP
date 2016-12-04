@@ -67,7 +67,7 @@ PROGRAM STAP90
 !   Y(NUMNP)    : Y coordinates
 !   Z(NUMNP)    : Z coordinates
 
-  IF (HED .EQ. 'PLATE') THEN
+  IF ((HED .EQ. 'PLATE') .OR. (HED .EQ. 'PLATE8Q')) THEN
       DIM = 3
   ELSEIF (HED .EQ. 'SHELL') THEN
       DIM = 5
@@ -322,7 +322,7 @@ SUBROUTINE WRITED (DISP,ID,NEQ,NUMNP)
           IF (KK.NE.0) D(I)=DISP(KK)
        END DO
 
-       WRITE (IOUT,'(1X,I3,8X,<DIM>E18.6)') II,D
+       WRITE (IOUT,'(1X,I3,8X,<DIM>E17.5)') II,D
    END DO
   ENDIF
   RETURN
