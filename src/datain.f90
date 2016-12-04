@@ -25,7 +25,7 @@ SUBROUTINE INPUT (ID,X,Y,Z,NUMNP,NEQ)
 ! .                                                                       .
 ! . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-  USE GLOBALS, ONLY : IIN, IOUT, DIM
+  USE GLOBALS, ONLY : IIN, IOUT, DIM, HED
 
   IMPLICIT NONE
   INTEGER :: NUMNP,NEQ,ID(DIM,NUMNP)
@@ -66,7 +66,7 @@ SUBROUTINE INPUT (ID,X,Y,Z,NUMNP,NEQ)
   END DO
 
 ! Write equation numbers
-  IF ('HED' == 'PLATE') THEN
+  IF ((HED .EQ. 'PLATE') .OR. (HED .EQ. 'PLATE8Q') .OR. (HED .EQ. 'PLATE_THIN')) THEN
     WRITE (IOUT,"(//,' EQUATION NUMBERS',//,'   NODE',9X,  &
                     'DEGREES OF FREEDOM',/,'  NUMBER',/,  &
                     '     N',13X,'W    BETAX BETAY',/,(1X,I5,9X,<DIM>I5))") (N,(ID(I,N),I=1,DIM),N=1,NUMNP)
@@ -96,7 +96,7 @@ SUBROUTINE LOADS (R,NOD,IDIRN,FLOAD,ID,NLOAD,NEQ)
 ! .   write onto unit ILOAD                                           .
 ! .                                                                   .
 ! . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-  USE GLOBALS, ONLY : IIN, IOUT, ILOAD, MODEX, DIM
+  USE GLOBALS, ONLY : IIN, IOUT, ILOAD, MODEX, DIM, NUMNP
 
   IMPLICIT NONE
   INTEGER :: NLOAD,NEQ,ID(DIM,*),NOD(NLOAD),IDIRN(NLOAD)

@@ -11,7 +11,7 @@
 ! .                                                                       .
 ! . . . . . . . . . . . . . .  . . .  . . . . . . . . . . . . . . . . . . .
     
-SUBROUTINE PLATE
+SUBROUTINE SHELL8Q
 ! . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 ! .                                                                   .
 ! .   To set up storage and call the PLATE element subroutine         .
@@ -31,7 +31,7 @@ SUBROUTINE PLATE
 ! 此处材料要求每一种提供E, Possion
 ! 每个element需要
   IF (IND == 1) THEN
-      MM = 2*NUMMAT*ITWO + 15*NUME + 12*NUME*ITWO
+      MM = 2*NUMMAT*ITWO + 22*NUME + 12*NUME*ITWO
       CALL MEMALLOC(11,"ELEGP",MM,1)
   END IF
 
@@ -41,16 +41,16 @@ SUBROUTINE PLATE
 ! Calculate the pointer to the arrays in the element group data
 ! N101: E(NUMMAT)
 ! N102: POSSION(NUMMAT)
-! N103: LM(12,NUME)
+! N103: LM(20,NUME)
 ! N104: XYZ(12,NUME)
 ! N105: MTAP(NUME)
-! N106: THICK(NUME)
+! N106: THICK(NUME
 ! N107: NLAST
   
   N101=NFIRST
   N102=N101+NUMMAT*ITWO
   N103=N102+NUMMAT*ITWO
-  N104=N103+12*NUME
+  N104=N103+20*NUME
   N105=N104+12*NUME*ITWO
   N106=N105+NUME
   N107=N106+NUME*ITWO
@@ -58,15 +58,15 @@ SUBROUTINE PLATE
 
   MIDEST=NLAST - NFIRST
 
-  CALL PLATE4Q (IA(NP(1)),DA(NP(2)),DA(NP(3)),DA(NP(4)),DA(NP(4)),IA(NP(5)),   &
-       A(N101),A(N102),A(N103),A(N104),A(N105),A(N106))
+  CALL SHELL8 (IA(NP(1)),DA(NP(2)),DA(NP(3)),DA(NP(4)),DA(NP(4)),IA(NP(5)),   &
+       A(N101),A(N102),A(N103),A(N104),A(N105), A(N106))
 
   RETURN
 
-END SUBROUTINE PLATE
+END SUBROUTINE SHELL8Q
 
 
-SUBROUTINE PLATE4Q (ID,X,Y,Z,U,MHT,E,POSSION,LM,XYZ,MATP,THICK)
+SUBROUTINE SHELL8 (ID,X,Y,Z,U,MHT,E,POSSION,LM,XYZ,MATP, THICK)
 ! . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 ! .                                                                   .
 ! .   TRUSS element subroutine                                        .
@@ -77,23 +77,23 @@ SUBROUTINE PLATE4Q (ID,X,Y,Z,U,MHT,E,POSSION,LM,XYZ,MATP,THICK)
   USE MEMALLOCATE
 
   IMPLICIT NONE
-  INTEGER :: ID(3,NUMNP),LM(12,NPAR(2)),MATP(NPAR(2)),MHT(NEQ)
+  INTEGER :: ID(5,NUMNP),LM(20,NPAR(2)),MATP(NPAR(2)),MHT(NEQ)
   REAL(8) :: X(NUMNP),Y(NUMNP),Z(NUMNP),E(NPAR(3)),POSSION(NPAR(3)),  &
-             XYZ(12,NPAR(2)),THICK(NPAR(2)),U(NEQ)
-
-  REAL(8) :: DE(12,1)
+             XYZ(12,NPAR(2)),THICK(NPAR(2)),U(NEQ), DISP(20,1)=0
+  
+  REAL(8) :: DE(20,1)
   INTEGER :: NPAR1, NUME, NUMMAT, ND, I, J, K, L, M, N
   INTEGER :: MTYPE, IPRINT
 
-  REAL(8) :: Cb(3, 3), Cs, Etemp, Ptemp, det
+  REAL(8) :: Cb(3, 3),Cc(3, 3), Cs, Etemp, Ptemp, det
   REAL(8) :: GAUSS(2) = (/-0.5773502692,0.5773502692/)
-  REAL(8) :: G1, G2, GN(2,4), Ja(2,2), Ja_inv(2,2), Bk(3,12),By(2,12), S(12,12), BB(2,4), NShape(1,4)
-  REAL(8) :: X_Y(4, 2), XY_G(1,2), STR1(3,1), STR2(2,1), NN(1,4)
+  REAL(8) :: G1, G2, GN(2,4), Ja(2,2), Ja_inv(2,2), Bk(3,20),By(2,20),Bm(3,20), S(20,20), BB(2,4), NShape(1,4)
+  REAL(8) :: X_Y(4, 2), XY_G(1,2), STR1(3,1), STR2(2,1)
   NPAR1  = NPAR(1)
   NUME   = NPAR(2)
   NUMMAT = NPAR(3) 
 
-  ND=12
+  ND=20
 
 ! Read and generate element information
   IF (IND .EQ. 1) THEN
@@ -144,11 +144,11 @@ SUBROUTINE PLATE4Q (ID,X,Y,Z,U,MHT,E,POSSION,LM,XYZ,MATP,THICK)
 
         MATP(N)=MTYPE  ! Material type
 
-        DO M=1,3
+        DO M=1,5
            LM(M,N)=ID(M,I)     ! Connectivity matrix
-           LM(M+3,N)=ID(M,J)
-           LM(M+6,N)=ID(M,K)
-           LM(M+9,N)=ID(M,L)
+           LM(M+5,N)=ID(M,J)
+           LM(M+10,N)=ID(M,K)
+           LM(M+15,N)=ID(M,L)
         END DO
 
 !       Update column heights and bandwidth
@@ -168,9 +168,8 @@ SUBROUTINE PLATE4Q (ID,X,Y,Z,U,MHT,E,POSSION,LM,XYZ,MATP,THICK)
         Etemp = E(MTYPE)
         Ptemp = POSSION(MTYPE)
         DO L = 1,4
-            X_Y(L,1)  = XYZ(3*L-2, N)
-            X_Y(L,2)  = XYZ(3*L-1, N)
-            !DE(3*L-2) = U
+            X_Y(L,1) = XYZ(3*L-2, N)
+            X_Y(L,2) = XYZ(3*L-1, N)
         END DO
 ! 计算D
         Cb(1,1) = 1
@@ -182,9 +181,11 @@ SUBROUTINE PLATE4Q (ID,X,Y,Z,U,MHT,E,POSSION,LM,XYZ,MATP,THICK)
         Cb(3,1) = 0
         Cb(3,2) = 0
         Cb(3,3) = (1-Ptemp)/2
-        Cb = Cb*Etemp/12.0/(1-Ptemp*Ptemp)*THICK(N)*THICK(N)*THICK(N)
+        
+        Cc = Cb*Etemp/12.0/(1-Ptemp*Ptemp)*5.0/6.0
+        Cb = Cb*Etemp/12.0/(1-Ptemp*Ptemp)*5.0/6.0
 
-        Cs = Etemp/(2*(1+Ptemp))*THICK(N)*5/6
+        Cs = Etemp/(2*(1+Ptemp))
 ! Gauss 积分常数
         S = 0
         DO L=1,2
@@ -201,29 +202,32 @@ SUBROUTINE PLATE4Q (ID,X,Y,Z,U,MHT,E,POSSION,LM,XYZ,MATP,THICK)
                 Ja_inv(2,2) = Ja(1,1)
                 Ja_inv = Ja_inv/det
                 BB = matmul(Ja_inv, GN)
-                
-            NN(1,1)=(1-G1)*(1-G2)/4
-            NN(1,2)=(1+G1)*(1-G2)/4
-            NN(1,3)=(1+G1)*(1+G2)/4
-            NN(1,4)=(1-G1)*(1+G2)/4
 ! 为弯曲部分的Bk赋值，改成循环
                 Bk = 0
                 DO K = 1,4
-                    Bk(1,3*K-1) = BB(1,K)
-                    Bk(2,3*K)   = BB(2,K)
-                    Bk(3,3*K-1) = BB(2,K)
-                    Bk(3,3*K)   = BB(1,K)
+                    Bk(1,5*K-3) = BB(1,K)
+                    Bk(2,5*K-2)   = BB(2,K)
+                    Bk(3,5*K-3) = BB(2,K)
+                    Bk(3,5*K-2)   = BB(1,K)
                 END DO
 ! 为剪切部分的By赋值。改成循环
                 By = 0
                 DO K = 1,4
-                    By(1,3*K-2) = BB(1,K)
-                    By(1,3*K-1) = -NN(1,K)
-                    By(2,3*K-2) = BB(2,K)
-                    By(2,3*K)   = -NN(1,K)
+                    By(1,5*K-4) = BB(1,K)
+                    By(1,5*K-3) = -1
+                    By(2,5*K-4) = BB(2,K)
+                    By(2,5*K-2)   = -1
                 END DO
- ! 这里不要忘了还要乘上z方向积分
-                S = S + (matmul(matmul(transpose(Bk), Cb), Bk) + Cs*matmul(transpose(By), By))*abs(det)
+! 为平面部分的Bm赋值。改成循环
+                Bm = 0
+                DO K = 1,4
+                    Bm(1,5*K-1) = BB(1,K)
+                    Bm(2,5*K) = BB(2,K)
+                    Bm(3,5*K-1) = BB(2,K)
+                    Bm(3,5*K)   = BB(1,K)
+                END DO
+! 这里不要忘了还要乘上z方向积分
+                S = S + (matmul(matmul(transpose(Bk), Cb), Bk)/12.0 + 5.0/6.0*Cs*matmul(transpose(By), By) + matmul(matmul(transpose(Bm), Cc), Bm))*abs(det)
             END DO
         END DO
 
@@ -235,7 +239,7 @@ SUBROUTINE PLATE4Q (ID,X,Y,Z,U,MHT,E,POSSION,LM,XYZ,MATP,THICK)
 
 ! Stress calculations
   ELSE IF (IND .EQ. 3) THEN
-     WRITE (IOUT,"(//,' S T R E S S   I N F O R M A T I O N',//,  &
+         WRITE (IOUT,"(//,' S T R E S S   I N F O R M A T I O N',//,  &
                   '           TAU_xx        TAU_yy        TAU_xy         TAU_xz       TAU_yz')")
      DO N=1,NUME
         WRITE (IOUT,"('ELEMENT', I3)") N
@@ -263,9 +267,11 @@ SUBROUTINE PLATE4Q (ID,X,Y,Z,U,MHT,E,POSSION,LM,XYZ,MATP,THICK)
         Cb(3,1) = 0
         Cb(3,2) = 0
         Cb(3,3) = (1-Ptemp)/2
-        Cb = Cb*Etemp/12.0/(1-Ptemp*Ptemp)*THICK(N)*THICK(N)*THICK(N)
+        Cb = Cb*Etemp/12.0/(1-Ptemp*Ptemp)*5.0/6.0
 
-        Cs = Etemp/(2*(1+Ptemp))*THICK(N)*5/6
+        Cc = Cb
+        
+        Cs = Etemp/(2*(1+Ptemp))
 ! Gauss 积分常数
         S = 0
         DO L=1,2
@@ -282,11 +288,6 @@ SUBROUTINE PLATE4Q (ID,X,Y,Z,U,MHT,E,POSSION,LM,XYZ,MATP,THICK)
                 Ja_inv(2,2) = Ja(1,1)
                 Ja_inv = Ja_inv/det
                 BB = matmul(Ja_inv, GN)
-                  
-            NN(1,1)=(1-G1)*(1-G2)/4
-            NN(1,2)=(1+G1)*(1-G2)/4
-            NN(1,3)=(1+G1)*(1+G2)/4
-            NN(1,4)=(1-G1)*(1+G2)/4
 ! 为弯曲部分的Bk赋值，改成循环
                 Bk = 0
                 DO K = 1,4
@@ -299,12 +300,20 @@ SUBROUTINE PLATE4Q (ID,X,Y,Z,U,MHT,E,POSSION,LM,XYZ,MATP,THICK)
                 By = 0
                 DO K = 1,4
                     By(1,3*K-2) = BB(1,K)
-                    By(1,3*K-1) = -NN(1,K)
+                    By(1,3*K-1) = -1
                     By(2,3*K-2) = BB(2,K)
-                    By(2,3*K)   = -NN(1,K)
+                    By(2,3*K)   = -1
+                END DO
+! 为平面部分的Bm赋值。改成循环
+                Bm = 0
+                DO K = 1,4
+                    Bm(1,5*K-1) = BB(1,K)
+                    Bm(2,5*K) = BB(2,K)
+                    Bm(3,5*K-1) = BB(2,K)
+                    Bm(3,5*K)   = BB(1,K)
                 END DO
 
-            STR1 = -THICK(N)/2*matmul(Cb,matmul(Bk,DE))
+            STR1 = -THICK(N)/2*matmul(Cb,matmul(Bk,DE)) + matmul(Cc,matmul(Bm, DE))
             STR2 = Cs*matmul(By, DE)
             WRITE (IOUT,"(5X,5E14.2)") STR1, STR2
             END DO
@@ -314,4 +323,4 @@ SUBROUTINE PLATE4Q (ID,X,Y,Z,U,MHT,E,POSSION,LM,XYZ,MATP,THICK)
      STOP "*** ERROR *** Invalid IND value."
   END IF
 
-END SUBROUTINE PLATE4Q
+END SUBROUTINE SHELL8
