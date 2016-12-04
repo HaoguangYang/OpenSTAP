@@ -96,7 +96,7 @@ SUBROUTINE LOADS (R,NOD,IDIRN,FLOAD,ID,NLOAD,NEQ)
 ! .   write onto unit ILOAD                                           .
 ! .                                                                   .
 ! . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-  USE GLOBALS, ONLY : IIN, IOUT, ILOAD, MODEX, DIM
+  USE GLOBALS, ONLY : IIN, IOUT, ILOAD, MODEX, DIM, NUMNP
 
   IMPLICIT NONE
   INTEGER :: NLOAD,NEQ,ID(DIM,*),NOD(NLOAD),IDIRN(NLOAD)
