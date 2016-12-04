@@ -31,7 +31,7 @@ SUBROUTINE SHELL8Q
 ! 此处材料要求每一种提供E, Possion
 ! 每个element需要
   IF (IND == 1) THEN
-      MM = 2*NUMMAT*ITWO + 22*NUME + 12*NUME*ITWO
+      MM = 2*NUMMAT*ITWO + 41*NUME + 25*NUME*ITWO
       CALL MEMALLOC(11,"ELEGP",MM,1)
   END IF
 
@@ -50,8 +50,8 @@ SUBROUTINE SHELL8Q
   N101=NFIRST
   N102=N101+NUMMAT*ITWO
   N103=N102+NUMMAT*ITWO
-  N104=N103+20*NUME
-  N105=N104+12*NUME*ITWO
+  N104=N103+40*NUME
+  N105=N104+24*NUME*ITWO
   N106=N105+NUME
   N107=N106+NUME*ITWO
   NLAST=N107
@@ -67,33 +67,28 @@ END SUBROUTINE SHELL8Q
 
 
 SUBROUTINE SHELL8 (ID,X,Y,Z,U,MHT,E,POSSION,LM,XYZ,MATP, THICK)
-! . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-! .                                                                   .
-! .   TRUSS element subroutine                                        .
-! .                                                                   .
-! . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
-  USE GLOBALS
+ USE GLOBALS
   USE MEMALLOCATE
 
   IMPLICIT NONE
-  INTEGER :: ID(5,NUMNP),LM(20,NPAR(2)),MATP(NPAR(2)),MHT(NEQ)
+  INTEGER :: ID(5,NUMNP),LM(40,NPAR(2)),MATP(NPAR(2)),MHT(NEQ)
   REAL(8) :: X(NUMNP),Y(NUMNP),Z(NUMNP),E(NPAR(3)),POSSION(NPAR(3)),  &
-             XYZ(12,NPAR(2)),THICK(NPAR(2)),U(NEQ), DISP(20,1)=0
-  
-  REAL(8) :: DE(20,1)
-  INTEGER :: NPAR1, NUME, NUMMAT, ND, I, J, K, L, M, N
+             XYZ(24,NPAR(2)),THICK(NPAR(2)),U(NEQ)
+
+  REAL(8) :: DE(40,1)
+  INTEGER :: NPAR1, NUME, NUMMAT, ND, I, J, K, L, I1,J1,K1,L1, M, N
   INTEGER :: MTYPE, IPRINT
 
-  REAL(8) :: Cb(3, 3),Cc(3, 3), Cs, Etemp, Ptemp, det
-  REAL(8) :: GAUSS(2) = (/-0.5773502692,0.5773502692/)
-  REAL(8) :: G1, G2, GN(2,4), Ja(2,2), Ja_inv(2,2), Bk(3,20),By(2,20),Bm(3,20), S(20,20), BB(2,4), NShape(1,4)
-  REAL(8) :: X_Y(4, 2), XY_G(1,2), STR1(3,1), STR2(2,1)
+  REAL(8) :: Cb(3, 3), Cs, Etemp, Ptemp, det, Cm(3, 3)
+  REAL(8) :: GAUSS(3) = (/-0.7745966692, 0.7745966692, 0.0/)
+  REAL(8) :: GAUSS_COF(3) = (/0.5555555556, 0.5555555556, 0.8888888889/)
+  REAL(8) :: G1, G2, GN(2,4), GN8(2,8), Ja(2,2), Ja_inv(2,2), Bk(3,40),By(2,40), S(40,40), BB(2,8), NN0(1,8)
+  REAL(8) :: X_Y(4, 2), STR1(3,1), STR2(2,1), Bm(3,40)
   NPAR1  = NPAR(1)
   NUME   = NPAR(2)
   NUMMAT = NPAR(3) 
 
-  ND=20
+  ND=40
 
 ! Read and generate element information
   IF (IND .EQ. 1) THEN
@@ -127,7 +122,7 @@ SUBROUTINE SHELL8 (ID,X,Y,Z,U,MHT,E,POSSION,LM,XYZ,MATP, THICK)
      N=0
      LM = 0
      DO WHILE (N .NE. NUME)
-        READ (IIN,'(6I5, F10.0, I5)') N,I,J,K,L,MTYPE,THICK(N)  ! Read in element information
+        READ (IIN,'(10I5, F10.0, I5)') N,I,J,K,L,I1,J1,K1,L1,MTYPE,THICK(N)  ! Read in element information
 
 !       Save element information
         XYZ(1,N)=X(I)  
@@ -142,6 +137,17 @@ SUBROUTINE SHELL8 (ID,X,Y,Z,U,MHT,E,POSSION,LM,XYZ,MATP, THICK)
         XYZ(10,N)=X(L)
         XYZ(11,N)=Y(L)
 
+        XYZ(13,N)=X(I1)  
+        XYZ(14,N)=Y(I1)
+        
+        XYZ(16,N)=X(J1) 
+        XYZ(17,N)=Y(J1)
+
+        XYZ(19,N)=X(K1) 
+        XYZ(20,N)=Y(K1)
+        
+        XYZ(22,N)=X(L1)
+        XYZ(23,N)=Y(L1)
         MATP(N)=MTYPE  ! Material type
 
         DO M=1,5
@@ -149,6 +155,10 @@ SUBROUTINE SHELL8 (ID,X,Y,Z,U,MHT,E,POSSION,LM,XYZ,MATP, THICK)
            LM(M+5,N)=ID(M,J)
            LM(M+10,N)=ID(M,K)
            LM(M+15,N)=ID(M,L)
+           LM(M+20,N)=ID(M,I1)     
+           LM(M+25,N)=ID(M,J1)
+           LM(M+30,N)=ID(M,K1)
+           LM(M+35,N)=ID(M,L1)
         END DO
 
 !       Update column heights and bandwidth
@@ -168,8 +178,9 @@ SUBROUTINE SHELL8 (ID,X,Y,Z,U,MHT,E,POSSION,LM,XYZ,MATP, THICK)
         Etemp = E(MTYPE)
         Ptemp = POSSION(MTYPE)
         DO L = 1,4
-            X_Y(L,1) = XYZ(3*L-2, N)
-            X_Y(L,2) = XYZ(3*L-1, N)
+            X_Y(L,1)  = XYZ(3*L-2, N)
+            X_Y(L,2)  = XYZ(3*L-1, N)
+            !DE(3*L-2) = U
         END DO
 ! 计算D
         Cb(1,1) = 1
@@ -181,15 +192,14 @@ SUBROUTINE SHELL8 (ID,X,Y,Z,U,MHT,E,POSSION,LM,XYZ,MATP, THICK)
         Cb(3,1) = 0
         Cb(3,2) = 0
         Cb(3,3) = (1-Ptemp)/2
+        Cm = Cb*THICK(N)*Etemp/(1-Ptemp*Ptemp)
+        Cb = Cb*Etemp/12.0/(1-Ptemp*Ptemp)*THICK(N)*THICK(N)*THICK(N)
         
-        Cc = Cb*Etemp/12.0/(1-Ptemp*Ptemp)*5.0/6.0
-        Cb = Cb*Etemp/12.0/(1-Ptemp*Ptemp)*5.0/6.0
-
-        Cs = Etemp/(2*(1+Ptemp))
+        Cs = Etemp/(2*(1+Ptemp))*THICK(N)*5/6
 ! Gauss 积分常数
         S = 0
-        DO L=1,2
-            DO M=1,2
+        DO L=1,3
+            DO M=1,3
                 G1 = GAUSS(L)
                 G2 = GAUSS(M)
 ! 计算Jacobian
@@ -201,10 +211,38 @@ SUBROUTINE SHELL8 (ID,X,Y,Z,U,MHT,E,POSSION,LM,XYZ,MATP, THICK)
                 Ja_inv(1,2) = -Ja(1,2)
                 Ja_inv(2,2) = Ja(1,1)
                 Ja_inv = Ja_inv/det
-                BB = matmul(Ja_inv, GN)
-! 为弯曲部分的Bk赋值，改成循环
+! 因为可能写不成一行了，所以直接依次赋值了~
+            NN0(1,1)=(1-G1)*(1-G2)*(-G1-G2-1)/4
+            NN0(1,2)=(1+G1)*(1-G2)*(G1-G2-1)/4
+            NN0(1,3)=(1+G1)*(1+G2)*(G1+G2-1)/4
+            NN0(1,4)=(1-G1)*(1+G2)*(-G1+G2-1)/4
+            NN0(1,5)=(1-G1*G1)*(1-G2)/2
+            NN0(1,6)=(1-G2*G2)*(1+G1)/2
+            NN0(1,7)=(1-G1*G1)*(1+G2)/2
+            NN0(1,8)=(1-G2*G2)*(1-G1)/2
+                         
+
+                GN8(1,1) = (1-G2)*(2*G1+G2)
+                GN8(2,1) = (1-G1)*(G1+2*G2)
+                GN8(1,2) = (1-G2)*(2*G1-G2)
+                GN8(2,2) = (1+G1)*(2*G2-G1)
+                GN8(1,3) = (1+G2)*(2*G1+G2)
+                GN8(2,3) = (1+G1)*(2*G2+G1)
+                GN8(1,4) = (1+G2)*(2*G1-G2)
+                GN8(2,4) = (1-G1)*(2*G2-G1)
+                GN8 = GN8/4
+                GN8(1,5) = G1*(G2-1)
+                GN8(2,5) = -(1-G1*G1)/2
+                GN8(1,6) = (1-G2*G2)/2
+                GN8(2,6) = -G2*(1+G1)
+                GN8(1,7) = -G1*(1+G2)
+                GN8(2,7) = (1-G1*G1)/2
+                GN8(1,8) = (G2*G2-1)/2
+                GN8(2,8) = G2*(G1-1)
+                BB = matmul(Ja_inv, GN8)
+  ! 为弯曲部分的Bk赋值，改成循环              
                 Bk = 0
-                DO K = 1,4
+                DO K = 1,8
                     Bk(1,5*K-3) = BB(1,K)
                     Bk(2,5*K-2)   = BB(2,K)
                     Bk(3,5*K-3) = BB(2,K)
@@ -212,25 +250,25 @@ SUBROUTINE SHELL8 (ID,X,Y,Z,U,MHT,E,POSSION,LM,XYZ,MATP, THICK)
                 END DO
 ! 为剪切部分的By赋值。改成循环
                 By = 0
-                DO K = 1,4
+                DO K = 1,8
                     By(1,5*K-4) = BB(1,K)
-                    By(1,5*K-3) = -1
+                    By(1,5*K-3) = -NN0(1, K)
                     By(2,5*K-4) = BB(2,K)
-                    By(2,5*K-2)   = -1
+                    By(2,5*K-2)   = -NN0(1, K)
                 END DO
 ! 为平面部分的Bm赋值。改成循环
                 Bm = 0
-                DO K = 1,4
+                DO K = 1,8
                     Bm(1,5*K-1) = BB(1,K)
                     Bm(2,5*K) = BB(2,K)
                     Bm(3,5*K-1) = BB(2,K)
                     Bm(3,5*K)   = BB(1,K)
                 END DO
-! 这里不要忘了还要乘上z方向积分
-                S = S + (matmul(matmul(transpose(Bk), Cb), Bk)/12.0 + 5.0/6.0*Cs*matmul(transpose(By), By) + matmul(matmul(transpose(Bm), Cc), Bm))*abs(det)
+ ! 这里不要忘了还要乘上z方向积分
+                S = S + (matmul(matmul(transpose(Bk), Cb), Bk) + Cs*matmul(transpose(By), By)+ matmul(matmul(transpose(Bm), Cm), Bm)) &
+                *abs(det)*GAUSS_COF(L)*GAUSS_COF(M)
             END DO
         END DO
-
         CALL ADDBAN (DA(NP(3)),IA(NP(2)),S,LM(1,N),ND)  ! 这里要输出的S就是制作好了的local stiffness matrix
         
      END DO
@@ -239,7 +277,7 @@ SUBROUTINE SHELL8 (ID,X,Y,Z,U,MHT,E,POSSION,LM,XYZ,MATP, THICK)
 
 ! Stress calculations
   ELSE IF (IND .EQ. 3) THEN
-         WRITE (IOUT,"(//,' S T R E S S   I N F O R M A T I O N',//,  &
+     WRITE (IOUT,"(//,' S T R E S S   I N F O R M A T I O N',//,  &
                   '           TAU_xx        TAU_yy        TAU_xy         TAU_xz       TAU_yz')")
      DO N=1,NUME
         WRITE (IOUT,"('ELEMENT', I3)") N
@@ -267,15 +305,13 @@ SUBROUTINE SHELL8 (ID,X,Y,Z,U,MHT,E,POSSION,LM,XYZ,MATP, THICK)
         Cb(3,1) = 0
         Cb(3,2) = 0
         Cb(3,3) = (1-Ptemp)/2
-        Cb = Cb*Etemp/12.0/(1-Ptemp*Ptemp)*5.0/6.0
-
-        Cc = Cb
-        
-        Cs = Etemp/(2*(1+Ptemp))
+        Cb = Cb*Etemp/12.0/(1-Ptemp*Ptemp)*THICK(N)*THICK(N)*THICK(N)
+        Cm = Cb*THICK(N)*Etemp/(1-Ptemp*Ptemp)
+        Cs = Etemp/(2*(1+Ptemp))*THICK(N)*5/6
 ! Gauss 积分常数
         S = 0
-        DO L=1,2
-            DO M=1,2
+        DO L=1,3
+            DO M=1,3
                 G1 = GAUSS(L)
                 G2 = GAUSS(M)
 ! 计算Jacobian
@@ -287,33 +323,61 @@ SUBROUTINE SHELL8 (ID,X,Y,Z,U,MHT,E,POSSION,LM,XYZ,MATP, THICK)
                 Ja_inv(1,2) = -Ja(1,2)
                 Ja_inv(2,2) = Ja(1,1)
                 Ja_inv = Ja_inv/det
-                BB = matmul(Ja_inv, GN)
-! 为弯曲部分的Bk赋值，改成循环
+                BB = matmul(Ja_inv, GN8)
+                
+            NN0(1,1)=(1-G1)*(1-G2)*(-G1-G2-1)/4
+            NN0(1,2)=(1+G1)*(1-G2)*(G1-G2-1)/4
+            NN0(1,3)=(1+G1)*(1+G2)*(G1+G2-1)/4
+            NN0(1,4)=(1-G1)*(1+G2)*(-G1+G2-1)/4
+            NN0(1,5)=(1-G1*G1)*(1-G2)/2
+            NN0(1,6)=(1-G2*G2)*(1+G1)/2
+            NN0(1,7)=(1-G1*G1)*(1+G2)/2
+            NN0(1,8)=(1-G2*G2)*(1-G1)/2
+! 因为可能写不成一行了，所以直接依次赋值了~
+                GN8(1,1) = (1-G2)*(2*G1+G2)
+                GN8(2,1) = (1-G1)*(G1+2*G2)
+                GN8(1,2) = (1-G2)*(2*G1-G2)
+                GN8(2,2) = (1+G1)*(2*G2-G1)
+                GN8(1,3) = (1+G2)*(2*G1+G2)
+                GN8(2,3) = (1+G1)*(2*G2+G1)
+                GN8(1,4) = (1+G2)*(2*G1-G2)
+                GN8(2,4) = (1-G1)*(2*G2-G1)
+                GN8 = GN8/4
+                GN8(1,5) = G1*(G2-1)
+                GN8(2,5) = -(1-G1*G1)/2
+                GN8(1,6) = (1-G2*G2)/2
+                GN8(2,6) = -G2*(1+G1)
+                GN8(1,7) = -G1*(1+G2)
+                GN8(2,7) = (1-G1*G1)/2
+                GN8(1,8) = (G2*G2-1)/2
+                GN8(2,8) = G2*(G1-1)
+                BB = matmul(Ja_inv, GN8)
+! 为弯曲部分的Bk赋值，改成循环              
                 Bk = 0
-                DO K = 1,4
-                    Bk(1,3*K-1) = BB(1,K)
-                    Bk(2,3*K)   = BB(2,K)
-                    Bk(3,3*K-1) = BB(2,K)
-                    Bk(3,3*K)   = BB(1,K)
+                DO K = 1,8
+                    Bk(1,5*K-3) = BB(1,K)
+                    Bk(2,5*K-2)   = BB(2,K)
+                    Bk(3,5*K-3) = BB(2,K)
+                    Bk(3,5*K-2)   = BB(1,K)
                 END DO
 ! 为剪切部分的By赋值。改成循环
                 By = 0
-                DO K = 1,4
-                    By(1,3*K-2) = BB(1,K)
-                    By(1,3*K-1) = -1
-                    By(2,3*K-2) = BB(2,K)
-                    By(2,3*K)   = -1
+                DO K = 1,8
+                    By(1,5*K-4) = BB(1,K)
+                    By(1,5*K-3) = -NN0(1, K)
+                    By(2,5*K-4) = BB(2,K)
+                    By(2,5*K-2)   = -NN0(1, K)
                 END DO
 ! 为平面部分的Bm赋值。改成循环
                 Bm = 0
-                DO K = 1,4
+                DO K = 1,8
                     Bm(1,5*K-1) = BB(1,K)
                     Bm(2,5*K) = BB(2,K)
                     Bm(3,5*K-1) = BB(2,K)
                     Bm(3,5*K)   = BB(1,K)
                 END DO
 
-            STR1 = -THICK(N)/2*matmul(Cb,matmul(Bk,DE)) + matmul(Cc,matmul(Bm, DE))
+            STR1 = -THICK(N)/2*matmul(Cb,matmul(Bk,DE))+ matmul(Cm,matmul(Bm,DE))
             STR2 = Cs*matmul(By, DE)
             WRITE (IOUT,"(5X,5E14.2)") STR1, STR2
             END DO
@@ -322,5 +386,4 @@ SUBROUTINE SHELL8 (ID,X,Y,Z,U,MHT,E,POSSION,LM,XYZ,MATP, THICK)
   ELSE 
      STOP "*** ERROR *** Invalid IND value."
   END IF
-
 END SUBROUTINE SHELL8
