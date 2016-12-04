@@ -66,7 +66,7 @@ SUBROUTINE INPUT (ID,X,Y,Z,NUMNP,NEQ)
   END DO
 
 ! Write equation numbers
-  IF ((HED .EQ. 'PLATE') .OR. (HED .EQ. 'PLATE8Q')) THEN
+  IF ((HED .EQ. 'PLATE') .OR. (HED .EQ. 'PLATE8Q') .OR. (HED .EQ. 'PLATE_THIN')) THEN
     WRITE (IOUT,"(//,' EQUATION NUMBERS',//,'   NODE',9X,  &
                     'DEGREES OF FREEDOM',/,'  NUMBER',/,  &
                     '     N',13X,'W    BETAX BETAY',/,(1X,I5,9X,<DIM>I5))") (N,(ID(I,N),I=1,DIM),N=1,NUMNP)

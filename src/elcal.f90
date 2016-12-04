@@ -82,9 +82,11 @@ SUBROUTINE ELEMNT
      CALL PLATE8Q
   case (9)
      CALL SHELL8Q
+  case (10)
+
 !    Other element types would be called here, identifying each
 !    element type by a different NPAR(1) parameter
-  case (10:)
+  case (11:)
      stop "ELEMENT TYPE STILL UNDER DEVELOPMENT..."
   END SELECT
 

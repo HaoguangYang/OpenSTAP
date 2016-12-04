@@ -89,7 +89,7 @@ SUBROUTINE PLATE8 (ID,X,Y,Z,U,MHT,E,POSSION,LM,XYZ,MATP,THICK)
   REAL(8) :: GAUSS(3) = (/-0.7745966692, 0.7745966692, 0.0/)
   REAL(8) :: GAUSS_COF(3) = (/0.5555555556, 0.5555555556, 0.8888888889/)
   REAL(8) :: G1, G2, GN(2,4), GN8(2,8), Ja(2,2), Ja_inv(2,2), Bk(3,24),By(2,24), S(24,24), BB(2,8)
-  REAL(8) :: X_Y(4, 2), STR1(3,1), STR2(2,1)
+  REAL(8) :: X_Y(4, 2), STR1(3,1), STR2(2,1), NN(1,8)
   NPAR1  = NPAR(1)
   NUME   = NPAR(2)
   NUMMAT = NPAR(3) 
@@ -198,9 +198,9 @@ SUBROUTINE PLATE8 (ID,X,Y,Z,U,MHT,E,POSSION,LM,XYZ,MATP,THICK)
         Cb(3,1) = 0
         Cb(3,2) = 0
         Cb(3,3) = (1-Ptemp)/2
-        Cb = Cb*Etemp/12.0/(1-Ptemp*Ptemp)*5.0/6.0
+        Cb = Cb*Etemp/12.0/(1-Ptemp*Ptemp)*THICK(N)*THICK(N)*THICK(N)
 
-        Cs = Etemp/(2*(1+Ptemp))
+        Cs = Etemp/(2*(1+Ptemp))*THICK(N)*5/6
 ! Gauss 积分常数
         S = 0
         DO L=1,3
@@ -216,6 +216,15 @@ SUBROUTINE PLATE8 (ID,X,Y,Z,U,MHT,E,POSSION,LM,XYZ,MATP,THICK)
                 Ja_inv(1,2) = -Ja(1,2)
                 Ja_inv(2,2) = Ja(1,1)
                 Ja_inv = Ja_inv/det
+                
+            NN(1,1)=(1-G1)*(1-G2)*(-G1-G2-1)/4
+            NN(1,2)=(1+G1)*(1-G2)*(G1-G2-1)/4
+            NN(1,3)=(1+G1)*(1+G2)*(G1+G2-1)/4
+            NN(1,4)=(1-G1)*(1+G2)*(-G1+G2-1)/4
+            NN(1,5)=(1-G1*G1)*(1-G2)/2
+            NN(1,6)=(1-G2*G2)*(1+G1)/2
+            NN(1,7)=(1-G1*G1)*(1+G2)/2
+            NN(1,8)=(1-G2*G2)*(1-G1)/2
 ! 因为可能写不成一行了，所以直接依次赋值了~
                 GN8(1,1) = (1-G2)*(2*G1+G2)
                 GN8(2,1) = (1-G1)*(G1+2*G2)
@@ -247,13 +256,13 @@ SUBROUTINE PLATE8 (ID,X,Y,Z,U,MHT,E,POSSION,LM,XYZ,MATP,THICK)
                 By = 0
                 DO K = 1,8
                     By(1,3*K-2) = BB(1,K)
-                    By(1,3*K-1) = -1
+                    By(1,3*K-1) = -NN(1,K)
                     By(2,3*K-2) = BB(2,K)
-                    By(2,3*K)   = -1
+                    By(2,3*K)   = -NN(1,K)
                 END DO
  ! 这里不要忘了还要乘上z方向积分
-                S = S + (matmul(matmul(transpose(Bk), Cb), Bk)*THICK(N)*THICK(N)*THICK(N)/12.0 + 5.0/6.0*Cs*matmul(transpose(By), By)) &
-                *abs(det)*THICK(N)*GAUSS_COF(L)*GAUSS_COF(M)
+                S = S + (matmul(matmul(transpose(Bk), Cb), Bk) + Cs*matmul(transpose(By), By)) &
+                *abs(det)*GAUSS_COF(L)*GAUSS_COF(M)
             END DO
         END DO
         CALL ADDBAN (DA(NP(3)),IA(NP(2)),S,LM(1,N),ND)  ! 这里要输出的S就是制作好了的local stiffness matrix
@@ -292,9 +301,9 @@ SUBROUTINE PLATE8 (ID,X,Y,Z,U,MHT,E,POSSION,LM,XYZ,MATP,THICK)
         Cb(3,1) = 0
         Cb(3,2) = 0
         Cb(3,3) = (1-Ptemp)/2
-        Cb = Cb*Etemp/12.0/(1-Ptemp*Ptemp)*5.0/6.0
+        Cb = Cb*Etemp/12.0/(1-Ptemp*Ptemp)*THICK(N)*THICK(N)*THICK(N)
 
-        Cs = Etemp/(2*(1+Ptemp))
+        Cs = Etemp/(2*(1+Ptemp))*THICK(N)*5/6
 ! Gauss 积分常数
         S = 0
         DO L=1,3
@@ -311,6 +320,15 @@ SUBROUTINE PLATE8 (ID,X,Y,Z,U,MHT,E,POSSION,LM,XYZ,MATP,THICK)
                 Ja_inv(2,2) = Ja(1,1)
                 Ja_inv = Ja_inv/det
                 BB = matmul(Ja_inv, GN8)
+                
+            NN(1,1)=(1-G1)*(1-G2)*(-G1-G2-1)/4
+            NN(1,2)=(1+G1)*(1-G2)*(G1-G2-1)/4
+            NN(1,3)=(1+G1)*(1+G2)*(G1+G2-1)/4
+            NN(1,4)=(1-G1)*(1+G2)*(-G1+G2-1)/4
+            NN(1,5)=(1-G1*G1)*(1-G2)/2
+            NN(1,6)=(1-G2*G2)*(1+G1)/2
+            NN(1,7)=(1-G1*G1)*(1+G2)/2
+            NN(1,8)=(1-G2*G2)*(1-G1)/2
 ! 因为可能写不成一行了，所以直接依次赋值了~
                 GN8(1,1) = (1-G2)*(2*G1+G2)
                 GN8(2,1) = (1-G1)*(G1+2*G2)
@@ -342,9 +360,9 @@ SUBROUTINE PLATE8 (ID,X,Y,Z,U,MHT,E,POSSION,LM,XYZ,MATP,THICK)
                 By = 0
                 DO K = 1,8
                     By(1,3*K-2) = BB(1,K)
-                    By(1,3*K-1) = -1
+                    By(1,3*K-1) = -NN(1,K)
                     By(2,3*K-2) = BB(2,K)
-                    By(2,3*K)   = -1
+                    By(2,3*K)   = -NN(1,K)
                 END DO
 
             STR1 = -THICK(N)/2*matmul(Cb,matmul(Bk,DE))
