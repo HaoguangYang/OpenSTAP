@@ -350,19 +350,19 @@ SUBROUTINE OPENFILES()
 !    call GETARG(1,FileInp)
 !  end if
 
-  !if(COMMAND_ARGUMENT_COUNT().ne.1) then
-  !   stop 'Usage: STAP90 InputFileName'
-  !else
-  !   call GET_COMMAND_ARGUMENT(1,FileInp)
-  !end if
+  if(COMMAND_ARGUMENT_COUNT().ne.1) then
+     stop 'Usage: STAP90 InputFileName'
+  else
+     call GET_COMMAND_ARGUMENT(1,FileInp)
+  end if
 
-  !INQUIRE(FILE = FileInp, EXIST = EX)
-  !IF (.NOT. EX) THEN
-  !   PRINT *, "*** STOP *** FILE STAP90.IN DOES NOT EXIST !"
-  !   STOP
-  !END IF
+  INQUIRE(FILE = FileInp, EXIST = EX)
+  IF (.NOT. EX) THEN
+     PRINT *, "*** STOP *** FILE STAP90.IN DOES NOT EXIST !"
+     STOP
+  END IF
 
-  OPEN(IIN   , FILE = "STAP90.IN",  STATUS = "OLD")
+  OPEN(IIN   , FILE = FileInp,  STATUS = "OLD")
   OPEN(IOUT  , FILE = "STAP90.OUT", STATUS = "REPLACE")
 
   OPEN(IELMNT, FILE = "ELMNT.TMP",  FORM = "UNFORMATTED")

@@ -91,10 +91,11 @@ subroutine HexEight (ID,X,Y,Z,U,MHT,E, PoissonRatio, Density, Gravity, LM, Posit
     CASE(1)
         WRITE (IOUT,"(' E L E M E N T   D E F I N I T I O N',//,  &
                    ' ELEMENT TYPE ',13(' .'),'( NPAR(1) ) . . =',I5,/,   &
-                   '     EQ.1, TRUSS ELEMENTS',/,       &
-                   '     EQ.2, 2D TRIANGLE',/,          &
-                   '     EQ.3, 2D QUADRANGLE',/,        &
-                   '     EQ.4, 3D HEXAHEDRAL',//,       &
+                   '     EQ.1, TRUSS ELEMENTS',/,   &
+                   '     EQ.2, 4Q ELEMENTS',/,      &
+                   '     EQ.3, 9Q ELEMENTS',//,     &
+                   '     EQ.4, 8H ELEMENTS',//,     &
+                   '     EQ.5, 3T ELEMENTS',//,     & 
                    ' NUMBER OF ELEMENTS.',10(' .'),'( NPAR(2) ) . . =',I5,/)") ElementType, NumberOfElements
         IF (NumberOfMaterials.EQ.0) NumberOfMaterials=1
         WRITE (IOUT,"(' M A T E R I A L   D E F I N I T I O N',//,  &
