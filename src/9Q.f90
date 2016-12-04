@@ -85,7 +85,7 @@ SUBROUTINE ELEMENT_9Q_MAIN (ID,X,Y,Z,U,MHT,E,POISSON,LM,XY,MATP)
         IMPLICIT NONE
         REAL(8):: eta
         REAL(8):: psi
-        REAL(8):: NmatElast9Q(2,18)
+        REAL(8):: NmatElast9Q(1,9)
     END FUNCTION
     FUNCTION BmatElast9Q(eta,psi,C)
         IMPLICIT NONE
@@ -102,8 +102,8 @@ SUBROUTINE ELEMENT_9Q_MAIN (ID,X,Y,Z,U,MHT,E,POISSON,LM,XY,MATP)
 
   INTEGER :: NPAR1, NUME, NUMMAT, ND, I1, I2, I3, I4, I5, I6, I7, I8, I9, L, N, I, J
   INTEGER :: MTYPE, IPRINT
-  INTEGER,PARAMETER :: GUASS_N=2
-  REAL(8) :: NMAT(2,18),BMAT(3,18),C(9,2),NA(1,9)
+  INTEGER,PARAMETER :: GUASS_N=3
+  REAL(8) :: NMAT(1,9),BMAT(3,18),C(9,2),NA(1,9)
   REAL(8) :: KE(18,18),DETJ,D(3,3)
   REAL(8) :: X_GUASS(4,2),XY0(1,2)
   REAL(8) :: STRESS_XX(NPAR(2),4),STRESS_YY(NPAR(2),4),STRESS_XY(NPAR(2),4),STRESS(3,1)
@@ -115,17 +115,17 @@ SUBROUTINE ELEMENT_9Q_MAIN (ID,X,Y,Z,U,MHT,E,POISSON,LM,XY,MATP)
   ALLOCATE(GP(GUASS_N),W(GUASS_N))
   
   IF (GUASS_N == 2) THEN
-      GP(1)=-0.57735027
-      GP(2)=0.57735027
+      GP(1)=-0.5773502692
+      GP(2)=0.5773502692
       W(1)=1.0
       W(2)=1.0
   ELSE IF (GUASS_N == 3) THEN
       GP(1)=-0.7745966692
       GP(2)=0.0
       GP(3)=0.7745966692
-      W(1)=5/9
-      W(2)=8/9
-      W(3)=5/9
+      W(1)=5.0/9
+      W(2)=8.0/9
+      W(3)=5.0/9
   END IF 
 
 
@@ -245,7 +245,7 @@ SUBROUTINE ELEMENT_9Q_MAIN (ID,X,Y,Z,U,MHT,E,POISSON,LM,XY,MATP)
                 
                 BMAT = BmatElast9Q(ETA,EPSILON,C)
                 
-                KE = KE + W(I)*W(J)*MATMUL(MATMUL(TRANSPOSE(BMAT),D),BMAT)*DETJ
+                KE = KE + W(I)*W(J)*MATMUL(MATMUL(TRANSPOSE(BMAT),D),BMAT)*abs(DETJ)
                 
             END DO
          END DO       
@@ -292,23 +292,13 @@ SUBROUTINE ELEMENT_9Q_MAIN (ID,X,Y,Z,U,MHT,E,POISSON,LM,XY,MATP)
                 
                 NMAT = NmatElast9Q(ETA,EPSILON)
                 
-                NA(1,:) = (/NMAT(1,1) , NMAT(1,3) , NMAT(1,5) , NMAT(1,7) , NMAT(1,9) , &
-                            NMAT(1,11) , NMAT(1,13) , NMAT(1,15) , NMAT(1,17)/)
-                
-                XY0 = MATMUL(NA,C)
-                X_GUASS(2*J+I-2,1) = XY0(1,1)
-                X_GUASS(2*J+I-2,2) = XY0(1,2)
-                
-
+                XY0 = MATMUL(NMAT,C)
                 BMAT = BmatElast9Q(ETA,EPSILON,C)
                 STRESS = MATMUL(D,MATMUL(BMAT,DST))
                 
-                STRESS_XX(N,2*J+I-2) = STRESS(1,1)
-                STRESS_YY(N,2*J+I-2) = STRESS(2,1)
-                STRESS_XY(N,2*J+I-2) = STRESS(3,1)
                 
-            WRITE (IOUT,"(1X,I5,4X,E13.6,4X,E13.6,11X,E13.6,4X,E13.6,4X, E13.6)") N, X_GUASS(2*J+I-2,1), &
-                   X_GUASS(2*J+I-2,2),STRESS_XX(N,2*J+I-2),STRESS_YY(N,2*J+I-2),STRESS_XY(N,2*J+I-2)
+            WRITE (IOUT,"(1X,I5,4X,E13.6,4X,E13.6,11X,E13.6,4X,E13.6,4X, E13.6)") N, XY0(1,1), &
+                   XY0(1,2),STRESS(1,1),STRESS(2,1),STRESS(3,1)
                 
             END DO
         END DO
@@ -325,22 +315,22 @@ FUNCTION NmatElast9Q(eta,psi)
   IMPLICIT NONE
   REAL(8):: eta
   REAL(8):: psi
-  REAL(8):: NmatElast9Q(2,18),N(2,18)
+  REAL(8):: NmatElast9Q(1,9),NMAT(1,9)
   REAL(8):: N00(3),N11(3)
   REAL(8):: N1,N2,N3,N4,N5,N6,N7,N8,N9
   REAL(8):: ZERO=0.0
   INTEGER:: I
   
   DO I=1,3
-      N00(1)=0.5*eta*(eta-1)
+      N00(1)=0.5*eta*(eta-1.0)
       N00(2)=1-eta*eta
-      N00(3)=0.5*eta*(eta+1)
+      N00(3)=0.5*eta*(eta+1.0)
   END DO
   
   DO I=1,3
-      N11(1)=0.5*psi*(psi-1)
+      N11(1)=0.5*psi*(psi-1.0)
       N11(2)=1-psi*psi
-      N11(3)=0.5*psi*(psi+1)
+      N11(3)=0.5*psi*(psi+1.0)
   END DO
   
   N1 = N00(1)*N11(1)
@@ -352,46 +342,48 @@ FUNCTION NmatElast9Q(eta,psi)
   N7 = N00(1)*N11(3)
   N8 = N00(1)*N11(2)
   N9 = N00(2)*N11(2)
+  
+  NMAT(1,:) = (/  N1,N2,N3,N4,N5,N6,N7,N8,N9  /)
 
-  N(1,1)=N1
-  N(1,2)=ZERO
-  N(1,3)=N2
-  N(1,4)=ZERO
-  N(1,5)=N3
-  N(1,6)=ZERO
-  N(1,7)=N4
-  N(1,8)=ZERO
-  N(1,9)=N5
-  N(1,10)=ZERO
-  N(1,11)=N6
-  N(1,12)=ZERO
-  N(1,13)=N7
-  N(1,14)=ZERO
-  N(1,15)=N8
-  N(1,16)=ZERO
-  N(1,17)=N9
-  N(1,18)=ZERO
+!  N(1,1)=N1
+!  N(1,2)=ZERO
+!  N(1,3)=N2
+!  N(1,4)=ZERO
+!  N(1,5)=N3
+!  N(1,6)=ZERO
+!  N(1,7)=N4
+!  N(1,8)=ZERO
+!  N(1,9)=N5
+!  N(1,10)=ZERO
+!  N(1,11)=N6
+!  N(1,12)=ZERO
+!  N(1,13)=N7
+!  N(1,14)=ZERO
+!  N(1,15)=N8
+!  N(1,16)=ZERO
+!  N(1,17)=N9
+!  N(1,18)=ZERO
   
-  N(2,1)=ZERO
-  N(2,2)=N1
-  N(2,3)=ZERO
-  N(2,4)=N2
-  N(2,5)=ZERO
-  N(2,6)=N3
-  N(2,7)=ZERO
-  N(2,8)=N4
-  N(2,9)=ZERO
-  N(2,10)=N5
-  N(2,11)=ZERO
-  N(2,12)=N6
-  N(2,13)=ZERO
-  N(2,14)=N7
-  N(2,15)=ZERO
-  N(2,16)=N8
-  N(2,17)=ZERO
-  N(2,18)=N9
+!  N(2,1)=ZERO
+!  N(2,2)=N1
+!  N(2,3)=ZERO
+!  N(2,4)=N2
+!  N(2,5)=ZERO
+!  N(2,6)=N3
+!  N(2,7)=ZERO
+!  N(2,8)=N4
+!  N(2,9)=ZERO
+!  N(2,10)=N5
+!  N(2,11)=ZERO
+!  N(2,12)=N6
+!  N(2,13)=ZERO
+!  N(2,14)=N7
+!  N(2,15)=ZERO
+!  N(2,16)=N8
+!  N(2,17)=ZERO
+!  N(2,18)=N9
   
-  NmatElast9Q=N
+  NmatElast9Q=NMAT
   
 END FUNCTION NmatElast9Q
   
@@ -407,12 +399,12 @@ FUNCTION BmatElast9Q(eta,psi,C)
     REAL(8),PARAMETER:: ZERO=0.0
     COMMON DETJ
     
-    GN(1,:)=(/(psi-0.5)*0.5*eta*(eta-1),(1-eta*eta)*(psi-0.5),0.5*eta*(eta+1)*(psi-0.5), &
-             0.5*eta*(eta+1)*(-2*psi),0.5*eta*(eta+1)*(psi+0.5),(1-eta*eta)*(psi+0.5),0.5*eta*(eta-1)*(psi+0.5), &
-             0.5*eta*(eta-1)*(-2*psi),(1-eta*eta)*(-2*psi)/)
-    GN(2,:)=(/(eta-0.5)*0.5*psi*(psi-1),(-2*eta)*0.5*psi*(psi-1),(eta+0.5)*0.5*psi*(psi-1), &
-              (eta+0.5)*(1-psi*psi),(eta+0.5)*0.5*psi*(psi+1),(-2*eta)*0.5*psi*(psi+1),(eta-0.5)*0.5*psi*(psi+1), &
-              (eta-0.5)*(1-psi*psi),(-2*eta)*(1-psi*psi)/)
+    GN(1,:)=(/(psi-0.5)*0.5*eta*(eta-1.0),(1-eta*eta)*(psi-0.5),0.5*eta*(eta+1.0)*(psi-0.5), &
+             0.5*eta*(eta+1.0)*(-2.0*psi),0.5*eta*(eta+1.0)*(psi+0.5),(1.0-eta*eta)*(psi+0.5),0.5*eta*(eta-1.0)*(psi+0.5), &
+             0.5*eta*(eta-1.0)*(-2.0*psi),(1.0-eta*eta)*(-2.0*psi)/)
+    GN(2,:)=(/(eta-0.5)*0.5*psi*(psi-1.0),(-2.0*eta)*0.5*psi*(psi-1.0),(eta+0.5)*0.5*psi*(psi-1.0), &
+              (eta+0.5)*(1.0-psi*psi),(eta+0.5)*0.5*psi*(psi+1.0),(-2.0*eta)*0.5*psi*(psi+1.0),(eta-0.5)*0.5*psi*(psi+1.0), &
+              (eta-0.5)*(1.0-psi*psi),(-2.0*eta)*(1.0-psi*psi)/)
     
     J = MATMUL(GN,C)
     DETJ = J(1,1)*J(2,2)-J(1,2)*J(2,1)

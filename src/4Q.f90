@@ -217,7 +217,7 @@ SUBROUTINE ELEMENT_4Q_MAIN (ID,X,Y,Z,U,MHT,E,POISSON,LM,XYZ,MATP)
                 NMAT = NmatElast2D(ETA,EPSILON)
                 BMAT = BmatElast2D(ETA,EPSILON,C)
                 
-                KE = KE + W(I)*W(J)*MATMUL(MATMUL(TRANSPOSE(BMAT),D),BMAT)*DETJ
+                KE = KE + W(I)*W(J)*MATMUL(MATMUL(TRANSPOSE(BMAT),D),BMAT)*abs(DETJ)
                 
             END DO
          END DO       
