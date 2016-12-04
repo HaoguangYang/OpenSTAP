@@ -69,7 +69,7 @@ PROGRAM STAP90
 
   IF ((HED .EQ. 'PLATE') .OR. (HED .EQ. 'PLATE8Q')) THEN
       DIM = 3
-  ELSEIF (HED .EQ. 'SHELL') THEN
+  ELSEIF ((HED .EQ. 'SHELL').OR. (HED .EQ. 'SHELL8Q')) THEN
       DIM = 5
   ELSE
       DIM = 3
@@ -274,7 +274,7 @@ SUBROUTINE WRITED (DISP,ID,NEQ,NUMNP)
   INTEGER :: IC,II,I,KK     !IL
 
 ! Print displacements
-  IF (HED == 'SHELL') THEN
+  IF ((HED .EQ. 'SHELL').OR. (HED .EQ. 'SHELL8Q')) THEN
     WRITE (IOUT,"(//,' D I S P L A C E M E N T S',//,'  NODE ',10X,   &
                     'W          BETA_X          BETA_Y          U         V')")
 
@@ -299,6 +299,31 @@ SUBROUTINE WRITED (DISP,ID,NEQ,NUMNP)
 
        WRITE (IOUT,'(1X,I3,4X,<DIM>E14.4)') II,D
     END DO
+  ELSE IF ((HED == 'PLATE') .OR. (HED == 'PLATE8Q' )) THEN
+    WRITE (IOUT,"(//,' D I S P L A C E M E N T S',//,'  NODE ',10X,   &
+                    '     W          BETA_X        BETA_Y')")
+    
+    IC=4
+
+    DO II=1,NUMNP
+       IC=IC + 1
+       IF (IC.GE.56) THEN
+          WRITE (IOUT,"(//,' D I S P L A C E M E N T S',//,'  NODE ',10X,   &
+                          '     W          BETA_X        BETA_Y')")
+          IC=4
+       END IF
+
+       DO I=1,3
+          D(I)=0.
+       END DO
+
+       DO I=1,3
+          KK=ID(I,II)
+          IF (KK.NE.0) D(I)=DISP(KK)
+       END DO
+
+       WRITE (IOUT,'(1X,I3,8X,<DIM>E17.5)') II,D
+   END DO
   ELSE
     WRITE (IOUT,"(//,' D I S P L A C E M E N T S',//,'  NODE ',10X,   &
                     'X-DISPLACEMENT    Y-DISPLACEMENT    Z-DISPLACEMENT')")

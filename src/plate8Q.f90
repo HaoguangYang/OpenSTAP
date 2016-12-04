@@ -122,8 +122,8 @@ SUBROUTINE PLATE8 (ID,X,Y,Z,U,MHT,E,POSSION,LM,XYZ,MATP,THICK)
      END DO
 
      WRITE (IOUT,"(//,' E L E M E N T   I N F O R M A T I O N',//,  &
-                      ' ELEMENT     NODE     NODE     NODE     NODE       MATERIAL',/,   &
-                      ' NUMBER-N      I        J        K        L       SET NUMBER')")
+                      ' ELEMENT   NODE  NODE  NODE  NODE  NODE  NODE  NODE  NODE      MATERIAL',/,   &
+                      ' NUMBER-N    I1   I2    I3    I4     I5    I6    I7    I8     SET NUMBER')")
      
      N=0
      LM = 0
@@ -170,7 +170,7 @@ SUBROUTINE PLATE8 (ID,X,Y,Z,U,MHT,E,POSSION,LM,XYZ,MATP,THICK)
 !       Update column heights and bandwidth
         CALL COLHT (MHT,ND,LM(1,N))   
 
-        WRITE (IOUT,"(I5,6X,I5,4X,I5,4X,I5,4X,I5,7X,I5)") N,I,J,K,L,MTYPE
+        WRITE (IOUT,"(I5,6X,8(I4,2X),4X,I5)") N,I,J,K,L,I1,J1,K1,L1,MTYPE
 
      END DO
 

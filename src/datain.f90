@@ -41,11 +41,19 @@ SUBROUTINE INPUT (ID,X,Y,Z,NUMNP,NEQ)
 
 ! Write complete nodal data
 
-  WRITE (IOUT,"(//,' N O D A L   P O I N T   D A T A',/)")
+IF (('HED' == 'SHELL') .OR. (HED .EQ. 'SHELL8Q')) THEN
+        WRITE (IOUT,"(//,' N O D A L   P O I N T   D A T A',/)")
 
-  WRITE (IOUT,"('  NODE',10X,'BOUNDARY',25X,'NODAL POINT',/,  &
+        WRITE (IOUT,"('  NODE',10X,'BOUNDARY',25X,'NODAL POINT',/,  &
+                ' NUMBER     CONDITION  CODES',21X,'COORDINATES', /,15X, &
+                'W    BETX BETY U    V',15X,'X',12X,'Y',12X,'Z')")
+ELSE
+        WRITE (IOUT,"(//,' N O D A L   P O I N T   D A T A',/)")
+
+        WRITE (IOUT,"('  NODE',10X,'BOUNDARY',25X,'NODAL POINT',/,  &
                 ' NUMBER     CONDITION  CODES',21X,'COORDINATES', /,15X, &
                 'X    Y    Z',15X,'X',12X,'Y',12X,'Z')")
+endif
 
   DO N=1,NUMNP
      WRITE (IOUT,"(I5,6X,<DIM>I5,6X,3F13.3)") N,(ID(I,N),I=1,DIM),X(N),Y(N),Z(N)
@@ -70,7 +78,7 @@ SUBROUTINE INPUT (ID,X,Y,Z,NUMNP,NEQ)
     WRITE (IOUT,"(//,' EQUATION NUMBERS',//,'   NODE',9X,  &
                     'DEGREES OF FREEDOM',/,'  NUMBER',/,  &
                     '     N',13X,'W    BETAX BETAY',/,(1X,I5,9X,<DIM>I5))") (N,(ID(I,N),I=1,DIM),N=1,NUMNP)
-  ELSE IF ('HED' == 'SHELL') THEN
+  ELSE IF (('HED' == 'SHELL') .OR. (HED .EQ. 'SHELL8Q')) THEN
       WRITE (IOUT,"(//,' EQUATION NUMBERS',//,'   NODE',9X,  &
                    'DEGREES OF FREEDOM',/,'  NUMBER',/,  &
                    '     N',13X,'W    BETAX BETAY U    V',/,(1X,I5,9X,<DIM>I5))") (N,(ID(I,N),I=1,DIM),N=1,NUMNP)

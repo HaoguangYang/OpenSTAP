@@ -239,7 +239,6 @@ SUBROUTINE ELEMENT_9Q_MAIN (ID,X,Y,Z,U,MHT,E,POISSON,LM,XY,MATP)
         END DO
         
         KE = 0
-
         DO I=1,GUASS_N
             DO J=1,GUASS_N
                 ETA = GP(I)
@@ -400,7 +399,7 @@ END FUNCTION NmatElast9Q
 FUNCTION BmatElast9Q(eta,psi,C)
     IMPLICIT NONE
     REAL(8):: eta,psi
-    REAL(8):: C(9,2)
+    REAL(8):: C(9,2) ! зјБъ
     REAL(8):: GN(2,9),J(2,2)
     REAL(8):: DETJ,INVJ(2,2)
     REAL(8):: BB(2,9)
