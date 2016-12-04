@@ -27,14 +27,7 @@
 		<Filter Name="Header Files" Filter="fi;fd"/>
 		<Filter Name="Resource Files" Filter="rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe"/>
 		<Filter Name="Source Files" Filter="f90;for;f;fpp;ftn;def;odl;idl">
-		<Filter Name="Data">
-		<File RelativePath="..\..\data\4Q\Example_4Q.dat"/>
-		<File RelativePath="..\..\data\4Q\Example_4Q.png"/>
-		<File RelativePath="..\..\data\4Q\Example_4Q_MATLAB.OUT"/>
-		<File RelativePath="..\..\data\4Q\Patch_4Q.dat"/>
-		<File RelativePath="..\..\data\4Q\Patch_4Q.jpg"/>
-		<File RelativePath="..\..\data\4Q\Patch_4Q.OUT"/>
-		<File RelativePath="..\..\data\4Q\STAP90.OUT"/></Filter>
+		<Filter Name="Data"/>
 		<File RelativePath="..\..\src\3T.f90"/>
 		<File RelativePath="..\..\src\4Q.f90"/>
 		<File RelativePath="..\..\src\9Q.f90"/>
