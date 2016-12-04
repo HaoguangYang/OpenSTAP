@@ -28,25 +28,26 @@
 		<Filter Name="Resource Files" Filter="rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe"/>
 		<Filter Name="Source Files" Filter="f90;for;f;fpp;ftn;def;odl;idl">
 		<Filter Name="Data">
-		<File RelativePath="..\..\data\4Q_Patch.OUT"/>
-		<File RelativePath="..\..\data\8H_Patch.OUT"/>
-		<File RelativePath="..\..\data\ELEMENT_3T.dat"/>
-		<File RelativePath="..\..\data\ELEMENT_4Q.dat"/>
-		<File RelativePath="..\..\data\ELEMENT_4Q_test.dat"/>
-		<File RelativePath="..\..\data\ELEMENT_9Q_test.dat"/>
-		<File RelativePath="..\..\data\Patch_3T.dat"/>
-		<File RelativePath="..\..\data\STAP90.OUT"/>
-		<File RelativePath="..\..\data\truss.dat"/></Filter>
+		<File RelativePath="..\..\data\4Q\Example_4Q.dat"/>
+		<File RelativePath="..\..\data\4Q\Example_4Q.png"/>
+		<File RelativePath="..\..\data\4Q\Example_4Q_MATLAB.OUT"/>
+		<File RelativePath="..\..\data\4Q\Patch_4Q.dat"/>
+		<File RelativePath="..\..\data\4Q\Patch_4Q.jpg"/>
+		<File RelativePath="..\..\data\4Q\Patch_4Q.OUT"/>
+		<File RelativePath="..\..\data\4Q\STAP90.OUT"/></Filter>
 		<File RelativePath="..\..\src\3T.f90"/>
 		<File RelativePath="..\..\src\4Q.f90"/>
 		<File RelativePath="..\..\src\9Q.f90"/>
 		<File RelativePath="..\..\src\assem.f90"/>
+		<File RelativePath="..\..\src\BEAM.f90"/>
 		<File RelativePath="..\..\src\datain.f90"/>
 		<File RelativePath="..\..\src\elcal.f90"/>
 		<File RelativePath="..\..\src\globals.f90"/>
 		<File RelativePath="..\..\src\hexahedral.f90"/>
 		<File RelativePath="..\..\src\mathkernel.f90"/>
 		<File RelativePath="..\..\src\memalloc.f90"/>
+		<File RelativePath="..\..\src\plate.f90"/>
+		<File RelativePath="..\..\src\shell.f90"/>
 		<File RelativePath="..\..\src\stap.f90"/>
 		<File RelativePath="..\..\src\truss.f90"/></Filter>
 		<File RelativePath="..\Readme.txt"/></Files>

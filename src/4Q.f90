@@ -126,11 +126,7 @@ SUBROUTINE ELEMENT_4Q_MAIN (ID,X,Y,Z,U,MHT,E,POISSON,LM,XYZ,MATP)
 
      WRITE (IOUT,"(' E L E M E N T   D E F I N I T I O N',//,  &
                    ' ELEMENT TYPE ',13(' .'),'( NPAR(1) ) . . =',I5,/,   &
-                   '     EQ.1, TRUSS ELEMENTS',/,   &
                    '     EQ.2, 4Q ELEMENTS',/,      &
-                   '     EQ.3, 9Q ELEMENTS',//,     &
-                   '     EQ.4, 8H ELEMENTS',//,     &
-                   '     EQ.5, 3T ELEMENTS',//,     & 
                    ' NUMBER OF ELEMENTS.',10(' .'),'( NPAR(2) ) . . =',I5,/)") NPAR1,NUME
 
      IF (NUMMAT.EQ.0) NUMMAT=1
@@ -140,8 +136,8 @@ SUBROUTINE ELEMENT_4Q_MAIN (ID,X,Y,Z,U,MHT,E,POISSON,LM,XYZ,MATP)
                    ' AND CROSS-SECTIONAL  CONSTANTS ',         &
                    4 (' .'),'( NPAR(3) ) . . =',I5,/)") NUMMAT
 
-     WRITE (IOUT,"('  SET       YOUNG''S     CROSS-SECTIONAL',/,  &
-                   ' NUMBER     MODULUS',10X,'AREA',/,  &
+     WRITE (IOUT,"('  SET       YOUNG''S        POISSON',/,  &
+                   ' NUMBER     MODULUS',9X,'RATIO',/,  &
                    15 X,'E',14X,'A')")
 
      DO I=1,NUMMAT
@@ -151,7 +147,7 @@ SUBROUTINE ELEMENT_4Q_MAIN (ID,X,Y,Z,U,MHT,E,POISSON,LM,XYZ,MATP)
 
      WRITE (IOUT,"(//,' E L E M E N T   I N F O R M A T I O N',//,  &
                       ' ELEMENT     NODE     NODE       MATERIAL',/,   &
-                      ' NUMBER-N      I        J       SET NUMBER')")
+                      ' NUMBER-N     I1       I2       I3       I4      SET NUMBER')")
 
      N=0
      DO WHILE (N .NE. NUME)
@@ -242,8 +238,8 @@ SUBROUTINE ELEMENT_4Q_MAIN (ID,X,Y,Z,U,MHT,E,POISSON,LM,XYZ,MATP)
         IF (IPRINT.GT.50) IPRINT=1
         IF (IPRINT.EQ.1) WRITE (IOUT,"(//,' S T R E S S  C A L C U L A T I O N S  F O R  ',  &
                                            'E L E M E N T  G R O U P',I4,//,   &
-                                           '  ELEMENT',9X,' X-CORRD',9X,'Y-CORRD',9X   &	
-                                           'STRESS_XX',7X,'STRESS_YY',9X,'STRESS_XY')") NG
+                                           '  ELEMENT',4X,' X-CORRD',9X,'Y-CORRD',17X   &	
+                                           'STRESS_XX',8X,'STRESS_YY',8X,'STRESS_XY')") NG
         MTYPE=MATP(N)
         
         D(1,:)=E(MATP(N))/(1D0-POISSON(MATP(N))*POISSON(MATP(N)))*(/1D0,POISSON(MATP(N)),0D0/)

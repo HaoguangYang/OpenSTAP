@@ -62,16 +62,34 @@ PROGRAM STAP90
 
 ! ALLOCATE STORAGE
 !   ID(3,NUMNP) : Boundary condition codes (0=free,1=deleted)
+!   IDBEAM(6,NUMNP) : Boundary condition codes for beam (0=free,1=fixed)
 !   X(NUMNP)    : X coordinates
 !   Y(NUMNP)    : Y coordinates
 !   Z(NUMNP)    : Z coordinates
 
-  CALL MEMALLOC(1,"ID   ",3*NUMNP,1)
+  IF (HED .EQ. 'PLATE') THEN
+      DIM = 3
+  ELSEIF (HED .EQ. 'SHELL') THEN
+      DIM = 5
+  ELSE
+      DIM = 3
+  ENDIF
+  
+  IF (HED .EQ. 'BEAM') THEN    !ATTENTION: 'IDBEAN' IS THE ID ARRAY USED FOR BEAM ONLY,  BECAUSE EVERY NODE HAS 6 DEGREE OF FREEDOM
+     CALL MEMALLOC(1,"IDBEAM",6*NUMNP,1)
+  ELSE
+     CALL MEMALLOC(1,"ID   ",DIM*NUMNP,1)  !OTHER SITUATIONS EXCEPT BEAM (THE FORMER ONE)
+  ENDIF
+    
   CALL MEMALLOC(2,"X    ",NUMNP,ITWO)
   CALL MEMALLOC(3,"Y    ",NUMNP,ITWO)
   CALL MEMALLOC(4,"Z    ",NUMNP,ITWO)
 
-  CALL INPUT (IA(NP(1)),DA(NP(2)),DA(NP(3)),DA(NP(4)),NUMNP,NEQ)
+  IF (HED .EQ. 'BEAM') THEN    !ATTENTION: 'INPUTBEAM' IS THE INPUT SUBROUTINE ONLY FOR BEAM, BECAUSE THE SHAPE OF ID IS 'ID(6,NUMNP)'
+     CALL INPUTBEAM (IA(NP(1)),DA(NP(2)),DA(NP(3)),DA(NP(4)),NUMNP,NEQ)
+  ELSE
+     CALL INPUT (IA(NP(1)),DA(NP(2)),DA(NP(3)),DA(NP(4)),NUMNP,NEQ)   !OTHER SITUATIONS EXCEPT BEAM(THE FORMER ONE)
+  ENDIF
 
   NEQ1=NEQ + 1
 
@@ -110,8 +128,12 @@ PROGRAM STAP90
      CALL MEMALLOC(6,"NOD  ",NLOAD,1)
      CALL MEMALLOC(7,"IDIRN",NLOAD,1)
      CALL MEMALLOC(8,"FLOAD",NLOAD,ITWO)
-
-     CALL LOADS (DA(NP(5)),IA(NP(6)),IA(NP(7)),DA(NP(8)),IA(NP(1)),NLOAD,NEQ)
+     
+     IF (HED .EQ. 'BEAM') THEN
+         CALL LOADSBEAM (DA(NP(5)),IA(NP(6)),IA(NP(7)),DA(NP(8)),IA(NP(1)),NLOAD,NEQ) !ATTENTION: LOADSBEAM IS USED ONLY FOR BEAM,BECAUSE 'ID(6,NUMNP)'
+      ELSE
+         CALL LOADS (DA(NP(5)),IA(NP(6)),IA(NP(7)),DA(NP(8)),IA(NP(1)),NLOAD,NEQ) !OTHER SITUATIONS EXCEPT BEAM(THE FORMER ONE)
+     ENDIF
 
   END DO
 
@@ -189,7 +211,12 @@ PROGRAM STAP90
         CALL COLSOL (DA(NP(3)),DA(NP(4)),IA(NP(2)),NEQ,NWK,NEQ1,2)
 
         WRITE (IOUT,"(//,' LOAD CASE ',I3)") L
-        CALL WRITED (DA(NP(4)),IA(NP(1)),NEQ,NUMNP)  ! Print displacements
+        
+        IF (NPAR(1) .EQ. 5) THEN
+            CALL WRITEDBEAM (DA(NP(4)),IA(NP(1)),NEQ,NUMNP)  ! ATTENTION: PRINT DISPLACEMENTS ONLY FOR BEAM
+          ELSE 
+            CALL WRITED (DA(NP(4)),IA(NP(1)),NEQ,NUMNP)  ! PRINT DISPLACEMENTS FOR OTHER SITUATIONS(THE FORMER ONE)
+        ENDIF
 
 !       Calculation of stresses
         CALL STRESS (A(NP(11)))
@@ -209,20 +236,11 @@ PROGRAM STAP90
 
   WRITE (IOUT,"(//,  &
      ' S O L U T I O N   T I M E   L O G   I N   S E C',//,   &
-     '     TIME FOR INPUT PHASE ',14(' .'),' =',F12.2,/,     &
-     '     TIME FOR CALCULATION OF STIFFNESS MATRIX  . . . . =',F12.2, /,   &
-     '     TIME FOR FACTORIZATION OF STIFFNESS MATRIX  . . . =',F12.2, /,   &
-     '     TIME FOR LOAD CASE SOLUTIONS ',10(' .'),' =',F12.2,//,   &
-     '      T O T A L   S O L U T I O N   T I M E  . . . . . =',F12.2)") (TIM(I),I=1,4),TT
-
-
-  WRITE (*,"(//,  &
-     ' S O L U T I O N   T I M E   L O G   I N   S E C',//,   &
-     '     TIME FOR INPUT PHASE ',14(' .'),' =',F12.2,/,     &
-     '     TIME FOR CALCULATION OF STIFFNESS MATRIX  . . . . =',F12.2, /,   &
-     '     TIME FOR FACTORIZATION OF STIFFNESS MATRIX  . . . =',F12.2, /,   &
-     '     TIME FOR LOAD CASE SOLUTIONS ',10(' .'),' =',F12.2,//,   &
-     '      T O T A L   S O L U T I O N   T I M E  . . . . . =',F12.2)") (TIM(I),I=1,4),TT
+     '     TIME FOR INPUT PHASE ',14(' .'),' =',F15.5,/,     &
+     '     TIME FOR CALCULATION OF STIFFNESS MATRIX  . . . . =',F15.5, /,   &
+     '     TIME FOR FACTORIZATION OF STIFFNESS MATRIX  . . . =',F15.5, /,   &
+     '     TIME FOR LOAD CASE SOLUTIONS ',10(' .'),' =',F15.5,//,   &
+     '      T O T A L   S O L U T I O N   T I M E  . . . . . =',F15.5)") (TIM(I),I=1,4),TT
   STOP
 
 END PROGRAM STAP90
@@ -248,41 +266,65 @@ SUBROUTINE WRITED (DISP,ID,NEQ,NUMNP)
 ! .   To print displacements                                          .
 ! . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-  USE GLOBALS, ONLY : IOUT
+  USE GLOBALS, ONLY : IOUT, HED, DIM
 
   IMPLICIT NONE
-  INTEGER :: NEQ,NUMNP,ID(3,NUMNP)
-  REAL(8) :: DISP(NEQ),D(3)
+  INTEGER :: NEQ,NUMNP,ID(DIM,NUMNP)
+  REAL(8) :: DISP(NEQ),D(DIM)
   INTEGER :: IC,II,I,KK     !IL
 
 ! Print displacements
+  IF (HED == 'SHELL') THEN
+    WRITE (IOUT,"(//,' D I S P L A C E M E N T S',//,'  NODE ',10X,   &
+                    'W          BETA_X          BETA_Y          U         V')")
 
-  WRITE (IOUT,"(//,' D I S P L A C E M E N T S',//,'  NODE ',10X,   &
+    IC=4
+
+    DO II=1,NUMNP
+       IC=IC + 1
+       IF (IC.GE.56) THEN
+          WRITE (IOUT,"(//,' D I S P L A C E M E N T S',//,'  NODE ',10X,   &
+                          'W          BETA_X        BETA_Y          U         V')")
+          IC=4
+       END IF
+
+       DO I=1,DIM
+          D(I)=0.
+       END DO
+
+       DO I=1,DIM
+          KK=ID(I,II)
+          IF (KK.NE.0) D(I)=DISP(KK)
+       END DO
+
+       WRITE (IOUT,'(1X,I3,4X,<DIM>E14.4)') II,D
+    END DO
+  ELSE
+    WRITE (IOUT,"(//,' D I S P L A C E M E N T S',//,'  NODE ',10X,   &
                     'X-DISPLACEMENT    Y-DISPLACEMENT    Z-DISPLACEMENT')")
+    
+    IC=4
 
-  IC=4
-
-  DO II=1,NUMNP
-     IC=IC + 1
-     IF (IC.GE.56) THEN
-        WRITE (IOUT,"(//,' D I S P L A C E M E N T S',//,'  NODE ',10X,   &
+    DO II=1,NUMNP
+       IC=IC + 1
+       IF (IC.GE.56) THEN
+          WRITE (IOUT,"(//,' D I S P L A C E M E N T S',//,'  NODE ',10X,   &
                           'X-DISPLACEMENT    Y-DISPLACEMENT    Z-DISPLACEMENT')")
-        IC=4
-     END IF
+          IC=4
+       END IF
 
-     DO I=1,3
-        D(I)=0.
-     END DO
+       DO I=1,3
+          D(I)=0.
+       END DO
 
-     DO I=1,3
-        KK=ID(I,II)
-        IF (KK.NE.0) D(I)=DISP(KK)
-     END DO
+       DO I=1,3
+          KK=ID(I,II)
+          IF (KK.NE.0) D(I)=DISP(KK)
+       END DO
 
-     WRITE (IOUT,'(1X,I3,8X,3E18.6)') II,D
-
-  END DO
-
+       WRITE (IOUT,'(1X,I3,8X,<DIM>E18.6)') II,D
+   END DO
+  ENDIF
   RETURN
 
 END SUBROUTINE WRITED

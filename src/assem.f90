@@ -236,12 +236,13 @@ SUBROUTINE COLSOL (A,V,MAXA,NN,NWK,NNM,KKK)
          KL=MAXA(N) + 1
          KU=MAXA(N+1) - 1
          IF (KU-KL .GE. 0) THEN
-            K=N
-            C=0.
-            DO KK=KL,KU
-               K=K - 1
-               C=C + A(KK)*V(K)
-            END DO
+            !K=N
+            !C=0.
+            !DO KK=KL,KU
+            !   K=K - 1
+            !   C=C + A(KK)*V(K)
+            !END DO
+            C = dot_product(A(KL:KU),V(N-1:N-(KU-KL)-1:-1))
             V(N)=V(N) - C
          END IF
       END DO

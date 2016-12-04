@@ -152,6 +152,86 @@ SUBROUTINE InvMat3 (A, AINV, OK_FLAG)
 
 END SUBROUTINE InvMat3
 
+!General inverse
+subroutine InvMat(MatIn,MatOut,n)
+!============================================================
+! Inverse matrix
+! Method: Based on Doolittle LU factorization for Ax=b
+!-----------------------------------------------------------
+! input ...
+! a(n,n) - array of coefficients for matrix A
+! n      - dimension
+! output ...
+! c(n,n) - inverse matrix of A
+! comments ...
+! the original matrix a(n,n) will be destroyed 
+! during the calculation
+!===========================================================
+implicit none 
+integer n
+double precision MatIn(n,n), MatOut(n,n)
+double precision L(n,n), U(n,n), b(n), d(n), x(n)
+double precision coeff
+integer i, j, k
+
+! step 0: initialization for matrices L and U and b
+! Fortran 90/95 aloows such operations on matrices
+L=0.0
+U=0.0
+b=0.0
+
+! step 1: forward elimination
+do k=1, n-1
+   do i=k+1,n
+      coeff=MatIn(i,k)/MatIn(k,k)
+      L(i,k) = coeff
+      do j=k+1,n
+         MatIn(i,j) = MatIn(i,j)-coeff*MatIn(k,j)
+      end do
+   end do
+end do
+
+! Step 2: prepare L and U matrices 
+! L matrix is a matrix of the elimination coefficient
+! + the diagonal elements are 1.0
+do i=1,n
+  L(i,i) = 1.0
+end do
+! U matrix is the upper triangular part of A
+do j=1,n
+  do i=1,j
+    U(i,j) = MatIn(i,j)
+  end do
+end do
+
+! Step 3: compute columns of the inverse matrix C
+do k=1,n
+  b(k)=1.0
+  d(1) = b(1)
+! Step 3a: Solve Ld=b using the forward substitution
+  do i=2,n
+    d(i)=b(i)
+    do j=1,i-1
+      d(i) = d(i) - L(i,j)*d(j)
+    end do
+  end do
+! Step 3b: Solve Ux=d using the back substitution
+  x(n)=d(n)/U(n,n)
+  do i = n-1,1,-1
+    x(i) = d(i)
+    do j=n,i+1,-1
+      x(i)=x(i)-U(i,j)*x(j)
+    end do
+    x(i) = x(i)/u(i,i)
+  end do
+! Step 3c: fill the solutions x(n) into column k of C
+  do i=1,n
+    MatOut(i,k) = x(i)
+  end do
+  b(k)=0.0
+end do
+end subroutine InvMat
+
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !!      Function calculating cross product of 3D vectors        !!
@@ -217,6 +297,11 @@ subroutine GaussianMask (GaussianPoints, Weights, QuadratureOrder)
     end select
 end subroutine GaussianMask
 
+!subroutine GaussianMaskSimplex (GaussianPts, Weights, QuadratureOrder)
+!    implicit none
+!    integer ::  QuadratureOrder
+!    real(8) ::  GaussianPts(npg)
+
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !!  Subroutine performing spacial rotations along a given axis   !!
@@ -231,10 +316,27 @@ subroutine AxialRotate(PtIn, PtOut, Axis, Theta)
 	Axis = Axis/sqrt(dot_product(Axis, Axis))
 	R = reshape((/Axis(1)**2+(1-Axis(1)**2)*C, Axis(1)*Axis(2)*(1-C)-Axis(3)*S, Axis(1)*Axis(3)*(1-C)+Axis(2)*S, &
 				  Axis(1)*Axis(2)*(1-C)+Axis(3)*S, Axis(2)**2+(1-Axis(2)**2)*C, Axis(2)*Axis(3)*(1-C)-Axis(1)*S, &
-				  Axis(1)*Axis(3)*(1-C)-Axis(2)*S, Axis(2)*Axis(3)*(1-C)+Axis(1)*S, Axis(3)**2+(1-Axis(3)**2)*C/), shape(R))
+				  Axis(1)*Axis(3)*(1-C)-Axis(2)*S, Axis(2)*Axis(3)*(1-C)+Axis(1)*S, Axis(3)**2+(1-Axis(3)**2)*C/),(/3,3/))
 	PtOut = matmul(R,PtIn)
 end subroutine AxialRotate
 
 
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!!              Perform least-square approoximation              !!
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+subroutine LeastSquare (coeff, value, Ncoeff, Nval, sets)
+    implicit none
+    integer ::  Ncoeff, Nval, sets, i
+    real(8) ::  coeff (Ncoeff, sets), value (Nval, Ncoeff+sets)
+    real(8) ::  ATA (Ncoeff, Ncoeff), ATY (Ncoeff)
+    
+    ATA = matmul(transpose(value(:,1:Ncoeff)),value(:,1:Ncoeff))        !May waste a lot of calcullatons here...
+    call InvMat(ATA, ATA, Ncoeff)
+    do i = 1,sets
+        ATY = matmul(transpose(value(:,1:Ncoeff)),value(:,Ncoeff+i))
+        coeff(:,i) = matmul(ATA,ATY)
+    end do
+    
+end subroutine LeastSquare
 END MODULE MathKernel
 

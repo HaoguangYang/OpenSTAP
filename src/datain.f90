@@ -25,10 +25,10 @@ SUBROUTINE INPUT (ID,X,Y,Z,NUMNP,NEQ)
 ! .                                                                       .
 ! . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-  USE GLOBALS, ONLY : IIN, IOUT
+  USE GLOBALS, ONLY : IIN, IOUT, DIM
 
   IMPLICIT NONE
-  INTEGER :: NUMNP,NEQ,ID(3,NUMNP)
+  INTEGER :: NUMNP,NEQ,ID(DIM,NUMNP)
   REAL(8) :: X(NUMNP),Y(NUMNP),Z(NUMNP)
   INTEGER :: I, N !, J
 
@@ -36,7 +36,7 @@ SUBROUTINE INPUT (ID,X,Y,Z,NUMNP,NEQ)
 
   N = 0
   DO WHILE (N.NE.NUMNP)
-     READ (IIN,"(4I5,3F10.0,I5)") N,(ID(I,N),I=1,3),X(N),Y(N),Z(N)
+     READ (IIN,"(<DIM+1>I5,3F10.0,I5)") N,(ID(I,N),I=1,DIM),X(N),Y(N),Z(N)
   END DO
 
 ! Write complete nodal data
@@ -48,14 +48,14 @@ SUBROUTINE INPUT (ID,X,Y,Z,NUMNP,NEQ)
                 'X    Y    Z',15X,'X',12X,'Y',12X,'Z')")
 
   DO N=1,NUMNP
-     WRITE (IOUT,"(I5,6X,3I5,6X,3F13.3)") N,(ID(I,N),I=1,3),X(N),Y(N),Z(N)
+     WRITE (IOUT,"(I5,6X,<DIM>I5,6X,3F13.3)") N,(ID(I,N),I=1,DIM),X(N),Y(N),Z(N)
   END DO
 
 ! Number unknowns
 
   NEQ=0
   DO N=1,NUMNP
-     DO I=1,3
+     DO I=1,DIM
         IF (ID(I,N) .EQ. 0) THEN
            NEQ=NEQ + 1
            ID(I,N)=NEQ
@@ -66,10 +66,23 @@ SUBROUTINE INPUT (ID,X,Y,Z,NUMNP,NEQ)
   END DO
 
 ! Write equation numbers
-  WRITE (IOUT,"(//,' EQUATION NUMBERS',//,'   NODE',9X,  &
+  IF ('HED' == 'PLATE') THEN
+    WRITE (IOUT,"(//,' EQUATION NUMBERS',//,'   NODE',9X,  &
+                    'DEGREES OF FREEDOM',/,'  NUMBER',/,  &
+                    '     N',13X,'W    BETAX BETAY',/,(1X,I5,9X,<DIM>I5))") (N,(ID(I,N),I=1,DIM),N=1,NUMNP)
+  ELSE IF ('HED' == 'SHELL') THEN
+      WRITE (IOUT,"(//,' EQUATION NUMBERS',//,'   NODE',9X,  &
                    'DEGREES OF FREEDOM',/,'  NUMBER',/,  &
-                   '     N',13X,'X    Y    Z',/,(1X,I5,9X,3I5))") (N,(ID(I,N),I=1,3),N=1,NUMNP)
-
+                   '     N',13X,'W    BETAX BETAY U    V',/,(1X,I5,9X,<DIM>I5))") (N,(ID(I,N),I=1,DIM),N=1,NUMNP)
+  ELSE IF (DIM == 2) THEN
+      WRITE (IOUT,"(//,' EQUATION NUMBERS',//,'   NODE',9X,  &
+                   'DEGREES OF FREEDOM',/,'  NUMBER',/,  &
+                   '     N',13X,'X    Y',/,(1X,I5,9X,<DIM>I5))") (N,(ID(I,N),I=1,DIM),N=1,NUMNP)
+  ELSE
+      WRITE (IOUT,"(//,' EQUATION NUMBERS',//,'   NODE',9X,  &
+                    'DEGREES OF FREEDOM',/,'  NUMBER',/,  &
+                    '     N',13X,'X    Y    Z',/,(1X,I5,9X,<DIM>I5))") (N,(ID(I,N),I=1,DIM),N=1,NUMNP)
+  END IF
   RETURN
 
 END SUBROUTINE INPUT
@@ -83,10 +96,10 @@ SUBROUTINE LOADS (R,NOD,IDIRN,FLOAD,ID,NLOAD,NEQ)
 ! .   write onto unit ILOAD                                           .
 ! .                                                                   .
 ! . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-  USE GLOBALS, ONLY : IIN, IOUT, ILOAD, MODEX
+  USE GLOBALS, ONLY : IIN, IOUT, ILOAD, MODEX, DIM
 
   IMPLICIT NONE
-  INTEGER :: NLOAD,NEQ,ID(3,*),NOD(NLOAD),IDIRN(NLOAD)
+  INTEGER :: NLOAD,NEQ,ID(DIM,*),NOD(NLOAD),IDIRN(NLOAD)
   REAL(8) :: R(NEQ),FLOAD(NLOAD)
   INTEGER :: I,L,LI,LN,II
 
@@ -98,9 +111,9 @@ SUBROUTINE LOADS (R,NOD,IDIRN,FLOAD,ID,NLOAD,NEQ)
 
   IF (MODEX.EQ.0) RETURN
 
-  DO I=1,NEQ
-     R(I)=0.
-  END DO
+  !DO I=1,NEQ
+     R(:)=0.
+  !END DO
 
   DO L=1,NLOAD
      LN=NOD(L)
