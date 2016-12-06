@@ -18,7 +18,7 @@ import sys,os
 path = sys.path[0]
 filename = input('Please input your filename:\n')
 location = path[2:].replace('\\','/') + '/' + filename + '.inp'
-location = '/Users/Administrator/Desktop/INP/4Q_4.inp'
+#location = '/Users/Administrator/Desktop/INP/4Q_4.inp'
 read = open(location,'r')
 
 
@@ -36,6 +36,8 @@ node_xyz = []   #NODE信息-节点xyz坐标
 element_num = []    #ELEMENT信息-element序号
 element_name = []   #ELEMENT信息-element名称
 element_node = []   #ELEMENT信息-单元节点号
+#部件信息
+part = []       #包含对于不同部件的所有信息
 
 
 #-----------读入文件到line-----------
@@ -47,6 +49,36 @@ read.close
 line_len = len(line)            #INP文件全长度
 
 
+#-----------读取特征关键词位置-------
+
+#关键词位置信息
+keyloc = [0 for x in range(line_len)] 
+
+for j in range(0,line_len-1):
+    if line[j].find('*Part')!=-1:
+        keyloc[j] = 1
+    if line[j].find('*Node')!=-1:
+        keyloc[j] = 2
+    if line[j].find('*Element')!=-1:
+        keyloc[j] = 3
+    #继续添加关键字---------
+print (keyloc)
+    
+    
+
+'''
+#-----------读取PART信息-------------
+i = 0
+k = 0
+l = 0
+for j in range(0,line_len-1):
+    if line[j].find('*Part')!=-1:
+        #l = l + 1
+        part.append([])
+        part[l].append(line[j][line[j].find('name')+5:])
+'''
+
+        
 #-----------读取NODE信息-------------
 i = 0
 k = 0
