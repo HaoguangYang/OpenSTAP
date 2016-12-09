@@ -241,6 +241,9 @@ PROGRAM STAP90
      '     TIME FOR FACTORIZATION OF STIFFNESS MATRIX  . . . =',F15.5, /,   &
      '     TIME FOR LOAD CASE SOLUTIONS ',10(' .'),' =',F15.5,//,   &
      '      T O T A L   S O L U T I O N   T I M E  . . . . . =',F15.5)") (TIM(I),I=1,4),TT
+     
+     
+  CALL CLOSEFILES()
   STOP
 
 END PROGRAM STAP90
@@ -272,6 +275,7 @@ SUBROUTINE WRITED (DISP,ID,NEQ,NUMNP)
   INTEGER :: NEQ,NUMNP,ID(DIM,NUMNP)
   REAL(8) :: DISP(NEQ),D(DIM)
   INTEGER :: IC,II,I,KK     !IL
+  character (len=25) :: cFmt
 
 ! Print displacements
   IF ((HED .EQ. 'SHELL').OR. (HED .EQ. 'SHELL8Q')) THEN
@@ -279,7 +283,7 @@ SUBROUTINE WRITED (DISP,ID,NEQ,NUMNP)
                     'W          BETA_X          BETA_Y          U         V')")
 
     IC=4
-
+    write (cFmt,"('(1X,I3,4X,',I2,'E14.4)')") DIM
     DO II=1,NUMNP
        IC=IC + 1
        IF (IC.GE.56) THEN
@@ -297,14 +301,14 @@ SUBROUTINE WRITED (DISP,ID,NEQ,NUMNP)
           IF (KK.NE.0) D(I)=DISP(KK)
        END DO
 
-       WRITE (IOUT,'(1X,I3,4X,<DIM>E14.4)') II,D
+       WRITE (IOUT,cFmt) II,D
     END DO
   ELSE IF ((HED == 'PLATE') .OR. (HED == 'PLATE8Q' )) THEN
     WRITE (IOUT,"(//,' D I S P L A C E M E N T S',//,'  NODE ',10X,   &
                     '     W          BETA_X        BETA_Y')")
     
     IC=4
-
+    write (cFmt,"('(1X,I3,8X,',I2,'E17.5)')") DIM
     DO II=1,NUMNP
        IC=IC + 1
        IF (IC.GE.56) THEN
@@ -322,14 +326,14 @@ SUBROUTINE WRITED (DISP,ID,NEQ,NUMNP)
           IF (KK.NE.0) D(I)=DISP(KK)
        END DO
 
-       WRITE (IOUT,'(1X,I3,8X,<DIM>E17.5)') II,D
+       WRITE (IOUT,cFmt) II,D
    END DO
   ELSE
     WRITE (IOUT,"(//,' D I S P L A C E M E N T S',//,'  NODE ',10X,   &
                     'X-DISPLACEMENT    Y-DISPLACEMENT    Z-DISPLACEMENT')")
     
     IC=4
-
+    write (cFmt,"('(1X,I3,8X,',I2,'E17.5)')") DIM
     DO II=1,NUMNP
        IC=IC + 1
        IF (IC.GE.56) THEN
@@ -347,7 +351,7 @@ SUBROUTINE WRITED (DISP,ID,NEQ,NUMNP)
           IF (KK.NE.0) D(I)=DISP(KK)
        END DO
 
-       WRITE (IOUT,'(1X,I3,8X,<DIM>E17.5)') II,D
+       WRITE (IOUT,cFmt) II,D
    END DO
   ENDIF
   RETURN

@@ -30,13 +30,15 @@ SUBROUTINE INPUT (ID,X,Y,Z,NUMNP,NEQ)
   IMPLICIT NONE
   INTEGER :: NUMNP,NEQ,ID(DIM,NUMNP)
   REAL(8) :: X(NUMNP),Y(NUMNP),Z(NUMNP)
-  INTEGER :: I, N !, J
+  INTEGER :: I, N
+  character (len=256) :: cFmt
 
 ! Read nodal point data
 
   N = 0
+  write (cFmt,"('(',I2,'I5,3F10.0,I5)')") DIM+1
   DO WHILE (N.NE.NUMNP)
-     READ (IIN,"(<DIM+1>I5,3F10.0,I5)") N,(ID(I,N),I=1,DIM),X(N),Y(N),Z(N)
+     READ (IIN,cFmt) N,(ID(I,N),I=1,DIM),X(N),Y(N),Z(N)
   END DO
 
 ! Write complete nodal data
@@ -55,8 +57,9 @@ ELSE
                 'X    Y    Z',15X,'X',12X,'Y',12X,'Z')")
 endif
 
+  write (cFmt,"('(I5,6X,',I2,'I5,6X,3F13.3)')") DIM
   DO N=1,NUMNP
-     WRITE (IOUT,"(I5,6X,<DIM>I5,6X,3F13.3)") N,(ID(I,N),I=1,DIM),X(N),Y(N),Z(N)
+     WRITE (IOUT,cFmt) N,(ID(I,N),I=1,DIM),X(N),Y(N),Z(N)
   END DO
 
 ! Number unknowns
@@ -75,21 +78,25 @@ endif
 
 ! Write equation numbers
   IF ((HED .EQ. 'PLATE') .OR. (HED .EQ. 'PLATE8Q') .OR. (HED .EQ. 'PLATE_THIN')) THEN
-    WRITE (IOUT,"(//,' EQUATION NUMBERS',//,'   NODE',9X,  &
+    write (cFmt, "(A150,I2,A4)") "(//,' EQUATION NUMBERS',//,'   NODE',9X,  &
                     'DEGREES OF FREEDOM',/,'  NUMBER',/,  &
-                    '     N',13X,'W    BETAX BETAY',/,(1X,I5,9X,<DIM>I5))") (N,(ID(I,N),I=1,DIM),N=1,NUMNP)
+                    '     N',13X,'W    BETAX BETAY',/,(1X,I5,9X,",DIM,"I5))"
+    WRITE (IOUT,cFmt) (N,(ID(I,N),I=1,DIM),N=1,NUMNP)
   ELSE IF (('HED' == 'SHELL') .OR. (HED .EQ. 'SHELL8Q')) THEN
-      WRITE (IOUT,"(//,' EQUATION NUMBERS',//,'   NODE',9X,  &
+      write (cFmt,"(A150,I2,A4)") "(//,' EQUATION NUMBERS',//,'   NODE',9X,  &
                    'DEGREES OF FREEDOM',/,'  NUMBER',/,  &
-                   '     N',13X,'W    BETAX BETAY U    V',/,(1X,I5,9X,<DIM>I5))") (N,(ID(I,N),I=1,DIM),N=1,NUMNP)
+                   '     N',13X,'W    BETAX BETAY U    V',/,(1X,I5,9X,", DIM,"I5))"
+      WRITE (IOUT,cFmt) (N,(ID(I,N),I=1,DIM),N=1,NUMNP)
   ELSE IF (DIM == 2) THEN
-      WRITE (IOUT,"(//,' EQUATION NUMBERS',//,'   NODE',9X,  &
+      write (cFmt,"(A150,I2,A4)") "(//,' EQUATION NUMBERS',//,'   NODE',9X,  &
                    'DEGREES OF FREEDOM',/,'  NUMBER',/,  &
-                   '     N',13X,'X    Y',/,(1X,I5,9X,<DIM>I5))") (N,(ID(I,N),I=1,DIM),N=1,NUMNP)
+                   '     N',13X,'X    Y',/,(1X,I5,9X,", DIM, "I5))"
+      WRITE (IOUT,cFmt) (N,(ID(I,N),I=1,DIM),N=1,NUMNP)
   ELSE
-      WRITE (IOUT,"(//,' EQUATION NUMBERS',//,'   NODE',9X,  &
+      write (cFmt,"(A150,I2,A4)") "(//,' EQUATION NUMBERS',//,'   NODE',9X,  &
                     'DEGREES OF FREEDOM',/,'  NUMBER',/,  &
-                    '     N',13X,'X    Y    Z',/,(1X,I5,9X,<DIM>I5))") (N,(ID(I,N),I=1,DIM),N=1,NUMNP)
+                    '     N',13X,'X    Y    Z',/,(1X,I5,9X,", DIM, "I5))"
+      WRITE (IOUT,cFmt) (N,(ID(I,N),I=1,DIM),N=1,NUMNP)
   END IF
   RETURN
 

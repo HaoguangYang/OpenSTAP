@@ -1,5 +1,5 @@
-stap : stap.o datain.o elcal.o assem.o globals.o truss.o memalloc.o 4Q.o 9Q.o mathkernel.o hexahedral.o BEAM.o
-	gfortran -o stap stap.o datain.o elcal.o assem.o globals.o truss.o memalloc.o 4Q.o 9Q.o mathkernel.o hexahedral.o BEAM.o
+stap : stap.o datain.o elcal.o assem.o globals.o truss.o memalloc.o 3T.o 4Q.o 9Q.o mathkernel.o hexahedral.o BEAM.o plate.o shell.o plate8Q.o shell8Q.o
+	gfortran -o stap stap.o datain.o elcal.o assem.o globals.o truss.o memalloc.o 3T.o 4Q.o 9Q.o mathkernel.o hexahedral.o BEAM.o plate.o shell.o plate8Q.o shell8Q.o
 
 stap.o : ../../src/stap.f90 ../../src/globals.f90 globals.mod memallocate.mod
 	gfortran -c  ../../src/stap.f90
@@ -16,6 +16,9 @@ elcal.o : ../../src/elcal.f90 ../../src/globals.f90 globals.mod memallocate.mod
 truss.o : ../../src/truss.f90 ../../src/globals.f90 globals.mod memallocate.mod
 	gfortran -c  ../../src/truss.f90
 	
+3T.o : ../../src/3T.f90 ../../src/globals.f90 globals.mod memallocate.mod
+	gfortran -c  ../../src/3T.f90
+	
 4Q.o : ../../src/4Q.f90 ../../src/globals.f90 globals.mod memallocate.mod
 	gfortran -c  ../../src/4Q.f90
 	
@@ -27,6 +30,18 @@ hexahedral.o : ../../src/hexahedral.f90 ../../src/globals.f90 globals.mod memall
 
 BEAM.o : ../../src/BEAM.f90 ../../src/globals.f90 globals.mod memallocate.mod
 	gfortran -c  ../../src/BEAM.f90
+	
+shell.o : ../../src/shell.f90 ../../src/globals.f90 globals.mod memallocate.mod
+	gfortran -c  ../../src/shell.f90
+	
+plate.o : ../../src/plate.f90 ../../src/globals.f90 globals.mod memallocate.mod
+	gfortran -c  ../../src/plate.f90
+	
+shell8Q.o : ../../src/shell8Q.f90 ../../src/globals.f90 globals.mod memallocate.mod
+	gfortran -c  ../../src/shell8Q.f90
+	
+plate8Q.o : ../../src/plate8Q.f90 ../../src/globals.f90 globals.mod memallocate.mod
+	gfortran -c  ../../src/plate8Q.f90
 
 globals.o : ../../src/globals.f90
 	gfortran -c  ../../src/globals.f90 
@@ -47,4 +62,4 @@ mathkernel.mod : ../../src/mathkernel.f90
 	gfortran -c  ../../src/mathkernel.f90
 
 clean : 
-	rm stap stap.o datain.o elcal.o assem.o globals.o globals.mod truss.o memalloc.o memallocate.mod 4Q.o 9Q.o hexahedral.o BEAM.o mathkernel.o mathkernel.mod LOAD.TMP ELMNT.TMP
+	rm stap stap.o datain.o elcal.o assem.o globals.o globals.mod truss.o memalloc.o memallocate.mod 3T.o 4Q.o 9Q.o hexahedral.o BEAM.o plate.o shell.o plate8Q.o shell8Q.o mathkernel.o mathkernel.mod LOAD.TMP ELMNT.TMP

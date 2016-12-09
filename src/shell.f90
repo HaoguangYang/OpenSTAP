@@ -227,7 +227,8 @@ SUBROUTINE SHELL4Q (ID,X,Y,Z,U,MHT,E,POSSION,LM,XYZ,MATP, THICK)
                     Bm(3,5*K)   = BB(1,K)
                 END DO
 ! 这里不要忘了还要乘上z方向积分
-                S = S + (matmul(matmul(transpose(Bk), Cb), Bk)/12.0 + 5.0/6.0*Cs*matmul(transpose(By), By) + matmul(matmul(transpose(Bm), Cc), Bm))*abs(det)
+                S = S + (matmul(matmul(transpose(Bk), Cb), Bk)/12.0 + 5.0/6.0*Cs* &
+                    matmul(transpose(By), By) + matmul(matmul(transpose(Bm), Cc), Bm))*abs(det)
             END DO
         END DO
 

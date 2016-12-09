@@ -265,8 +265,8 @@ SUBROUTINE SHELL8 (ID,X,Y,Z,U,MHT,E,POSSION,LM,XYZ,MATP, THICK)
                     Bm(3,5*K)   = BB(1,K)
                 END DO
  ! 这里不要忘了还要乘上z方向积分
-                S = S + (matmul(matmul(transpose(Bk), Cb), Bk) + Cs*matmul(transpose(By), By)+ matmul(matmul(transpose(Bm), Cm), Bm)) &
-                *abs(det)*GAUSS_COF(L)*GAUSS_COF(M)
+                S = S + (matmul(matmul(transpose(Bk), Cb), Bk) + Cs*matmul(transpose(By), By)+ &
+                    matmul(matmul(transpose(Bm), Cm), Bm))*abs(det)*GAUSS_COF(L)*GAUSS_COF(M)
             END DO
         END DO
         CALL ADDBAN (DA(NP(3)),IA(NP(2)),S,LM(1,N),ND)  ! 这里要输出的S就是制作好了的local stiffness matrix
