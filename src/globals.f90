@@ -19,6 +19,9 @@ module GLOBALS
    integer, parameter :: ILOAD=2	! Unit storing load vectors
    integer, parameter :: IIN=5		! Unit used for input
    integer, parameter :: IOUT=6		! Unit used for output
+   integer, parameter :: VTKFile=7
+   integer, parameter :: VTKNodeTmp=8
+   integer, parameter :: VTKElTypTmp=9
 
    integer :: DIM       ! Dimension of the problem
    integer :: NUMNP		! Total number of nodal points
@@ -39,7 +42,14 @@ module GLOBALS
 						!   NPAR(2) - Number of elements
 						!   NPAR(3) - Number of different sets of material and 
 						!             cross-sectional  constants
+						!   NPAR(4) - Consider Gravity Or Not
+						!   NPAR(5) - Numder of Element Shape Nodes
+						!   NPAR(6) - Number of Element Load Interplotation Nodes
    integer :: NUMEG		! Total number of element groups, > 0
+   integer :: NEL       ! Total number of elements (for post-processing .vtk)
+   integer :: NCONECT   ! Total element numbers in connection matrix
+   integer :: NLCASE
+   integer :: CURLCASE  ! Current Load Case
 
    integer :: MODEX		! Solution mode: 0 - data check only;  1 -  execution                                   
 

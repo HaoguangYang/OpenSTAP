@@ -1,7 +1,7 @@
-stap : stap.o datain.o elcal.o assem.o globals.o truss.o memalloc.o 3T.o 4Q.o 9Q.o mathkernel.o hexahedral.o BEAM.o plate.o shell.o plate8Q.o shell8Q.o
-	gfortran -o stap stap.o datain.o elcal.o assem.o globals.o truss.o memalloc.o 3T.o 4Q.o 9Q.o mathkernel.o hexahedral.o BEAM.o plate.o shell.o plate8Q.o shell8Q.o
+stap : stap.o datain.o elcal.o assem.o globals.o truss.o memalloc.o 3T.o 4Q.o 9Q.o mathkernel.o hexahedral.o BEAM.o plate.o shell.o plate8Q.o shell8Q.o postprocessor.o
+	gfortran -o stap stap.o datain.o elcal.o assem.o globals.o truss.o memalloc.o 3T.o 4Q.o 9Q.o mathkernel.o hexahedral.o BEAM.o plate.o shell.o plate8Q.o shell8Q.o postprocessor.o
 
-stap.o : ../../src/stap.f90 ../../src/globals.f90 globals.mod memallocate.mod
+stap.o : ../../src/stap.f90 ../../src/globals.f90 globals.mod memallocate.mod postprocessor.o
 	gfortran -c  ../../src/stap.f90
 
 datain.o : ../../src/datain.f90 ../../src/globals.f90 globals.mod memallocate.mod
@@ -60,6 +60,9 @@ mathkernel.o : ../../src/mathkernel.f90
 
 mathkernel.mod : ../../src/mathkernel.f90
 	gfortran -c  ../../src/mathkernel.f90
+	
+postprocessor.o : ../../src/postprocessor.f90 mathkernel.o memallocate.mod
+	gfortran -c  ../../src/postprocessor.f90
 
 clean : 
-	rm stap stap.o datain.o elcal.o assem.o globals.o globals.mod truss.o memalloc.o memallocate.mod 3T.o 4Q.o 9Q.o hexahedral.o BEAM.o plate.o shell.o plate8Q.o shell8Q.o mathkernel.o mathkernel.mod LOAD.TMP ELMNT.TMP
+	rm stap stap.o datain.o elcal.o assem.o globals.o globals.mod truss.o memalloc.o memallocate.mod 3T.o 4Q.o 9Q.o hexahedral.o BEAM.o plate.o shell.o plate8Q.o shell8Q.o mathkernel.o mathkernel.mod postprocessor.o LOAD.TMP ELMNT.TMP

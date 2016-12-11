@@ -17,8 +17,8 @@ PROGRAM STAP90
   USE MEMALLOCATE
 
   IMPLICIT NONE
-  INTEGER :: NLCASE, NEQ1, NLOAD, MM
-  INTEGER :: L, LL, I
+  INTEGER :: NEQ1, NLOAD, MM
+  INTEGER :: LL, I
   REAL :: TT
 
 ! OPEN INPUT DATA FILE, RESULTS OUTPUT FILE AND TEMPORARY FILES
@@ -91,8 +91,6 @@ PROGRAM STAP90
      CALL INPUT (IA(NP(1)),DA(NP(2)),DA(NP(3)),DA(NP(4)),NUMNP,NEQ)   !OTHER SITUATIONS EXCEPT BEAM(THE FORMER ONE)
   ENDIF
 
-  NEQ1=NEQ + 1
-
 ! Calculate and store load vectors
 !   R(NEQ) : Load vector
 
@@ -102,7 +100,7 @@ PROGRAM STAP90
 
   REWIND ILOAD
 
-  DO L=1,NLCASE
+  DO CURLCASE=1,NLCASE
 
 !    LL    - Load case number
 !    NLOAD - The number of concentrated loads applied in this load case
@@ -112,7 +110,7 @@ PROGRAM STAP90
      WRITE (IOUT,"(/,'     LOAD CASE NUMBER',7(' .'),' = ',I5,/, &
                      '     NUMBER OF CONCENTRATED LOADS . = ',I5)") LL,NLOAD
 
-     IF (LL.NE.L) THEN
+     IF (LL.NE.CURLCASE) THEN
         WRITE (IOUT,"(' *** ERROR *** LOAD CASES ARE NOT IN ORDER')")
         STOP
      ENDIF
@@ -147,6 +145,7 @@ PROGRAM STAP90
 
   IND=1    ! Read and generate element information
   CALL ELCAL
+  CALL VTKgenerate (IND)        !Prepare Post-Processing Files.
 
   CALL SECOND (TIM(2))
 
@@ -160,7 +159,7 @@ PROGRAM STAP90
 
 ! ALLOCATE STORAGE
 !    MAXA(NEQ+1)
-  CALL MEMFREEFROM(6)
+  CALL MEMFREEFROM(7)
   CALL MEMFREEFROMTO(2,4)
   CALL MEMALLOC(2,"MAXA ",NEQ+1,1)
 
@@ -197,6 +196,7 @@ PROGRAM STAP90
      CALL SECOND (TIM(3))
 
 !    Triangularize stiffness matrix
+     NEQ1=NEQ + 1
      CALL COLSOL (DA(NP(3)),DA(NP(4)),IA(NP(2)),NEQ,NWK,NEQ1,1)
 
      CALL SECOND (TIM(4))
@@ -204,13 +204,14 @@ PROGRAM STAP90
      IND=3    ! Stress calculations
 
      REWIND ILOAD
-     DO L=1,NLCASE
+     CALL VTKgenerate (IND)
+     DO CURLCASE=1,NLCASE
         CALL LOADV (DA(NP(4)),NEQ)   ! Read in the load vector
 
 !       Solve the equilibrium equations to calculate the displacements
         CALL COLSOL (DA(NP(3)),DA(NP(4)),IA(NP(2)),NEQ,NWK,NEQ1,2)
 
-        WRITE (IOUT,"(//,' LOAD CASE ',I3)") L
+        WRITE (IOUT,"(//,' LOAD CASE ',I3)") CURLCASE
         
         IF (NPAR(1) .EQ. 5) THEN
             CALL WRITEDBEAM (DA(NP(4)),IA(NP(1)),NEQ,NUMNP)  ! ATTENTION: PRINT DISPLACEMENTS ONLY FOR BEAM
@@ -222,7 +223,7 @@ PROGRAM STAP90
         CALL STRESS (A(NP(11)))
 
      END DO
-
+     CALL VTKgenerate (IND+1)
      CALL SECOND (TIM(5))
   END IF
 
@@ -233,7 +234,7 @@ PROGRAM STAP90
      TIM(I)=TIM(I+1) - TIM(I)
      TT=TT + TIM(I)
   END DO
-
+  
   WRITE (IOUT,"(//,  &
      ' S O L U T I O N   T I M E   L O G   I N   S E C',//,   &
      '     TIME FOR INPUT PHASE ',14(' .'),' =',F15.5,/,     &
@@ -269,11 +270,11 @@ SUBROUTINE WRITED (DISP,ID,NEQ,NUMNP)
 ! .   To print displacements                                          .
 ! . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-  USE GLOBALS, ONLY : IOUT, HED, DIM
+  USE GLOBALS, ONLY : IOUT, HED, CURLCASE, VTKFILE, DIM
 
   IMPLICIT NONE
   INTEGER :: NEQ,NUMNP,ID(DIM,NUMNP)
-  REAL(8) :: DISP(NEQ),D(DIM)
+  REAL(8) :: DISP(NEQ),D(DIM,NUMNP)
   INTEGER :: IC,II,I,KK     !IL
   character (len=25) :: cFmt
 
@@ -293,15 +294,15 @@ SUBROUTINE WRITED (DISP,ID,NEQ,NUMNP)
        END IF
 
        DO I=1,DIM
-          D(I)=0.
+          D(I,II)=0.
        END DO
 
        DO I=1,DIM
           KK=ID(I,II)
-          IF (KK.NE.0) D(I)=DISP(KK)
+          IF (KK.NE.0) D(I,II)=DISP(KK)
        END DO
 
-       WRITE (IOUT,cFmt) II,D
+       WRITE (IOUT,cFmt) II,D(:,II)
     END DO
   ELSE IF ((HED == 'PLATE') .OR. (HED == 'PLATE8Q' )) THEN
     WRITE (IOUT,"(//,' D I S P L A C E M E N T S',//,'  NODE ',10X,   &
@@ -318,15 +319,15 @@ SUBROUTINE WRITED (DISP,ID,NEQ,NUMNP)
        END IF
 
        DO I=1,3
-          D(I)=0.
+          D(I,II)=0.
        END DO
 
        DO I=1,3
           KK=ID(I,II)
-          IF (KK.NE.0) D(I)=DISP(KK)
+          IF (KK.NE.0) D(I,II)=DISP(KK)
        END DO
 
-       WRITE (IOUT,cFmt) II,D
+       WRITE (IOUT,cFmt) II,D(:,II)
    END DO
   ELSE
     WRITE (IOUT,"(//,' D I S P L A C E M E N T S',//,'  NODE ',10X,   &
@@ -343,17 +344,22 @@ SUBROUTINE WRITED (DISP,ID,NEQ,NUMNP)
        END IF
 
        DO I=1,3
-          D(I)=0.
+          D(I,II)=0.
        END DO
 
        DO I=1,3
           KK=ID(I,II)
-          IF (KK.NE.0) D(I)=DISP(KK)
+          IF (KK.NE.0) D(I,II)=DISP(KK)
+          
        END DO
 
-       WRITE (IOUT,cFmt) II,D
+       WRITE (IOUT,cFmt) II,D(:,II)
    END DO
   ENDIF
+  write (VTKFile, "('Displacement_of_Load_Case',I1,2X,I2,2X,I7,2X, 'float')") CURLCASE, DIM, NUMNP
+  do I = 1,DIM
+      write (VTKFile,*) D(I,:) !Displacements
+  end do
   RETURN
 
 END SUBROUTINE WRITED
@@ -396,6 +402,10 @@ SUBROUTINE OPENFILES()
 
   OPEN(IELMNT, FILE = "ELMNT.TMP",  FORM = "UNFORMATTED")
   OPEN(ILOAD , FILE = "LOAD.TMP",   FORM = "UNFORMATTED")
+  OPEN(VTKFile, FILE = "STAP90.OUT.vtk", STATUS = "REPLACE")
+  OPEN(VTKNodeTmp, FILE = "VTKNode.tmp", STATUS = "REPLACE")
+  OPEN(VTKElTypTmp, FILE = "VTKElTyp.tmp", STATUS = "REPLACE")
+  
 END SUBROUTINE OPENFILES
 
 
@@ -411,4 +421,7 @@ SUBROUTINE CLOSEFILES()
   CLOSE(IOUT)
   CLOSE(IELMNT)
   CLOSE(ILOAD)
+  close(VTKFile)
+  close(VTKNodeTmp)
+  close(VTKElTypTmp)
 END SUBROUTINE CLOSEFILES

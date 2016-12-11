@@ -39,6 +39,29 @@ SUBROUTINE ELCAL
      IF (MIDEST.GT.MAXEST) MAXEST=MIDEST
 
      WRITE (IELMNT) MIDEST,NPAR,(A(I),I=NFIRST,NLAST)
+     
+     select case (NPAR(1))
+     case (1)
+        write (VTKElTypTmp, *) 3
+     case (2)
+        write (VTKElTypTmp, *) 9
+     case (3)
+        write (VTKElTypTmp, *) 28
+     case (4)
+        write (VTKElTypTmp, *) 12
+     case (5)
+        write (VTKElTypTmp, *) 3
+     case (6)
+        write (VTKElTypTmp, *) 9
+     case (7)
+        write (VTKElTypTmp, *) 9
+     case (8)
+        write (VTKElTypTmp, *) 23
+     case (9)
+        write (VTKElTypTmp, *) 23
+     case (10)
+        write (VTKElTypTmp, *) 5
+     end select
 
   END DO
 
