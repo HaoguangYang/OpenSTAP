@@ -48,9 +48,9 @@ subroutine PostProcessor (ElementType, Dimen, PositionData, &
                 do i = 1, QuadratureOrder
                     do j = 1, QuadratureOrder
                         do k = 1, QuadratureOrder
-                            x = GaussianCollection (1, ind1+mod(ind-1,8))
-                            y = GaussianCollection (2, ind1+mod(ind-1,8))
-                            z = GaussianCollection (3, ind1+mod(ind-1,8))
+                            x = GaussianCollection (1, ind1+mod(ind0-1,8))
+                            y = GaussianCollection (2, ind1+mod(ind0-1,8))
+                            z = GaussianCollection (3, ind1+mod(ind0-1,8))
                             Stress(:,L) = StressCollection (:,ind1+mod(ind0-1,8))
                             
                             if (Ncoeff .EQ. 10) &
@@ -135,6 +135,7 @@ subroutine PostProcessor (ElementType, Dimen, PositionData, &
 end subroutine PostProcessor
 
 
+
 subroutine VTKgenerate (Flag)
     use globals
     use memallocate
@@ -148,6 +149,30 @@ case (1)
     do i = 1, NUMNP
         write (VTKFile,*) DA(NP(2)+i-1), DA(NP(3)+i-1), DA(NP(4)+i-1)   !X(i), Y(i), Z(i)
     end do
+    
+case (2)
+    select case (NPAR(1))
+     case (1)
+        write (VTKElTypTmp, *) (3,I=1,NPAR(2))
+     case (2)
+        write (VTKElTypTmp, *) (9,I=1,NPAR(2))
+     case (3)
+        write (VTKElTypTmp, *) (28,I=1,NPAR(2))
+     case (4)
+        write (VTKElTypTmp, *) (12,I=1,NPAR(2))
+     case (5)
+        write (VTKElTypTmp, *) (3,I=1,NPAR(2))
+     case (6)
+        write (VTKElTypTmp, *) (9,I=1,NPAR(2))
+     case (7)
+        write (VTKElTypTmp, *) (9,I=1,NPAR(2))
+     case (8)
+        write (VTKElTypTmp, *) (23,I=1,NPAR(2))
+     case (9)
+        write (VTKElTypTmp, *) (23,I=1,NPAR(2))
+     case (10)
+        write (VTKElTypTmp, *) (5,I=1,NPAR(2))
+     end select
     
 case (3)
     write (VTKFile,*) "FIELD Result", NLCASE*2

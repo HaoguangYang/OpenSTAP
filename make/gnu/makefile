@@ -10,7 +10,7 @@ datain.o : ../../src/datain.f90 ../../src/globals.f90 globals.mod memallocate.mo
 assem.o : ../../src/assem.f90 ../../src/globals.f90 globals.mod memallocate.mod
 	gfortran -c  ../../src/assem.f90
 
-elcal.o : ../../src/elcal.f90 ../../src/globals.f90 globals.mod memallocate.mod
+elcal.o : ../../src/elcal.f90 ../../src/globals.f90 globals.mod memallocate.mod postprocessor.o
 	gfortran -c  ../../src/elcal.f90
 
 truss.o : ../../src/truss.f90 ../../src/globals.f90 globals.mod memallocate.mod
