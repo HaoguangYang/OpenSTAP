@@ -48,16 +48,25 @@ line_len = len(line)            #INP文件全长度
 keylocation = [0 for x in range(line_len)] 
 
 for i in range(0,line_len-1):
-    if line[i].find('*Part')!=-1:
+    if line[i].find('*Part')!=-1:           #'Part'--1
         keylocation[i] = 1
-    if line[i].find('*Node')!=-1:
+    if line[i].find('*Node')!=-1:           #'Node'--2
         keylocation[i] = 2
-    if line[i].find('*Element')!=-1:
+    if line[i].find('*Element')!=-1:        #'Element'--3
         keylocation[i] = 3
-#    if line[i].find('*Nset')!=-1:
-#        keylocation[i] = 4
     #继续添加关键字---------
 #print (keylocation)
+
+j = 0
+for i in range(0,line_len-1):
+    if keylocation[i] == 3:
+        j = 1
+        continue
+    if j == 1:
+        if line[i][:1] == '*':
+            keylocation[i-1] = 4            #每个element结束位置--4
+            j = 0
+        
 
 keynum = max(keylocation)    #关键字个数
 keyloc = [[] for x in range(keynum)]          
@@ -145,6 +154,7 @@ for i in range(0,partnum):
     part[i].append(readpartname(keyloc[0][i]))
     part[i].append(readnode(keyloc[1][i]+1,keyloc[2][i]-1))
     part[i].append(readelementname(keyloc[2][i]))
+    part[i].append(readelement(keyloc[2][i]+1,keyloc[3][i]))
 
     
 
@@ -162,6 +172,13 @@ for i in range(len(part)):
     print('\n')
     print('-------------单元类型---------------')
     print(part[i][2])
+    print('\n')
+    print('-------------单元编号---------------')
+    print(part[i][3][0])
+    print('\n')
+    print('-------------单元节点---------------')
+    print(part[i][3][1])
+    print('\n')
     
     print('·····························')
     print('\n'*5)
