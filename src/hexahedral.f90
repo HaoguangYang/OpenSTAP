@@ -138,7 +138,7 @@ subroutine HexEight (ID,X,Y,Z,U,MHT,E, PoissonRatio, Density, Gravity, LM, Posit
             WRITE (IOUT,"(I7,5X,7(I7,1X),I7,4X,I5)") N,Node(N,1:ElementShapeNodes),MaterialType
             
             !write (IOUT,*) 'MHT',MHT
-            write (VTKNodeTmp,*) NPAR(5), Node(N,:)-1
+            write (VTKNodeTmp) NPAR(5), Node(N,:)-1
             
         enddo
         return

@@ -12,6 +12,7 @@ subroutine PostProcessor (ElementType, Dimen, PositionData, &
     real(8) :: coeff(10,6), value(NPAR(5)*QuadratureOrder**Dimen,16), Stress(6,NUMNP), PositionData(3*NPAR(5), NPAR(2)), U(NEQ), &
                GaussianCollection(3, NPAR(2)*QuadratureOrder**Dimen), StressCollection(6,NPAR(2)*QuadratureOrder**Dimen)
     real(8) :: x, y, z, Displacement(NEQ)
+    character(len=19) :: String
     
     write (IOUT,"(/,/)") 
     write (IOUT,*) "               S T R E S S   R E C O V E R Y   A T   N O D A L   P O I N T S"
@@ -123,11 +124,12 @@ subroutine PostProcessor (ElementType, Dimen, PositionData, &
         end do
     end if
     NEL = NEL+NPAR(2)                               !renew total number of elements.
-    NCONECT = NCONECT + NPAR(5)*NPAR(2)             !Renew total connectivity matrix element number
+    NCONECT = NCONECT + NPAR(5)*(NPAR(2)+1)             !Renew total connectivity matrix element number
     
     if (Dimen == 3) NumberOfStress = 6
     if (Dimen == 2) NumberOfStress = 3
-    write (VTKFile, "('Stress_of_Load_Case',I1,2X,I2,2X,I7,2X,'float')") CURLCASE, NumberOfStress, NUMNP
+    write (String, "('Stress_Load_Case',I2.2)") CURLCASE
+    write (VTKFile,*) String, NumberOfStress, NUMNP, 'float'
     do j = 1, NumberOfStress
         write (VTKFile,*) Stress(j,:) !Stresses
     end do
@@ -140,12 +142,15 @@ subroutine VTKgenerate (Flag)
     use globals
     use memallocate
     implicit none
-    integer :: i,j,Flag
+    integer :: i,j,Flag, Dat(NEL+100)
     
 select case (Flag)
 case (1)
-    write (VTKFile, "('#vtk DataFile Version 3.0',/,A80,/,'ASCII',/,'DATASET UNSTRUCTURED GRID')") HED
-    write (VTKFile, *) "POINTS ",NUMNP," float"
+    write (VTKFile,*) '#vtk DataFile Version 3.0'
+    write (VTKFile,*) HED
+    write (VTKFile,*) 'ASCII'
+    write (VTKFile,*) 'DATASET UNSTRUCTURED GRID'
+    write (VTKFile,*) "POINTS",NUMNP,"float"
     do i = 1, NUMNP
         write (VTKFile,*) DA(NP(2)+i-1), DA(NP(3)+i-1), DA(NP(4)+i-1)   !X(i), Y(i), Z(i)
     end do
@@ -153,32 +158,41 @@ case (1)
 case (2)
     select case (NPAR(1))
      case (1)
-        write (VTKElTypTmp, *) (3,I=1,NPAR(2))
+        write (VTKElTypTmp) (3,I=1,NPAR(2))
      case (2)
-        write (VTKElTypTmp, *) (9,I=1,NPAR(2))
+        write (VTKElTypTmp) (9,I=1,NPAR(2))
      case (3)
-        write (VTKElTypTmp, *) (28,I=1,NPAR(2))
+        write (VTKElTypTmp) (28,I=1,NPAR(2))
      case (4)
-        write (VTKElTypTmp, *) (12,I=1,NPAR(2))
+        write (VTKElTypTmp) (12,I=1,NPAR(2))
      case (5)
-        write (VTKElTypTmp, *) (3,I=1,NPAR(2))
+        write (VTKElTypTmp) (3,I=1,NPAR(2))
      case (6)
-        write (VTKElTypTmp, *) (9,I=1,NPAR(2))
+        write (VTKElTypTmp) (9,I=1,NPAR(2))
      case (7)
-        write (VTKElTypTmp, *) (9,I=1,NPAR(2))
+        write (VTKElTypTmp) (9,I=1,NPAR(2))
      case (8)
-        write (VTKElTypTmp, *) (23,I=1,NPAR(2))
+        write (VTKElTypTmp) (23,I=1,NPAR(2))
      case (9)
-        write (VTKElTypTmp, *) (23,I=1,NPAR(2))
+        write (VTKElTypTmp) (23,I=1,NPAR(2))
      case (10)
-        write (VTKElTypTmp, *) (5,I=1,NPAR(2))
+        write (VTKElTypTmp) (5,I=1,NPAR(2))
      end select
     
 case (3)
-    write (VTKFile,*) "FIELD Result", NLCASE*2
+    write (VTKFile,*) "FIELD Result ", NLCASE*2
     
 case (4)
-    write (VTKFile, *) "CELLS ", NEL, NCONECT          !Sum up all elements to generate a global picture
+    write (VTKFile,*) "CELLS ", NEL, NCONECT          !Sum up all elements to generate a global picture
+    rewind (VTKNodeTmp)
+    do i = 1 , NEL
+        read (VTKNodeTmp) Dat(1), Dat(2:1+Dat(1))
+        write (VTKFile,*) Dat(1:1+Dat(1))
+    end do
+    write (VTKFile,*) "CELL_TYPES ", NEL
+    rewind (VTKElTypTmp)
+    read (VTKElTypTmp) Dat(1:NEL)
+    write (VTKFile,*) Dat(1:NEL)
 end select
     
     !do i = 1, NUMEG
@@ -187,7 +201,7 @@ end select
     !    end do
     !end do
     
-    !write (VTKFile,*) "CELL_TYPES", NEL
+    
     !do i = 1, NUMEG
     !    select case (NPAR(1))
     !    case (1) write(VTKElTypTmp,*) ?

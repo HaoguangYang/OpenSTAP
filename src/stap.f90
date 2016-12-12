@@ -356,7 +356,8 @@ SUBROUTINE WRITED (DISP,ID,NEQ,NUMNP)
        WRITE (IOUT,cFmt) II,D(:,II)
    END DO
   ENDIF
-  write (VTKFile, "('Displacement_of_Load_Case',I1,2X,I2,2X,I7,2X, 'float')") CURLCASE, DIM, NUMNP
+  write(cFmt, "('Displacement_Load_Case',I2.2)") CURLCASE
+  write (VTKFile,*) cFmt, DIM, NUMNP, 'float'
   do I = 1,DIM
       write (VTKFile,*) D(I,:) !Displacements
   end do
@@ -403,8 +404,8 @@ SUBROUTINE OPENFILES()
   OPEN(IELMNT, FILE = "ELMNT.TMP",  FORM = "UNFORMATTED")
   OPEN(ILOAD , FILE = "LOAD.TMP",   FORM = "UNFORMATTED")
   OPEN(VTKFile, FILE = "STAP90.OUT.vtk", STATUS = "REPLACE")
-  OPEN(VTKNodeTmp, FILE = "VTKNode.tmp", STATUS = "REPLACE")
-  OPEN(VTKElTypTmp, FILE = "VTKElTyp.tmp", STATUS = "REPLACE")
+  OPEN(VTKNodeTmp, FILE = "VTKNode.tmp", FORM = "UNFORMATTED", STATUS = "REPLACE")
+  OPEN(VTKElTypTmp, FILE = "VTKElTyp.tmp", FORM = "UNFORMATTED", STATUS = "REPLACE")
   
 END SUBROUTINE OPENFILES
 
