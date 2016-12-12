@@ -65,4 +65,4 @@ postprocessor.o : ../../src/postprocessor.f90 mathkernel.o memallocate.mod
 	gfortran -c  ../../src/postprocessor.f90
 
 clean : 
-	rm stap stap.o datain.o elcal.o assem.o globals.o globals.mod truss.o memalloc.o memallocate.mod 3T.o 4Q.o 9Q.o hexahedral.o BEAM.o plate.o shell.o plate8Q.o shell8Q.o mathkernel.o mathkernel.mod postprocessor.o LOAD.TMP ELMNT.TMP
+	rm stap stap.o datain.o elcal.o assem.o globals.o globals.mod truss.o memalloc.o memallocate.mod 3T.o 4Q.o 9Q.o hexahedral.o BEAM.o plate.o shell.o plate8Q.o shell8Q.o mathkernel.o mathkernel.mod postprocessor.o

@@ -377,6 +377,7 @@ SUBROUTINE OPENFILES()
   IMPLICIT NONE
   LOGICAL :: EX
   CHARACTER*80 FileInp
+  integer :: i
 
 ! Only for Compaq Fortran
 ! if(NARGS().ne.2) then
@@ -396,13 +397,16 @@ SUBROUTINE OPENFILES()
      PRINT *, "*** STOP *** FILE STAP90.IN DOES NOT EXIST !"
      STOP
   END IF
-
+  
+  do i = 1, len_trim(FileInp)
+    if (FileInp(i:i) .EQ. '.') exit
+  end do
+  
   OPEN(IIN   , FILE = FileInp,  STATUS = "OLD")
-  OPEN(IOUT  , FILE = "STAP90.OUT", STATUS = "REPLACE")
-
+  OPEN(IOUT  , FILE = FileInp(1:i-1)//".OUT", STATUS = "REPLACE")
   OPEN(IELMNT, FILE = "ELMNT.TMP",  FORM = "UNFORMATTED")
   OPEN(ILOAD , FILE = "LOAD.TMP",   FORM = "UNFORMATTED")
-  OPEN(VTKFile, FILE = "STAP90.OUT.vtk", STATUS = "REPLACE")
+  OPEN(VTKFile, FILE = FileInp(1:i-1)//".OUT.vtk", STATUS = "REPLACE")
   OPEN(VTKTmpFile, File = "VTK.tmp", FORM = "UNFORMATTED", STATUS = "REPLACE")
   OPEN(VTKNodeTmp, FILE = "VTKNode.tmp", FORM = "UNFORMATTED", STATUS = "REPLACE")
   OPEN(VTKElTypTmp, FILE = "VTKElTyp.tmp", FORM = "UNFORMATTED", STATUS = "REPLACE")
@@ -420,10 +424,10 @@ SUBROUTINE CLOSEFILES()
   IMPLICIT NONE
   CLOSE(IIN)
   CLOSE(IOUT)
-  CLOSE(IELMNT)
-  CLOSE(ILOAD)
+  CLOSE(IELMNT, status='delete')
+  CLOSE(ILOAD, status='delete')
   close(VTKFile)
-  close(VTKTmpFile)
-  close(VTKNodeTmp)
-  close(VTKElTypTmp)
+  close(VTKTmpFile, status='delete')
+  close(VTKNodeTmp, status='delete')
+  close(VTKElTypTmp, status='delete')
 END SUBROUTINE CLOSEFILES
