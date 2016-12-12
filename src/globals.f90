@@ -20,8 +20,9 @@ module GLOBALS
    integer, parameter :: IIN=5		! Unit used for input
    integer, parameter :: IOUT=6		! Unit used for output
    integer, parameter :: VTKFile=7
-   integer, parameter :: VTKNodeTmp=8
-   integer, parameter :: VTKElTypTmp=9
+   integer, parameter :: VTKTmpFile=8
+   integer, parameter :: VTKNodeTmp=9
+   integer, parameter :: VTKElTypTmp=10
 
    integer :: DIM       ! Dimension of the problem
    integer :: NUMNP		! Total number of nodal points

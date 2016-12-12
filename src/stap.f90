@@ -204,7 +204,6 @@ PROGRAM STAP90
      IND=3    ! Stress calculations
 
      REWIND ILOAD
-     CALL VTKgenerate (IND)
      DO CURLCASE=1,NLCASE
         CALL LOADV (DA(NP(4)),NEQ)   ! Read in the load vector
 
@@ -223,7 +222,7 @@ PROGRAM STAP90
         CALL STRESS (A(NP(11)))
 
      END DO
-     CALL VTKgenerate (IND+1)
+     CALL VTKgenerate (IND)
      CALL SECOND (TIM(5))
   END IF
 
@@ -270,7 +269,7 @@ SUBROUTINE WRITED (DISP,ID,NEQ,NUMNP)
 ! .   To print displacements                                          .
 ! . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-  USE GLOBALS, ONLY : IOUT, HED, CURLCASE, VTKFILE, DIM
+  USE GLOBALS, ONLY : IOUT, HED, CURLCASE, VTKTmpFile, DIM
 
   IMPLICIT NONE
   INTEGER :: NEQ,NUMNP,ID(DIM,NUMNP)
@@ -357,9 +356,9 @@ SUBROUTINE WRITED (DISP,ID,NEQ,NUMNP)
    END DO
   ENDIF
   write(cFmt, "('Displacement_Load_Case',I2.2)") CURLCASE
-  write (VTKFile,*) cFmt, DIM, NUMNP, 'float'
-  do I = 1,DIM
-      write (VTKFile,*) D(I,:) !Displacements
+  write (VTKTmpFile) cFmt, DIM, NUMNP
+  do I = 1,NUMNP
+      write (VTKTmpFile) D(1:DIM,I) !Displacements
   end do
   RETURN
 
@@ -404,6 +403,7 @@ SUBROUTINE OPENFILES()
   OPEN(IELMNT, FILE = "ELMNT.TMP",  FORM = "UNFORMATTED")
   OPEN(ILOAD , FILE = "LOAD.TMP",   FORM = "UNFORMATTED")
   OPEN(VTKFile, FILE = "STAP90.OUT.vtk", STATUS = "REPLACE")
+  OPEN(VTKTmpFile, File = "VTK.tmp", FORM = "UNFORMATTED", STATUS = "REPLACE")
   OPEN(VTKNodeTmp, FILE = "VTKNode.tmp", FORM = "UNFORMATTED", STATUS = "REPLACE")
   OPEN(VTKElTypTmp, FILE = "VTKElTyp.tmp", FORM = "UNFORMATTED", STATUS = "REPLACE")
   
@@ -423,6 +423,7 @@ SUBROUTINE CLOSEFILES()
   CLOSE(IELMNT)
   CLOSE(ILOAD)
   close(VTKFile)
+  close(VTKTmpFile)
   close(VTKNodeTmp)
   close(VTKElTypTmp)
 END SUBROUTINE CLOSEFILES

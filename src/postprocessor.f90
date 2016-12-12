@@ -129,9 +129,9 @@ subroutine PostProcessor (ElementType, Dimen, PositionData, &
     if (Dimen == 3) NumberOfStress = 6
     if (Dimen == 2) NumberOfStress = 3
     write (String, "('Stress_Load_Case',I2.2)") CURLCASE
-    write (VTKFile,*) String, NumberOfStress, NUMNP, 'float'
-    do j = 1, NumberOfStress
-        write (VTKFile,*) Stress(j,:) !Stresses
+    write (VTKTmpFile) String, NumberOfStress, NUMNP
+    do j = 1, NUMNP
+        write (VTKTmpFile) Stress(1:NumberOfStress,j) !Stresses
     end do
     
 end subroutine PostProcessor
@@ -143,14 +143,16 @@ subroutine VTKgenerate (Flag)
     use memallocate
     implicit none
     integer :: i,j,Flag, Dat(NEL+100)
+    character(len=25) :: string
+    real(8) :: Dat1(NUMNP)
     
 select case (Flag)
 case (1)
-    write (VTKFile,*) '#vtk DataFile Version 3.0'
+    write (VTKFile,"(A26)") '# vtk DataFile Version 3.0'
     write (VTKFile,*) HED
-    write (VTKFile,*) 'ASCII'
-    write (VTKFile,*) 'DATASET UNSTRUCTURED GRID'
-    write (VTKFile,*) "POINTS",NUMNP,"float"
+    write (VTKFile,"(A5)") 'ASCII'
+    write (VTKFile,"(A25)") 'DATASET UNSTRUCTURED_GRID'
+    write (VTKFile,*) "POINTS",NUMNP,"double"
     do i = 1, NUMNP
         write (VTKFile,*) DA(NP(2)+i-1), DA(NP(3)+i-1), DA(NP(4)+i-1)   !X(i), Y(i), Z(i)
     end do
@@ -178,11 +180,8 @@ case (2)
      case (10)
         write (VTKElTypTmp) (5,I=1,NPAR(2))
      end select
-    
+     
 case (3)
-    write (VTKFile,*) "FIELD Result ", NLCASE*2
-    
-case (4)
     write (VTKFile,*) "CELLS ", NEL, NCONECT          !Sum up all elements to generate a global picture
     rewind (VTKNodeTmp)
     do i = 1 , NEL
@@ -193,6 +192,24 @@ case (4)
     rewind (VTKElTypTmp)
     read (VTKElTypTmp) Dat(1:NEL)
     write (VTKFile,*) Dat(1:NEL)
+    write (VTKFile,*) "CELL_DATA", NEL
+    write (VTKFile,*) "POINT_DATA", NUMNP
+    write (VTKFile,*) "FIELD Result ", NLCASE*2
+    rewind (VTKTmpFile)
+    do i = 1 , NLCASE
+        read (VTKTmpFile) string(1:25), Dat(1:2)                !Fetch Displacements of Load Cases
+        write (VTKFile,*) string(1:25), Dat(1:2), "double"
+        do j = 1, NUMNP
+            read (VTKTmpFile) Dat1(1:Dat(1))
+            write (VTKFile,*) Dat1(1:Dat(1))
+        end do
+        read (VTKTmpFile) string(1:19), Dat(1:2)                !Fetch Stress of Load Cases
+        write (VTKFile,*) string(1:19), Dat(1:2), "double"
+        do j = 1, NUMNP
+            read (VTKTmpFile) Dat1(1:Dat(1))
+            write (VTKFile,*) Dat1(1:Dat(1))
+        end do
+    end do
 end select
     
     !do i = 1, NUMEG
