@@ -225,12 +225,12 @@ case (3)                                                            !Called in s
             read (VTKTmpFile) Dat1(1:Dat(1))
             write (VTKFile,*) Dat1(1:Dat(1))
         end do
-        read (VTKTmpFile) string(1:19), Dat(1:2)                    !Fetch Stress of Load Cases
-        write (VTKFile,*) string(1:19), Dat(1:2), "double"          !Dat(1) should be <=6 for no more than 6 stress components
-        do j = 1, NUMNP
-            read (VTKTmpFile) Dat1(1:Dat(1))
-            write (VTKFile,*) Dat1(1:Dat(1))
-        end do
+        !read (VTKTmpFile) string(1:19), Dat(1:2)                    !Fetch Stress of Load Cases
+        !write (VTKFile,*) string(1:19), Dat(1:2), "double"          !Dat(1) should be <=6 for no more than 6 stress components
+        !do j = 1, NUMNP
+        !    read (VTKTmpFile) Dat1(1:Dat(1))
+        !    write (VTKFile,*) Dat1(1:Dat(1))
+        !end do
     end do
 end select
     
