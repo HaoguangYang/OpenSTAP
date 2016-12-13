@@ -117,7 +117,7 @@ subroutine HexEight (ID,X,Y,Z,U,MHT,E, PoissonRatio, Density, Gravity, LM, Posit
         CALL GaussianMask(GaussianPts, W, QuadratureOrder)
         
         DO WHILE (N .NE. NumberOfElements)
-            READ (IIN,'(11I5)') N,Node(N,1:8),MaterialType          ! Read in element information
+            READ (IIN,'(11I5)') N,Node(N,1:NPAR(5)),MaterialType          ! Read in element information
             
     !       Save element information
             PositionData(1:ElementShapeNodes*3-1:3,N)=X(Node(N,:))        ! Coordinates of the element's nodes
