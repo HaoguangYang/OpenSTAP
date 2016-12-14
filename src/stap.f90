@@ -46,12 +46,7 @@ PROGRAM STAP90
 !            1 : execution
 
   READ (IIN,'(A80,/,4I5)') HED,NUMNP,NUMEG,NLCASE,MODEX
-! 桥梁部分做的修改
-! 首先输入一遍所有的单元，记录每种元素都有多少个
-! 默认所有元素都是6个自由度，分别是u,v,w,thea_x, theta_y, theta_z
-  BandwidthOpt = 0
-  CALL PREPROCESS(IA(NP(1))
-! 修改结束  
+
 ! input node
   IF (NUMNP.EQ.0) STOP   ! Data check mode
 
@@ -65,7 +60,6 @@ PROGRAM STAP90
      '         EQ.1, EXECUTION')") HED,NUMNP,NUMEG,NLCASE,MODEX
 
 ! Read nodal point data
-
 ! ALLOCATE STORAGE
 !   ID(6,NUMNP) : Boundary condition codes (0=free,1=deleted)
 !   IDBEAM(6,NUMNP) : Boundary condition codes for beam (0=free,1=fixed)
@@ -196,9 +190,8 @@ PROGRAM STAP90
         CALL LOADV (DA(NP(4)),NEQ)   ! Read in the load vector
 
 !       Solve the equilibrium equations to calculate the displacements
-!change for SparseBLAS        CALL COLSOL (DA(NP(3)),DA(NP(4)),IA(NP(2)),NEQ,NWK,NEQ1,2)
-!SparseBLAS
-        CALL SOLVE(DA(NP(3)),DA(NP(4)),IA(NP(2)),NEQ,NWK,NEQ1,2)
+        CALL COLSOL (DA(NP(3)),DA(NP(4)),IA(NP(2)),NEQ,NWK,NEQ1,2)
+
         WRITE (IOUT,"(//,' LOAD CASE ',I3)") L
         
         IF (NPAR(1) .EQ. 5) THEN
@@ -267,82 +260,33 @@ SUBROUTINE WRITED (DISP,ID,NEQ,NUMNP)
   character (len=25) :: cFmt
 
 ! Print displacements
-  IF ((HED .EQ. 'SHELL').OR. (HED .EQ. 'SHELL8Q')) THEN
-    WRITE (IOUT,"(//,' D I S P L A C E M E N T S',//,'  NODE ',10X,   &
-                    'W          BETA_X          BETA_Y          U         V')")
 
-    IC=4
-    write (cFmt,"('(1X,I3,4X,',I2,'E14.4)')") DIM
-    DO II=1,NUMNP
-       IC=IC + 1
-       IF (IC.GE.56) THEN
-          WRITE (IOUT,"(//,' D I S P L A C E M E N T S',//,'  NODE ',10X,   &
-                          'W          BETA_X        BETA_Y          U         V')")
-          IC=4
-       END IF
+  WRITE (IOUT,"(//,' D I S P L A C E M E N T S',//,'  NODE ',3X,   &
+                    'X-DISPLACEMENT  Y-DISPLACEMENT  Z-DISPLACEMENT  X-ROTATION  Y-ROTATION  Z-ROTATION')")
 
-       DO I=1,DIM
-          D(I)=0.
-       END DO
+  IC=4
 
-       DO I=1,DIM
-          KK=ID(I,II)
-          IF (KK.NE.0) D(I)=DISP(KK)
-       END DO
+  DO II=1,NUMNP
+     IC=IC + 1
+     IF (IC.GE.56) THEN
+        WRITE (IOUT,"(//,' D I S P L A C E M E N T S',//,'  NODE ',3X,   &
+                          'X-DISPLACEMENT   Y-DISPLACEMENT  Z-DISPLACEMENT  X-ROTATION  Y-ROTATION  Z-ROTATION')")
+        IC=4
+     END IF
 
-       WRITE (IOUT,cFmt) II,D
-    END DO
-  ELSE IF ((HED == 'PLATE') .OR. (HED == 'PLATE8Q' )) THEN
-    WRITE (IOUT,"(//,' D I S P L A C E M E N T S',//,'  NODE ',10X,   &
-                    '     W          BETA_X        BETA_Y')")
-    
-    IC=4
-    write (cFmt,"('(1X,I3,8X,',I2,'E17.5)')") DIM
-    DO II=1,NUMNP
-       IC=IC + 1
-       IF (IC.GE.56) THEN
-          WRITE (IOUT,"(//,' D I S P L A C E M E N T S',//,'  NODE ',10X,   &
-                          '     W          BETA_X        BETA_Y')")
-          IC=4
-       END IF
+     DO I=1,6
+        D(I)=0.
+     END DO
 
-       DO I=1,3
-          D(I)=0.
-       END DO
+     DO I=1,6
+        KK=ID(I,II)
+        IF (KK.NE.0) D(I)=DISP(KK)
+     END DO
 
-       DO I=1,3
-          KK=ID(I,II)
-          IF (KK.NE.0) D(I)=DISP(KK)
-       END DO
+     WRITE (IOUT,'(1X,I3,5X,6E14.6)') II,D
 
-       WRITE (IOUT,cFmt) II,D
-   END DO
-  ELSE
-    WRITE (IOUT,"(//,' D I S P L A C E M E N T S',//,'  NODE ',10X,   &
-                    'X-DISPLACEMENT    Y-DISPLACEMENT    Z-DISPLACEMENT')")
-    
-    IC=4
-    write (cFmt,"('(1X,I3,8X,',I2,'E17.5)')") DIM
-    DO II=1,NUMNP
-       IC=IC + 1
-       IF (IC.GE.56) THEN
-          WRITE (IOUT,"(//,' D I S P L A C E M E N T S',//,'  NODE ',10X,   &
-                          'X-DISPLACEMENT    Y-DISPLACEMENT    Z-DISPLACEMENT')")
-          IC=4
-       END IF
+  END DO
 
-       DO I=1,3
-          D(I)=0.
-       END DO
-
-       DO I=1,3
-          KK=ID(I,II)
-          IF (KK.NE.0) D(I)=DISP(KK)
-       END DO
-
-       WRITE (IOUT,cFmt) II,D
-   END DO
-  ENDIF
   RETURN
 
 END SUBROUTINE WRITED

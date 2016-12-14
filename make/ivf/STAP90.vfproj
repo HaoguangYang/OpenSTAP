@@ -41,6 +41,7 @@
 		<File RelativePath="..\..\src\memalloc.f90"/>
 		<File RelativePath="..\..\src\plate.f90"/>
 		<File RelativePath="..\..\src\plate8Q.f90"/>
+		<File RelativePath=".\preprocess.f90"/>
 		<File RelativePath="..\..\src\shell.f90"/>
 		<File RelativePath="..\..\src\shell8Q.f90"/>
 		<File RelativePath="..\..\src\stap.f90"/>

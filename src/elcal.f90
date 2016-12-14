@@ -28,7 +28,7 @@ SUBROUTINE ELCAL
   WRITE (IOUT,"(//,' E L E M E N T   G R O U P   D A T A',//)")
 
 ! Loop over all element groups
-
+! every element group represent for a kind of element
   DO N=1,NUMEG
      IF (N.NE.1) WRITE (IOUT,'(1X)')
 

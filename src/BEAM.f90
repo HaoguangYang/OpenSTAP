@@ -392,46 +392,6 @@ SUBROUTINE BEAMELE (ID,X,Y,Z,U,MHT,E,G,AREA,I_X,I_Y,I_Z,J_X,J_Y,J_Z,LM,XYZ,MATP)
 
  END SUBROUTINE BEAMELE
     
- SUBROUTINE LOADSBEAM (R,NOD,IDIRN,FLOAD,ID,NLOAD,NEQ)
-! . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-! .                                                                   .
-! .   To read nodal load data                                         .
-! .   To calculate the load vector r for each load case and           .
-! .   write onto unit ILOAD                                           .
-! .                                                                   .
-! . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-  USE GLOBALS, ONLY : IIN, IOUT, ILOAD, MODEX
-
-  IMPLICIT NONE
-  INTEGER :: NLOAD,NEQ,ID(6,*),NOD(NLOAD),IDIRN(NLOAD)
-  REAL(8) :: R(NEQ),FLOAD(NLOAD)
-  INTEGER :: I,L,LI,LN,II
-
-  WRITE (IOUT,"(/,'    NODE       DIRECTION      LOAD',/, '   NUMBER',19X,'MAGNITUDE')")
-
-  READ (IIN,"(2I5,F10.0)") (NOD(I),IDIRN(I),FLOAD(I),I=1,NLOAD)
-
-  WRITE (IOUT,"(' ',I6,9X,I4,7X,E12.5)") (NOD(I),IDIRN(I),FLOAD(I),I=1,NLOAD)
-
-  IF (MODEX.EQ.0) RETURN
-
-  DO I=1,NEQ
-     R(I)=0.
-  END DO
-
-  DO L=1,NLOAD
-     LN=NOD(L)
-     LI=IDIRN(L)
-     II=ID(LI,LN)
-     IF (II > 0) R(II)=R(II) + FLOAD(L)
-  END DO
-
-  WRITE (ILOAD) R
-
-  RETURN
-  
-END SUBROUTINE LOADSBEAM
-    
 SUBROUTINE WRITEDBEAM (DISP,ID,NEQ,NUMNP)
 ! . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 ! .                                                                   .

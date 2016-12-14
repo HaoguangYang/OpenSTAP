@@ -272,26 +272,4 @@ SUBROUTINE COLSOL (A,V,MAXA,NN,NWK,NNM,KKK)
 
   END IF
 
-    END SUBROUTINE COLSOL
-
-
-SUBROUTINE SOLVE(A,V,pntr,NEQ,NWK,NNM,KKK)
-  USE GLOBALS, ONLY : IOUT
-  
-    
-  IMPLICIT NONE
-  INTEGER :: MAXA(NNM),NEQ,NWK,NNM,KKK
-  REAL(8) :: A(NWK),V(NEQ),x(NEQ),C,B
-  INTEGER :: MIN0
-  
-  CHARACTER*1 transa
-  CHARACTER*6 matdescra
-  INTEGER m
-  INTEGER pntr(NEQ+1)
-  REAL(8) :: alpha = 1, beta = 0
-
-  transa = 'N'
-  matdescra = 'TUNF'
-
-  CALL mkl_dskysv(transa, NEQ, alpha, matdescra, A, pntr, V, V)
-END SUBROUTINE SOLVE
+END SUBROUTINE COLSOL

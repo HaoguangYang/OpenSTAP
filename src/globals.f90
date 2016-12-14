@@ -41,8 +41,8 @@ module GLOBALS
 						!             cross-sectional  constants
    integer :: NUMEG		! 有多少种类型的元素
    integer :: element_type(10)
+   integer :: element_type_nodes(10) = (/2, 4, 9, 8, 2, 4, 4, 8, 8, 3/)
    integer :: element_type_count(10) ! 每个里面存储了对于序号对应的类型，有多少个element
-   
    integer :: MODEX		! Solution mode: 0 - data check only;  1 -  execution                                   
 
    real :: TIM(5)		! Timing information
@@ -54,4 +54,6 @@ module GLOBALS
    integer :: MAXEST
 
    integer :: NG
+   
+   integer :: BandwidthOpt
 end module GLOBALS
