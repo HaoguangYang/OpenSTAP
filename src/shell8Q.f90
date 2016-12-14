@@ -71,7 +71,7 @@ SUBROUTINE SHELL8 (ID,X,Y,Z,U,MHT,E,POSSION,LM,XYZ,MATP, THICK)
   USE MEMALLOCATE
 
   IMPLICIT NONE
-  INTEGER :: ID(5,NUMNP),LM(40,NPAR(2)),MATP(NPAR(2)),MHT(NEQ)
+  INTEGER :: ID(6,NUMNP),LM(40,NPAR(2)),MATP(NPAR(2)),MHT(NEQ)
   REAL(8) :: X(NUMNP),Y(NUMNP),Z(NUMNP),E(NPAR(3)),POSSION(NPAR(3)),  &
              XYZ(24,NPAR(2)),THICK(NPAR(2)),U(NEQ)
 
@@ -150,17 +150,27 @@ SUBROUTINE SHELL8 (ID,X,Y,Z,U,MHT,E,POSSION,LM,XYZ,MATP, THICK)
         XYZ(23,N)=Y(L1)
         MATP(N)=MTYPE  ! Material type
 
-        DO M=1,5
-           LM(M,N)=ID(M,I)     ! Connectivity matrix
-           LM(M+5,N)=ID(M,J)
-           LM(M+10,N)=ID(M,K)
-           LM(M+15,N)=ID(M,L)
-           LM(M+20,N)=ID(M,I1)     
-           LM(M+25,N)=ID(M,J1)
-           LM(M+30,N)=ID(M,K1)
-           LM(M+35,N)=ID(M,L1)
+        DO M=1,3
+           LM(M,N)=ID(M+2,I)     ! Connectivity matrix
+           LM(M+5,N)=ID(M+2,J)
+           LM(M+10,N)=ID(M+2,K)
+           LM(M+15,N)=ID(M+2,L)
+           LM(M+20,N)=ID(M+2,I1)     
+           LM(M+25,N)=ID(M+2,J1)
+           LM(M+30,N)=ID(M+2,K1)
+           LM(M+35,N)=ID(M+2,L1)
         END DO
-
+        
+        DO M=4,5
+           LM(M,N)=ID(M-3,I)     ! Connectivity matrix
+           LM(M+5,N)=ID(M-3,J)
+           LM(M+10,N)=ID(M-3,K)
+           LM(M+15,N)=ID(M-3,L)
+           LM(M+20,N)=ID(M-3,I1)     
+           LM(M+25,N)=ID(M-3,J1)
+           LM(M+30,N)=ID(M-3,K1)
+           LM(M+35,N)=ID(M-3,L1)
+        END DO
 !       Update column heights and bandwidth
         CALL COLHT (MHT,ND,LM(1,N))   
 

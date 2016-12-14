@@ -145,10 +145,10 @@ SUBROUTINE PLATE4Q (ID,X,Y,Z,U,MHT,E,POSSION,LM,XYZ,MATP,THICK)
         MATP(N)=MTYPE  ! Material type
 
         DO M=1,3
-           LM(M,N)=ID(M,I)     ! Connectivity matrix
-           LM(M+3,N)=ID(M,J)
-           LM(M+6,N)=ID(M,K)
-           LM(M+9,N)=ID(M,L)
+           LM(M,N)=ID(M+2,I)     ! Connectivity matrix
+           LM(M+3,N)=ID(M+2,J)
+           LM(M+6,N)=ID(M+2,K)
+           LM(M+9,N)=ID(M+2,L)
         END DO
 
 !       Update column heights and bandwidth
