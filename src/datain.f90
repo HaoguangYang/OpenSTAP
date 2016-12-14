@@ -25,9 +25,7 @@ SUBROUTINE INPUT (ID,X,Y,Z,NUMNP,NEQ)
 ! .                                                                       .
 ! . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-  USE GLOBALS, ONLY : IIN, IOUT, DIM, HED
-
-  USE GLOBALS, ONLY : IIN, IOUT
+  USE GLOBALS, ONLY : IIN, IOUT, DIM
 
   IMPLICIT NONE
   INTEGER :: NUMNP,NEQ,ID(DIM,NUMNP)
