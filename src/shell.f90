@@ -143,25 +143,25 @@ SUBROUTINE SHELL4Q (ID,X,Y,Z,U,MHT,E,POSSION,LM,XYZ,MATP, THICK)
         XYZ(11,N)=Y(L)
 
         MATP(N)=MTYPE  ! Material type
-        DO M=1,5
-           LM(M,N)=ID(M,I)     ! Connectivity matrix
-           LM(M+5,N)=ID(M,J)
-           LM(M+10,N)=ID(M,K)
-           LM(M+15,N)=ID(M,L)
-        END DO
+        !DO M=1,5
+        !   LM(M,N)=ID(M,I)     ! Connectivity matrix
+        !   LM(M+5,N)=ID(M,J)
+        !   LM(M+10,N)=ID(M,K)
+        !   LM(M+15,N)=ID(M,L)
+        !END DO
         ! 这里是为了让顺序
-        !DO M=1,3
-        !   LM(M,N)=ID(M+2,I)     ! Connectivity matrix
-        !   LM(M+5,N)=ID(M+2,J)
-        !   LM(M+10,N)=ID(M+2,K)
-        !   LM(M+15,N)=ID(M+2,L)
-        !END DO
-        !DO M=4,5
-        !   LM(M,N)=ID(M-3,I)
-        !   LM(M+5,N)=ID(M-3,J)
-        !   LM(M+10,N)=ID(M-3,K)
-        !   LM(M+15,N)=ID(M-3,L)
-        !END DO
+        DO M=1,3
+           LM(M,N)=ID(M+2,I)     ! Connectivity matrix
+           LM(M+5,N)=ID(M+2,J)
+           LM(M+10,N)=ID(M+2,K)
+           LM(M+15,N)=ID(M+2,L)
+        END DO
+        DO M=4,5
+           LM(M,N)=ID(M-3,I)
+           LM(M+5,N)=ID(M-3,J)
+           LM(M+10,N)=ID(M-3,K)
+           LM(M+15,N)=ID(M-3,L)
+        END DO
 !       Update column heights and bandwidth
         CALL COLHT (MHT,ND,LM(1,N))   
 
