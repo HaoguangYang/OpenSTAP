@@ -309,11 +309,11 @@ SUBROUTINE OPENFILES()
 !    call GETARG(1,FileInp)
 !  end if
 
-!  if(COMMAND_ARGUMENT_COUNT().ne.1) then
-!     stop 'Usage: STAP90 InputFileName'
-!  else
-!     call GET_COMMAND_ARGUMENT(1,FileInp)
-!  end if
+  if(COMMAND_ARGUMENT_COUNT().ne.1) then
+     stop 'Usage: STAP90 InputFileName'
+  else
+     call GET_COMMAND_ARGUMENT(1,FileInp)
+  end if
 
   INQUIRE(FILE = FileInp, EXIST = EX)
   IF (.NOT. EX) THEN
