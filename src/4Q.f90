@@ -29,19 +29,11 @@ USE GLOBALS
 USE memAllocate
 
 IMPLICIT NONE
-INTEGER NUME, NUMMAT, MM, N101, N102, N103, N104, N105, N106
+INTEGER NUME, NUMMAT, MM, N(7)
 
 NUME = NPAR(2)
 NUMMAT = NPAR(3)
-
-! Allocate storage for element group data
-  IF (IND == 1) THEN
-      MM = 2*NUMMAT*ITWO + 9*NUME + 12*NUME*ITWO
-      CALL MEMALLOC(11,"ELEGP",MM,1)
-  END IF
-
-  NFIRST=NP(11)   ! Pointer to the first entry in the element group data array
-                  ! in the unit of single precision (corresponding to A)
+NPAR(5) = 4
 
 ! Calculate the pointer to the arrays in the element group data
 ! N101: E(NUMMAT)
@@ -49,25 +41,32 @@ NUMMAT = NPAR(3)
 ! N103: LM(8,NUME)
 ! N104: XYZ(12,NUME)
 ! N105: MTAP(NUME)
-  N101=NFIRST
-  N102=N101+NUMMAT*ITWO
-  N103=N102+NUMMAT*ITWO
-  N104=N103+8*NUME
-  N105=N104+12*NUME*ITWO
-  N106=N105+NUME
-  NLAST=N106
-
-  MIDEST = NLAST - NFIRST
+  N(1)=0
+  N(2)=N(1)+NUMMAT*ITWO
+  N(3)=N(2)+NUMMAT*ITWO
+  N(4)=N(3)+8*NUME
+  N(5)=N(4)+12*NUME*ITWO
+  N(6)=N(5)+NUME
+  N(7)=N(6)+NPAR(5)*NPAR(2)
+  
+  MIDEST=N(7)
+  if (IND .EQ. 1) then
+        ! Allocate storage for element group data
+        call MemAlloc(11,"ELEGP",MIDEST,1)
+  end if
+  NFIRST = NP(11)   ! Pointer to the first entry in the element group data array in the unit of single precision (corresponding to A)
+  N(:) = N(:) + NFIRST
+  NLAST=N(7)
 
   CALL ELEMENT_4Q_MAIN (IA(NP(1)),DA(NP(2)),DA(NP(3)),DA(NP(4)),DA(NP(4)),IA(NP(5)),   &
-       A(N101),A(N102),A(N103),A(N104),A(N105))
+       A(N(1)),A(N(2)),A(N(3)),A(N(4)),A(N(5)),A(N(6)))
 
   RETURN
 
 END SUBROUTINE ELEMENT_4Q
 
 
-SUBROUTINE ELEMENT_4Q_MAIN (ID,X,Y,Z,U,MHT,E,POISSON,LM,XYZ,MATP)
+SUBROUTINE ELEMENT_4Q_MAIN (ID,X,Y,Z,U,MHT,E,POISSON,LM,XYZ,MATP,Node)
 ! . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 ! .                                                                   .
 ! .   TRUSS element subroutine                                        .
@@ -101,17 +100,17 @@ SUBROUTINE ELEMENT_4Q_MAIN (ID,X,Y,Z,U,MHT,E,POISSON,LM,XYZ,MATP)
              XYZ(12,NPAR(2)),U(NEQ),DST(8,1)
   REAL(8) :: ETA,EPSILON
 
-  INTEGER :: NPAR1, NUME, NUMMAT, ND, I1, I2, I3, I4, L, N, I, J
+  INTEGER :: NPAR1, NUME, NUMMAT, ND, Node(NPAR(2),NPAR(5)), L, N, I, J
   INTEGER :: MTYPE, IPRINT
   REAL(8) :: GP(2),W(2),NMAT(2,8),BMAT(3,8),C(4,2),NA(1,4)
   REAL(8) :: KE(8,8),DETJ,D(3,3)
-  REAL(8) :: X_GUASS(4,2),XY(1,2)
+  REAL(8) :: X_GUASS(4,2),XY(1,2), GaussianCollection(2,NPAR(2)*4)
   REAL(8) :: STRESS_XX(NPAR(2),4),STRESS_YY(NPAR(2),4),STRESS_XY(NPAR(2),4),STRESS(3,1)
   COMMON DETJ
   
   !定义gauss积分常数
-  GP(1)=-0.57735027
-  GP(2)=0.57735027
+  GP(1)=-sqrt(3D0)/3.           !-0.57735027
+  GP(2)=sqrt(3D0)/3.            !0.57735027
   W(1)=1.0
   W(2)=1.0
 
@@ -146,29 +145,17 @@ SUBROUTINE ELEMENT_4Q_MAIN (ID,X,Y,Z,U,MHT,E,POISSON,LM,XYZ,MATP)
      END DO
 
      WRITE (IOUT,"(//,' E L E M E N T   I N F O R M A T I O N',//,  &
-                      ' ELEMENT     NODE     NODE       MATERIAL',/,   &
-                      ' NUMBER-N     I1       I2       I3       I4      SET NUMBER')")
+                      ' ELEMENT    |------------- NODE -------------|    MATERIAL',/,   &
+                      ' NUMBER-N      1        2        3        4      SET NUMBER')")
 
      N=0
      DO WHILE (N .NE. NUME)
-        READ (IIN,'(7I5)') N,I1,I2,I3,I4,MTYPE  ! Read in element information
+        READ (IIN,'(7I5)') N, Node(N,1:NPAR(5)), MTYPE  ! Read in element information
 
 !       Save element information
-        XYZ(1,N)=X(I1)  ! Coordinates of the element's 1st node
-        XYZ(2,N)=Y(I1)
-        XYZ(3,N)=Z(I1)
-
-        XYZ(4,N)=X(I2)  ! Coordinates of the element's 2nd node
-        XYZ(5,N)=Y(I2)
-        XYZ(6,N)=Z(I2)
-        
-        XYZ(7,N)=X(I3)  ! Coordinates of the element's 3rd node
-        XYZ(8,N)=Y(I3)
-        XYZ(9,N)=Z(I3)
-        
-        XYZ(10,N)=X(I4) ! Coordinates of the element's 4th node
-        XYZ(11,N)=Y(I4)
-        XYZ(12,N)=Z(I4)
+        XYZ(1:NPAR(5)*3-1:3,N)=X(Node(N,:))  ! Coordinates of the element's nodes
+        XYZ(2:NPAR(5)*3  :3,N)=Y(Node(N,:))
+        XYZ(3:NPAR(5)*3+1:3,N)=Z(Node(N,:))
 
         MATP(N)=MTYPE  ! Material type
 
@@ -177,16 +164,17 @@ SUBROUTINE ELEMENT_4Q_MAIN (ID,X,Y,Z,U,MHT,E,POISSON,LM,XYZ,MATP)
         END DO
 
         DO L=1,2
-           LM(L,N)=ID(L,I1)     ! Connectivity matrix
-           LM(L+2,N)=ID(L,I2)
-           LM(L+4,N)=ID(L,I3)
-           LM(L+6,N)=ID(L,I4)
+           LM(L  ,N) = ID(L,Node(N,1))     ! Connectivity matrix
+           LM(L+2,N) = ID(L,Node(N,2))
+           LM(L+4,N) = ID(L,Node(N,3))
+           LM(L+6,N) = ID(L,Node(N,4))
         END DO
 
 !       Update column heights and bandwidth
         CALL COLHT (MHT,ND,LM(1,N))   
 
-        WRITE (IOUT,"(I5,6X,I5,4X,I5,4X,I5,4X,I5,7X,I5)") N,I1,I2,I3,I4,MTYPE
+        WRITE (IOUT,"(I5,6X,I5,4X,I5,4X,I5,4X,I5,7X,I5)") N,Node(N,1:NPAR(5)),MTYPE
+        write (VTKNodeTmp) NPAR(5), Node(N,:)-1
 
      END DO
 
@@ -269,25 +257,29 @@ SUBROUTINE ELEMENT_4Q_MAIN (ID,X,Y,Z,U,MHT,E,POISSON,LM,XYZ,MATP)
                 NA(1,:) = (/NMAT(1,1) , NMAT(1,3) , NMAT(1,5) , NMAT(1,7)/)
                 
                 XY = MATMUL(NA,C)
-                X_GUASS(2*J+I-2,1) = XY(1,1)
-                X_GUASS(2*J+I-2,2) = XY(1,2)
+                X_GUASS(2*I+J-2,1) = XY(1,1)
+                X_GUASS(2*I+J-2,2) = XY(1,2)
                 
 
                 BMAT = BmatElast2D(ETA,EPSILON,C)
                 STRESS = MATMUL(D,MATMUL(BMAT,DST))
                 
-                STRESS_XX(N,2*J+I-2) = STRESS(1,1)
-                STRESS_YY(N,2*J+I-2) = STRESS(2,1)
-                STRESS_XY(N,2*J+I-2) = STRESS(3,1)
+                STRESS_XX(N,2*I+J-2) = STRESS(1,1)
+                STRESS_YY(N,2*I+J-2) = STRESS(2,1)
+                STRESS_XY(N,2*I+J-2) = STRESS(3,1)
                 
-            WRITE (IOUT,"(1X,I5,4X,E13.6,4X,E13.6,11X,E13.6,4X,E13.6,4X, E13.6)") N,X_GUASS(2*J+I-2,1), &
-            X_GUASS(2*J+I-2,2),STRESS_XX(N,2*J+I-2),STRESS_YY(N,2*J+I-2),STRESS_XY(N,2*J+I-2)
+            WRITE (IOUT,"(1X,I5,4X,E13.6,4X,E13.6,11X,E13.6,4X,E13.6,4X, E13.6)") N,X_GUASS(2*I+J-2,1), &
+            X_GUASS(2*I+J-2,2),STRESS_XX(N,2*I+J-2),STRESS_YY(N,2*I+J-2),STRESS_XY(N,2*I+J-2)
                 
             END DO
         END DO
-                
+        
+        I = (N-1)*4+1
+        J = N*4
+        GaussianCollection (:,I:J) = transpose(X_GUASS)
      END DO
-
+     call PostProcessor(NPAR(1), 2, XYZ((/1,2,4,5,7,8,10,11/),:), Node, 4, GaussianCollection, &
+         TRANSPOSE(reshape((/transpose(STRESS_XX),transpose(STRESS_YY),transpose(STRESS_XY)/),(/4*NPAR(2),3/))), U)
   ELSE 
      STOP "*** ERROR *** Invalid IND value."
   END IF

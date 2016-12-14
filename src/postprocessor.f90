@@ -24,7 +24,7 @@ subroutine PostProcessor (ElementType, Dimen, PositionData, &
     integer :: Dimen, NGauss, ElementType, NumberOfStress, ref1, ref2
     integer :: NodeRelationFlag(NUMNP,NPAR(5)*2+12), Ncoeff, Nval, N, i, j, k, L, &
                ind0, ind1, ind2, Node(NPAR(2),NPAR(5))
-    real(8) :: coeff(10,6), Stress(6,NUMNP), PositionData(3*NPAR(5), NPAR(2)), U(NEQ), &
+    real(8) :: coeff(10,6), Stress(6,NUMNP), PositionData(Dimen*NPAR(5), NPAR(2)), U(NEQ), &
                GaussianCollection(Dimen, NPAR(2)*NGauss), StressCollection(3*Dimen-3,NPAR(2)*NGauss)
     real(8) :: x, y, z, Displacement(NEQ)
     REAL(8), ALLOCATABLE :: value(:,:)
@@ -101,7 +101,7 @@ subroutine PostProcessor (ElementType, Dimen, PositionData, &
             coeff(:,:) = 0
             Nval = NodeRelationFlag(L,ref1) * NGauss
             ind0 = 1
-            if (Nval .GE. 8) then
+            if (Nval .GE. 9) then
                 Ncoeff = 6
             else
                 Ncoeff = 3
@@ -140,6 +140,7 @@ subroutine PostProcessor (ElementType, Dimen, PositionData, &
                                                                 L, Stress(1:2,L), "---", Stress(3,L), "---", "---"
         end do
     end if
+    deallocate (value)
     NEL = NEL+NPAR(2)                                               !renew total number of elements.
     NCONECT = NCONECT + NPAR(2)*(NPAR(5)+1)                         !Renew total connectivity matrix element number
     

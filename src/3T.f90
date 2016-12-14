@@ -56,7 +56,7 @@ NPAR(5) = 3
         ! Allocate storage for element group data
         call MemAlloc(11,"ELEGP",MIDEST,1)
   end if
-  NFIRST = NP(11)                                       ! Pointer to the first entry in the element group data array in the unit of single precision (corresponding to A)
+  NFIRST = NP(11)   ! Pointer to the first entry in the element group data array in the unit of single precision (corresponding to A)
   N(:) = N(:) + NFIRST
   NLAST=N(7)
 
@@ -158,8 +158,8 @@ SUBROUTINE ELEMENT_3T_MAIN (ID,X,Y,Z,U,MHT,E,POISSON,LM,XYZ,MATP,Node)
      END DO
 
      WRITE (IOUT,"(//,' E L E M E N T   I N F O R M A T I O N',//,  &
-                      ' ELEMENT     NODE     NODE       MATERIAL',/,   &
-                      ' NUMBER-N      I        J        K       SET NUMBER')")
+                      ' ELEMENT    |-------- NODE ---------|      MATERIAL',/,   &
+                      ' NUMBER-N      1        2        3       SET NUMBER')")
 
      N=0
      DO WHILE (N .NE. NUME)
@@ -268,13 +268,13 @@ SUBROUTINE ELEMENT_3T_MAIN (ID,X,Y,Z,U,MHT,E,POISSON,LM,XYZ,MATP,Node)
         GaussianCollection (:,I:J) = transpose(XY)
         StressCollection (:,I:J) = Stress
      END DO
-     call PostProcessor(NPAR1, 2, XYZ((/1,2,4,5,7,8/),:), &
+     call PostProcessor(NPAR(1), 2, XYZ((/1,2,4,5,7,8/),:), &
                            Node, 3, GaussianCollection, StressCollection, U)
 
   ELSE 
      STOP "*** ERROR *** Invalid IND value."
   END IF
-
+  deallocate (GP1, GP2, W, STRESS)
 END SUBROUTINE ELEMENT_3T_MAIN
     
 FUNCTION NmatElast3T(ETA,EPSILON)
