@@ -77,7 +77,7 @@ SUBROUTINE PLATE4Q (ID,X,Y,Z,U,MHT,E,POSSION,LM,XYZ,MATP,THICK)
   USE MEMALLOCATE
 
   IMPLICIT NONE
-  INTEGER :: ID(3,NUMNP),LM(12,NPAR(2)),MATP(NPAR(2)),MHT(NEQ)
+  INTEGER :: ID(6,NUMNP),LM(12,NPAR(2)),MATP(NPAR(2)),MHT(NEQ)
   REAL(8) :: X(NUMNP),Y(NUMNP),Z(NUMNP),E(NPAR(3)),POSSION(NPAR(3)),  &
              XYZ(12,NPAR(2)),THICK(NPAR(2)),U(NEQ)
 
@@ -145,10 +145,10 @@ SUBROUTINE PLATE4Q (ID,X,Y,Z,U,MHT,E,POSSION,LM,XYZ,MATP,THICK)
         MATP(N)=MTYPE  ! Material type
 
         DO M=1,3
-           LM(M,N)=ID(M,I)     ! Connectivity matrix
-           LM(M+3,N)=ID(M,J)
-           LM(M+6,N)=ID(M,K)
-           LM(M+9,N)=ID(M,L)
+           LM(M,N)=ID(M+2,I)     ! Connectivity matrix
+           LM(M+3,N)=ID(M+2,J)
+           LM(M+6,N)=ID(M+2,K)
+           LM(M+9,N)=ID(M+2,L)
         END DO
 
 !       Update column heights and bandwidth

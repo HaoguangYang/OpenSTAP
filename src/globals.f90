@@ -51,7 +51,7 @@ module GLOBALS
    integer :: NCONECT   ! Total element numbers in connection matrix
    integer :: NLCASE
    integer :: CURLCASE  ! Current Load Case
-
+   
    integer :: MODEX		! Solution mode: 0 - data check only;  1 -  execution                                   
 
    real :: TIM(5)		! Timing information
@@ -63,5 +63,6 @@ module GLOBALS
    integer :: MAXEST
 
    integer :: NG
-
+   
+   integer :: BandwidthOpt
 end module GLOBALS

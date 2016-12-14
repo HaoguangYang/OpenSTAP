@@ -48,7 +48,7 @@ line_len = len(line)            #INP文件全长度
 keylocation = [0 for x in range(line_len)] 
 
 for i in range(0,line_len-1):
-    if line[i].find('*Part')!=-1:           #'Part'--1
+    if line[i].find('** PART INSTANCE')!=-1:           #'Part'--1
         keylocation[i] = 1
     if line[i].find('*Node')!=-1:           #'Node'--2
         keylocation[i] = 2
@@ -135,7 +135,7 @@ def readelement(beg,end):
 #-----------读取PART名称-------------
 def readpartname(beg):
     
-    partname = line[beg][line[beg].find('name')+5:]
+    partname = line[beg][line[beg].find(':')+2:]
     return partname
 
 

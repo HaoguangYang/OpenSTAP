@@ -47,6 +47,7 @@ PROGRAM STAP90
 
   READ (IIN,'(A80,/,4I5)') HED,NUMNP,NUMEG,NLCASE,MODEX
 
+! input node
   IF (NUMNP.EQ.0) STOP   ! Data check mode
 
   WRITE (IOUT,"(/,' ',A80,//,  &
@@ -59,37 +60,22 @@ PROGRAM STAP90
      '         EQ.1, EXECUTION')") HED,NUMNP,NUMEG,NLCASE,MODEX
 
 ! Read nodal point data
-
 ! ALLOCATE STORAGE
-!   ID(3,NUMNP) : Boundary condition codes (0=free,1=deleted)
+!   ID(6,NUMNP) : Boundary condition codes (0=free,1=deleted)
 !   IDBEAM(6,NUMNP) : Boundary condition codes for beam (0=free,1=fixed)
 !   X(NUMNP)    : X coordinates
 !   Y(NUMNP)    : Y coordinates
 !   Z(NUMNP)    : Z coordinates
 
-  IF ((HED .EQ. 'PLATE') .OR. (HED .EQ. 'PLATE8Q')) THEN
-      DIM = 3
-  ELSEIF ((HED .EQ. 'SHELL').OR. (HED .EQ. 'SHELL8Q')) THEN
-      DIM = 5
-  ELSE
-      DIM = 3
-  ENDIF
+  DIM = 6
   
-  IF (HED .EQ. 'BEAM') THEN    !ATTENTION: 'IDBEAN' IS THE ID ARRAY USED FOR BEAM ONLY,  BECAUSE EVERY NODE HAS 6 DEGREE OF FREEDOM
-     CALL MEMALLOC(1,"IDBEAM",6*NUMNP,1)
-  ELSE
-     CALL MEMALLOC(1,"ID   ",DIM*NUMNP,1)  !OTHER SITUATIONS EXCEPT BEAM (THE FORMER ONE)
-  ENDIF
+  CALL MEMALLOC(1,"ID   ",DIM*NUMNP,1)  !OTHER SITUATIONS EXCEPT BEAM (THE FORMER ONE)
     
   CALL MEMALLOC(2,"X    ",NUMNP,ITWO)
   CALL MEMALLOC(3,"Y    ",NUMNP,ITWO)
   CALL MEMALLOC(4,"Z    ",NUMNP,ITWO)
 
-  IF (HED .EQ. 'BEAM') THEN    !ATTENTION: 'INPUTBEAM' IS THE INPUT SUBROUTINE ONLY FOR BEAM, BECAUSE THE SHAPE OF ID IS 'ID(6,NUMNP)'
-     CALL INPUTBEAM (IA(NP(1)),DA(NP(2)),DA(NP(3)),DA(NP(4)),NUMNP,NEQ)
-  ELSE
-     CALL INPUT (IA(NP(1)),DA(NP(2)),DA(NP(3)),DA(NP(4)),NUMNP,NEQ)   !OTHER SITUATIONS EXCEPT BEAM(THE FORMER ONE)
-  ENDIF
+  CALL INPUT (IA(NP(1)),DA(NP(2)),DA(NP(3)),DA(NP(4)),NUMNP,NEQ)   !OTHER SITUATIONS EXCEPT BEAM(THE FORMER ONE)
 
 ! Calculate and store load vectors
 !   R(NEQ) : Load vector
@@ -127,11 +113,7 @@ PROGRAM STAP90
      CALL MEMALLOC(7,"IDIRN",NLOAD,1)
      CALL MEMALLOC(8,"FLOAD",NLOAD,ITWO)
      
-     IF (HED .EQ. 'BEAM') THEN
-         CALL LOADSBEAM (DA(NP(5)),IA(NP(6)),IA(NP(7)),DA(NP(8)),IA(NP(1)),NLOAD,NEQ) !ATTENTION: LOADSBEAM IS USED ONLY FOR BEAM,BECAUSE 'ID(6,NUMNP)'
-      ELSE
-         CALL LOADS (DA(NP(5)),IA(NP(6)),IA(NP(7)),DA(NP(8)),IA(NP(1)),NLOAD,NEQ) !OTHER SITUATIONS EXCEPT BEAM(THE FORMER ONE)
-     ENDIF
+     CALL LOADS (DA(NP(5)),IA(NP(6)),IA(NP(7)),DA(NP(8)),IA(NP(1)),NLOAD,NEQ) !OTHER SITUATIONS EXCEPT BEAM(THE FORMER ONE)
 
   END DO
 
@@ -212,11 +194,7 @@ PROGRAM STAP90
 
         WRITE (IOUT,"(//,' LOAD CASE ',I3)") CURLCASE
         
-        IF (NPAR(1) .EQ. 5) THEN
-            CALL WRITEDBEAM (DA(NP(4)),IA(NP(1)),NEQ,NUMNP)  ! ATTENTION: PRINT DISPLACEMENTS ONLY FOR BEAM
-          ELSE 
-            CALL WRITED (DA(NP(4)),IA(NP(1)),NEQ,NUMNP)  ! PRINT DISPLACEMENTS FOR OTHER SITUATIONS(THE FORMER ONE)
-        ENDIF
+        CALL WRITED (DA(NP(4)),IA(NP(1)),NEQ,NUMNP)  ! PRINT DISPLACEMENTS FOR OTHER SITUATIONS(THE FORMER ONE)
 
 !       Calculation of stresses
         CALL STRESS (A(NP(11)))
@@ -264,102 +242,47 @@ END SUBROUTINE SECOND
 
 
 SUBROUTINE WRITED (DISP,ID,NEQ,NUMNP)
+
 ! . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 ! .                                                                   .
-! .   To print displacements                                          .
+! .   To PRINT DISPLACEMENT AND ANGLES                                          .
 ! . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-  USE GLOBALS, ONLY : IOUT, HED, CURLCASE, VTKTmpFile, DIM
+  USE GLOBALS, ONLY : IOUT
 
   IMPLICIT NONE
-  INTEGER :: NEQ,NUMNP,ID(DIM,NUMNP)
-  REAL(8) :: DISP(NEQ),D(DIM,NUMNP)
-  INTEGER :: IC,II,I,KK     !IL
-  character (len=25) :: cFmt
+  INTEGER :: NEQ,NUMNP,ID(6,NUMNP)
+  REAL(8) :: DISP(NEQ),D(6)
+  INTEGER :: IC,II,I,KK,IL
 
 ! Print displacements
-  IF ((HED .EQ. 'SHELL').OR. (HED .EQ. 'SHELL8Q')) THEN
-    WRITE (IOUT,"(//,' D I S P L A C E M E N T S',//,'  NODE ',10X,   &
-                    'W          BETA_X          BETA_Y          U         V')")
 
-    IC=4
-    write (cFmt,"('(1X,I3,4X,',I2,'E14.4)')") DIM
-    DO II=1,NUMNP
-       IC=IC + 1
-       IF (IC.GE.56) THEN
-          WRITE (IOUT,"(//,' D I S P L A C E M E N T S',//,'  NODE ',10X,   &
-                          'W          BETA_X        BETA_Y          U         V')")
-          IC=4
-       END IF
+  WRITE (IOUT,"(//,' D I S P L A C E M E N T S',//,'  NODE ',3X,   &
+                    'X-DISPLACEMENT  Y-DISPLACEMENT  Z-DISPLACEMENT  X-ROTATION  Y-ROTATION  Z-ROTATION')")
 
-       DO I=1,DIM
-          D(I,II)=0.
-       END DO
+  IC=4
 
-       DO I=1,DIM
-          KK=ID(I,II)
-          IF (KK.NE.0) D(I,II)=DISP(KK)
-       END DO
+  DO II=1,NUMNP
+     IC=IC + 1
+     IF (IC.GE.56) THEN
+        WRITE (IOUT,"(//,' D I S P L A C E M E N T S',//,'  NODE ',3X,   &
+                          'X-DISPLACEMENT   Y-DISPLACEMENT  Z-DISPLACEMENT  X-ROTATION  Y-ROTATION  Z-ROTATION')")
+        IC=4
+     END IF
 
-       WRITE (IOUT,cFmt) II,D(:,II)
-    END DO
-  ELSE IF ((HED == 'PLATE') .OR. (HED == 'PLATE8Q' )) THEN
-    WRITE (IOUT,"(//,' D I S P L A C E M E N T S',//,'  NODE ',10X,   &
-                    '     W          BETA_X        BETA_Y')")
-    
-    IC=4
-    write (cFmt,"('(1X,I3,8X,',I2,'E17.5)')") DIM
-    DO II=1,NUMNP
-       IC=IC + 1
-       IF (IC.GE.56) THEN
-          WRITE (IOUT,"(//,' D I S P L A C E M E N T S',//,'  NODE ',10X,   &
-                          '     W          BETA_X        BETA_Y')")
-          IC=4
-       END IF
+     DO I=1,6
+        D(I)=0.
+     END DO
 
-       DO I=1,3
-          D(I,II)=0.
-       END DO
+     DO I=1,6
+        KK=ID(I,II)
+        IF (KK.NE.0) D(I)=DISP(KK)
+     END DO
 
-       DO I=1,3
-          KK=ID(I,II)
-          IF (KK.NE.0) D(I,II)=DISP(KK)
-       END DO
+     WRITE (IOUT,'(1X,I3,5X,6E14.6)') II,D
 
-       WRITE (IOUT,cFmt) II,D(:,II)
-   END DO
-  ELSE
-    WRITE (IOUT,"(//,' D I S P L A C E M E N T S',//,'  NODE ',10X,   &
-                    'X-DISPLACEMENT    Y-DISPLACEMENT    Z-DISPLACEMENT')")
-    
-    IC=4
-    write (cFmt,"('(1X,I3,8X,',I2,'E17.5)')") DIM
-    DO II=1,NUMNP
-       IC=IC + 1
-       IF (IC.GE.56) THEN
-          WRITE (IOUT,"(//,' D I S P L A C E M E N T S',//,'  NODE ',10X,   &
-                          'X-DISPLACEMENT    Y-DISPLACEMENT    Z-DISPLACEMENT')")
-          IC=4
-       END IF
+  END DO
 
-       DO I=1,3
-          D(I,II)=0.
-       END DO
-
-       DO I=1,3
-          KK=ID(I,II)
-          IF (KK.NE.0) D(I,II)=DISP(KK)
-          
-       END DO
-
-       WRITE (IOUT,cFmt) II,D(:,II)
-   END DO
-  ENDIF
-  write(cFmt, "('Displacement_Load_Case',I2.2)") CURLCASE
-  write (VTKTmpFile) cFmt, DIM, NUMNP
-  do I = 1,NUMNP
-      write (VTKTmpFile) D(1:DIM,I) !Displacements
-  end do
   RETURN
 
 END SUBROUTINE WRITED
@@ -386,11 +309,11 @@ SUBROUTINE OPENFILES()
 !    call GETARG(1,FileInp)
 !  end if
 
-  if(COMMAND_ARGUMENT_COUNT().ne.1) then
-     stop 'Usage: STAP90 InputFileName'
-  else
-     call GET_COMMAND_ARGUMENT(1,FileInp)
-  end if
+!  if(COMMAND_ARGUMENT_COUNT().ne.1) then
+!     stop 'Usage: STAP90 InputFileName'
+!  else
+!     call GET_COMMAND_ARGUMENT(1,FileInp)
+!  end if
 
   INQUIRE(FILE = FileInp, EXIST = EX)
   IF (.NOT. EX) THEN

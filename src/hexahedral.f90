@@ -69,7 +69,7 @@ subroutine HexEight (ID,X,Y,Z,U,MHT,E, PoissonRatio, Density, Gravity, LM, Posit
     implicit none
     integer ::  ElementShapeNodes, NumberOfMaterials, NumberOfElements
     integer ::  QuadratureOrder     = 2                     ! NPAR(6) -- Element Load Nodes
-    INTEGER ::  ID(3,NUMNP), MHT(NEQ), MaterialData(NPAR(2))
+    INTEGER ::  ID(6,NUMNP), MHT(NEQ), MaterialData(NPAR(2))
     integer ::  MaterialType, MaterialComp, ND, L, N, i, j, LM(24,NPAR(2)), ElementType, ind0, iprint, k, &
                 ind1, ind2, Node(NPAR(2),NPAR(5))
     real(8) ::  X(NUMNP), Y(NUMNP), Z(NUMNP), U(NEQ), &
