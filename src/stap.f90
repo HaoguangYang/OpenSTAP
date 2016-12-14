@@ -17,8 +17,8 @@ PROGRAM STAP90
   USE MEMALLOCATE
 
   IMPLICIT NONE
-  INTEGER :: NLCASE, NEQ1, NLOAD, MM
-  INTEGER :: L, LL, I
+  INTEGER :: NEQ1, NLOAD, MM
+  INTEGER :: LL, I
   REAL :: TT
 
 ! OPEN INPUT DATA FILE, RESULTS OUTPUT FILE AND TEMPORARY FILES
@@ -77,8 +77,6 @@ PROGRAM STAP90
 
   CALL INPUT (IA(NP(1)),DA(NP(2)),DA(NP(3)),DA(NP(4)),NUMNP,NEQ)   !OTHER SITUATIONS EXCEPT BEAM(THE FORMER ONE)
 
-  NEQ1=NEQ + 1
-
 ! Calculate and store load vectors
 !   R(NEQ) : Load vector
 
@@ -88,7 +86,7 @@ PROGRAM STAP90
 
   REWIND ILOAD
 
-  DO L=1,NLCASE
+  DO CURLCASE=1,NLCASE
 
 !    LL    - Load case number
 !    NLOAD - The number of concentrated loads applied in this load case
@@ -98,7 +96,7 @@ PROGRAM STAP90
      WRITE (IOUT,"(/,'     LOAD CASE NUMBER',7(' .'),' = ',I5,/, &
                      '     NUMBER OF CONCENTRATED LOADS . = ',I5)") LL,NLOAD
 
-     IF (LL.NE.L) THEN
+     IF (LL.NE.CURLCASE) THEN
         WRITE (IOUT,"(' *** ERROR *** LOAD CASES ARE NOT IN ORDER')")
         STOP
      ENDIF
@@ -129,6 +127,7 @@ PROGRAM STAP90
 
   IND=1    ! Read and generate element information
   CALL ELCAL
+  CALL VTKgenerate (IND)        !Prepare Post-Processing Files.
 
   CALL SECOND (TIM(2))
 
@@ -142,7 +141,7 @@ PROGRAM STAP90
 
 ! ALLOCATE STORAGE
 !    MAXA(NEQ+1)
-  CALL MEMFREEFROM(6)
+  CALL MEMFREEFROM(7)
   CALL MEMFREEFROMTO(2,4)
   CALL MEMALLOC(2,"MAXA ",NEQ+1,1)
 
@@ -179,6 +178,7 @@ PROGRAM STAP90
      CALL SECOND (TIM(3))
 
 !    Triangularize stiffness matrix
+     NEQ1=NEQ + 1
      CALL COLSOL (DA(NP(3)),DA(NP(4)),IA(NP(2)),NEQ,NWK,NEQ1,1)
 
      CALL SECOND (TIM(4))
@@ -186,13 +186,13 @@ PROGRAM STAP90
      IND=3    ! Stress calculations
 
      REWIND ILOAD
-     DO L=1,NLCASE
+     DO CURLCASE=1,NLCASE
         CALL LOADV (DA(NP(4)),NEQ)   ! Read in the load vector
 
 !       Solve the equilibrium equations to calculate the displacements
         CALL COLSOL (DA(NP(3)),DA(NP(4)),IA(NP(2)),NEQ,NWK,NEQ1,2)
 
-        WRITE (IOUT,"(//,' LOAD CASE ',I3)") L
+        WRITE (IOUT,"(//,' LOAD CASE ',I3)") CURLCASE
         
         CALL WRITED (DA(NP(4)),IA(NP(1)),NEQ,NUMNP)  ! PRINT DISPLACEMENTS FOR OTHER SITUATIONS(THE FORMER ONE)
 
@@ -200,7 +200,7 @@ PROGRAM STAP90
         CALL STRESS (A(NP(11)))
 
      END DO
-
+     CALL VTKgenerate (IND)
      CALL SECOND (TIM(5))
   END IF
 
@@ -211,7 +211,7 @@ PROGRAM STAP90
      TIM(I)=TIM(I+1) - TIM(I)
      TT=TT + TIM(I)
   END DO
-
+  
   WRITE (IOUT,"(//,  &
      ' S O L U T I O N   T I M E   L O G   I N   S E C',//,   &
      '     TIME FOR INPUT PHASE ',14(' .'),' =',F15.5,/,     &
@@ -242,18 +242,18 @@ END SUBROUTINE SECOND
 
 
 SUBROUTINE WRITED (DISP,ID,NEQ,NUMNP)
+
 ! . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 ! .                                                                   .
-! .   To print displacements                                          .
+! .   To PRINT DISPLACEMENT AND ANGLES                                          .
 ! . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-  USE GLOBALS, ONLY : IOUT, HED, DIM
+  USE GLOBALS, ONLY : IOUT
 
   IMPLICIT NONE
-  INTEGER :: NEQ,NUMNP,ID(DIM,NUMNP)
-  REAL(8) :: DISP(NEQ),D(DIM)
-  INTEGER :: IC,II,I,KK     !IL
-  character (len=25) :: cFmt
+  INTEGER :: NEQ,NUMNP,ID(6,NUMNP)
+  REAL(8) :: DISP(NEQ),D(6)
+  INTEGER :: IC,II,I,KK,IL
 
 ! Print displacements
 
@@ -300,6 +300,7 @@ SUBROUTINE OPENFILES()
   IMPLICIT NONE
   LOGICAL :: EX
   CHARACTER*80 FileInp
+  integer :: i
 
 ! Only for Compaq Fortran
 ! if(NARGS().ne.2) then
@@ -314,17 +315,25 @@ SUBROUTINE OPENFILES()
 !     call GET_COMMAND_ARGUMENT(1,FileInp)
 !  end if
 
-!  INQUIRE(FILE = FileInp, EXIST = EX)
-!  IF (.NOT. EX) THEN
-!     PRINT *, "*** STOP *** FILE STAP90.IN DOES NOT EXIST !"
-!     STOP
-!  END IF
-
-  OPEN(IIN   , FILE = "STAP90.IN",  STATUS = "OLD")
-  OPEN(IOUT  , FILE = "STAP90.OUT", STATUS = "REPLACE")
-
+  INQUIRE(FILE = FileInp, EXIST = EX)
+  IF (.NOT. EX) THEN
+     PRINT *, "*** STOP *** FILE STAP90.IN DOES NOT EXIST !"
+     STOP
+  END IF
+  
+  do i = 1, len_trim(FileInp)
+    if (FileInp(i:i) .EQ. '.') exit
+  end do
+  
+  OPEN(IIN   , FILE = FileInp,  STATUS = "OLD")
+  OPEN(IOUT  , FILE = FileInp(1:i-1)//".OUT", STATUS = "REPLACE")
   OPEN(IELMNT, FILE = "ELMNT.TMP",  FORM = "UNFORMATTED")
   OPEN(ILOAD , FILE = "LOAD.TMP",   FORM = "UNFORMATTED")
+  OPEN(VTKFile, FILE = FileInp(1:i-1)//".OUT.vtk", STATUS = "REPLACE")
+  OPEN(VTKTmpFile, File = "VTK.tmp", FORM = "UNFORMATTED", STATUS = "REPLACE")
+  OPEN(VTKNodeTmp, FILE = "VTKNode.tmp", FORM = "UNFORMATTED", STATUS = "REPLACE")
+  OPEN(VTKElTypTmp, FILE = "VTKElTyp.tmp", FORM = "UNFORMATTED", STATUS = "REPLACE")
+  
 END SUBROUTINE OPENFILES
 
 
@@ -338,6 +347,10 @@ SUBROUTINE CLOSEFILES()
   IMPLICIT NONE
   CLOSE(IIN)
   CLOSE(IOUT)
-  CLOSE(IELMNT)
-  CLOSE(ILOAD)
+  CLOSE(IELMNT, status='delete')
+  CLOSE(ILOAD, status='delete')
+  close(VTKFile)
+  close(VTKTmpFile, status='delete')
+  close(VTKNodeTmp, status='delete')
+  close(VTKElTypTmp, status='delete')
 END SUBROUTINE CLOSEFILES

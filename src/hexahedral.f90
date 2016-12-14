@@ -47,6 +47,7 @@ subroutine hexahedral
     
     if (IND .EQ. 1) then
         call MemAlloc(11,"ELEGP",MIDEST,1)
+        !call MemAlloc(6,"NODE ",NPAR(5)*NPAR(2),1)
     end if
     NFIRST = NP(11)
     N(:) = N(:) + NFIRST
@@ -116,7 +117,7 @@ subroutine HexEight (ID,X,Y,Z,U,MHT,E, PoissonRatio, Density, Gravity, LM, Posit
         CALL GaussianMask(GaussianPts, W, QuadratureOrder)
         
         DO WHILE (N .NE. NumberOfElements)
-            READ (IIN,'(11I5)') N,Node(N,1:8),MaterialType          ! Read in element information
+            READ (IIN,'(11I5)') N,Node(N,1:NPAR(5)),MaterialType          ! Read in element information
             
     !       Save element information
             PositionData(1:ElementShapeNodes*3-1:3,N)=X(Node(N,:))        ! Coordinates of the element's nodes
@@ -137,7 +138,7 @@ subroutine HexEight (ID,X,Y,Z,U,MHT,E, PoissonRatio, Density, Gravity, LM, Posit
             WRITE (IOUT,"(I7,5X,7(I7,1X),I7,4X,I5)") N,Node(N,1:ElementShapeNodes),MaterialType
             
             !write (IOUT,*) 'MHT',MHT
-            
+            write (VTKNodeTmp) NPAR(5), Node(N,:)-1
             
         enddo
         return
@@ -243,8 +244,8 @@ subroutine HexEight (ID,X,Y,Z,U,MHT,E, PoissonRatio, Density, Gravity, LM, Posit
             StressCollection (:,ind1:ind2) = Stress
         END DO
 
-        !call PostProcessor(ElementType, 3, PositionData, &
-        !                   Node, QuadratureOrder, GaussianCollection, StressCollection)
+        call PostProcessor(ElementType, 3, PositionData, &
+                           Node, QuadratureOrder**3, GaussianCollection, StressCollection, U)
                            
                 
     END SELECT

@@ -13,6 +13,7 @@
 !                                                                         -
 !        3T element                                                       -
 !        Qi He,(2016)                                                     -
+!        Revision: Haoguang Yang  (12.2016)                               -
 !        Tsinghua University                                              -
 !                                                                         -
 !                                                                         -
@@ -29,19 +30,11 @@ USE GLOBALS
 USE memAllocate
 
 IMPLICIT NONE
-INTEGER NUME, NUMMAT, MM, N101, N102, N103, N104, N105, N106
+INTEGER NUME, NUMMAT, MM, N(7)
 
 NUME = NPAR(2)
 NUMMAT = NPAR(3)
-
-! Allocate storage for element group data
-  IF (IND == 1) THEN
-      MM = 2*NUMMAT*ITWO + 7*NUME + 9*NUME*ITWO
-      CALL MEMALLOC(11,"ELEGP",MM,1)
-  END IF
-
-  NFIRST=NP(11)   ! Pointer to the first entry in the element group data array
-                  ! in the unit of single precision (corresponding to A)
+NPAR(5) = 3
 
 ! Calculate the pointer to the arrays in the element group data
 ! N101: E(NUMMAT)
@@ -49,25 +42,33 @@ NUMMAT = NPAR(3)
 ! N103: LM(6,NUME)
 ! N104: XYZ(9,NUME)
 ! N105: MTAP(NUME)
-  N101=NFIRST
-  N102=N101+NUMMAT*ITWO
-  N103=N102+NUMMAT*ITWO
-  N104=N103+6*NUME
-  N105=N104+9*NUME*ITWO
-  N106=N105+NUME
-  NLAST=N106
+  N(1)=0
+  N(2)=N(1)+NUMMAT*ITWO
+  N(3)=N(2)+NUMMAT*ITWO
+  N(4)=N(3)+6*NUME
+  N(5)=N(4)+9*NUME*ITWO
+  N(6)=N(5)+NUME
+  N(7)=N(6)+NPAR(5)*NPAR(2)
+  
 
-  MIDEST=NLAST - NFIRST
+  MIDEST=N(7)
+  if (IND .EQ. 1) then
+        ! Allocate storage for element group data
+        call MemAlloc(11,"ELEGP",MIDEST,1)
+  end if
+  NFIRST = NP(11)                                       ! Pointer to the first entry in the element group data array in the unit of single precision (corresponding to A)
+  N(:) = N(:) + NFIRST
+  NLAST=N(7)
 
   CALL ELEMENT_3T_MAIN (IA(NP(1)),DA(NP(2)),DA(NP(3)),DA(NP(4)),DA(NP(4)),IA(NP(5)),   &
-       A(N101),A(N102),A(N103),A(N104),A(N105))
+       A(N(1)),A(N(2)),A(N(3)),A(N(4)),A(N(5)),A(N(6)))
 
   RETURN
 
 END SUBROUTINE ELEMENT_3T
 
 
-SUBROUTINE ELEMENT_3T_MAIN (ID,X,Y,Z,U,MHT,E,POISSON,LM,XYZ,MATP)
+SUBROUTINE ELEMENT_3T_MAIN (ID,X,Y,Z,U,MHT,E,POISSON,LM,XYZ,MATP,Node)
 ! . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 ! .                                                                   .
 ! .   TRUSS element subroutine                                        .
@@ -98,30 +99,30 @@ SUBROUTINE ELEMENT_3T_MAIN (ID,X,Y,Z,U,MHT,E,POISSON,LM,XYZ,MATP)
              XYZ(9,NPAR(2)),U(NEQ),DST(6,1)
   REAL(8) :: ETA,EPSILON
 
-  INTEGER :: NPAR1, NUME, NUMMAT, ND, I1, I2, I3, L, N, I, J
+  INTEGER :: NPAR1, NUME, NUMMAT, ND, Node(NPAR(2),NPAR(5)), L, N, I, J
   INTEGER :: MTYPE, IPRINT
   INTEGER,PARAMETER:: GUASS_N=3
   REAL(8),ALLOCATABLE:: GP1(:),GP2(:),W(:)
   REAL(8) :: NMAT(1,3),BMAT(3,6),C(3,2)
-  REAL(8) :: KE(6,6),DETJ,D(3,3),XY(1,2)
+  REAL(8) :: KE(6,6),DETJ,D(3,3),XY(3,2), StressCollection(3,NPAR(2)*3), GaussianCollection(2,NPAR(2)*3)
   REAL(8),ALLOCATABLE:: STRESS_XX(:,:),STRESS_YY(:,:),STRESS_XY(:,:),STRESS(:,:)
   COMMON DETJ
   
   !定义gauss积分常数
   
   ALLOCATE(GP1(GUASS_N),GP2(GUASS_N),W(GUASS_N))
-  ALLOCATE(STRESS_XX(NPAR(2),GUASS_N),STRESS_YY(NPAR(2),GUASS_N),STRESS_XY(NPAR(2),GUASS_N),STRESS(GUASS_N,1))
+  ALLOCATE(STRESS(3,GUASS_N))
   
   IF (GUASS_N == 3) THEN
-      GP1(1)=0.16666666666
-      GP1(2)=0.66666666666
-      GP1(3)=0.16666666666
-      GP2(1)=0.16666666666
-      GP2(2)=0.16666666666
-      GP2(3)=0.66666666666
-      W(1)=0.16666666666
-      W(2)=0.16666666666
-      W(3)=0.16666666666
+      GP1(1)=1./6.              !0.16666666666
+      GP1(2)=2./3.              !0.66666666666
+      GP1(3)=1./6.              !0.16666666666
+      GP2(1)=1./6.              !0.16666666666
+      GP2(2)=1./6.              !0.16666666666
+      GP2(3)=2./3.              !0.66666666666
+      W(1)=1./6.                !0.16666666666
+      W(2)=1./6.                !0.16666666666
+      W(3)=1./6.                !0.16666666666
   ELSE 
       WRITE(*,*) 'YOU NEED TO CHANGE THE PROGRAM FILE IN 3T.F90'
   END IF 
@@ -162,21 +163,13 @@ SUBROUTINE ELEMENT_3T_MAIN (ID,X,Y,Z,U,MHT,E,POISSON,LM,XYZ,MATP)
 
      N=0
      DO WHILE (N .NE. NUME)
-        READ (IIN,'(5I5)') N,I1,I2,I3,MTYPE  ! Read in element information
+        READ (IIN,'(5I5)') N, Node(N,1:NPAR(5)) ,MTYPE  ! Read in element information
 
 !       Save element information
-        XYZ(1,N)=X(I1)  ! Coordinates of the element's 1st node
-        XYZ(2,N)=Y(I1)
-        XYZ(3,N)=Z(I1)
-
-        XYZ(4,N)=X(I2)  ! Coordinates of the element's 2nd node
-        XYZ(5,N)=Y(I2)
-        XYZ(6,N)=Z(I2)
+        XYZ(1:NPAR(5)*3-1:3,N)=X(Node(N,:))  ! Coordinates of the element's nodes
+        XYZ(2:NPAR(5)*3  :3,N)=Y(Node(N,:))
+        XYZ(3:NPAR(5)*3+1:3,N)=Z(Node(N,:))
         
-        XYZ(7,N)=X(I3)  ! Coordinates of the element's 3rd node
-        XYZ(8,N)=Y(I3)
-        XYZ(9,N)=Z(I3)
-
         MATP(N)=MTYPE  ! Material type
 
         DO L=1,6
@@ -184,15 +177,16 @@ SUBROUTINE ELEMENT_3T_MAIN (ID,X,Y,Z,U,MHT,E,POISSON,LM,XYZ,MATP)
         END DO
 
         DO L=1,2
-           LM(L,N)=ID(L,I1)     ! Connectivity matrix
-           LM(L+2,N)=ID(L,I2)
-           LM(L+4,N)=ID(L,I3)
+           LM(L,N)=ID(L,Node(N,1))     ! Connectivity matrix
+           LM(L+2,N)=ID(L,Node(N,2))
+           LM(L+4,N)=ID(L,Node(N,3))
         END DO
 
 !       Update column heights and bandwidth
         CALL COLHT (MHT,ND,LM(1,N))   
 
-        WRITE (IOUT,"(I5,6X,I5,4X,I5,4X,I5,7X,I5)") N,I1,I2,I3,MTYPE
+        WRITE (IOUT,"(I5,6X,I5,4X,I5,4X,I5,7X,I5)") N,Node(N,1:NPAR(5)),MTYPE
+        write (VTKNodeTmp) NPAR(5), Node(N,:)-1
 
      END DO
 
@@ -253,24 +247,29 @@ SUBROUTINE ELEMENT_3T_MAIN (ID,X,Y,Z,U,MHT,E,POISSON,LM,XYZ,MATP)
         END DO
         
         DO I=1,GUASS_N
-                ETA = GP1(I)
-                EPSILON = GP2(I)
+            ETA = GP1(I)
+            EPSILON = GP2(I)
+            
+            NMAT = NmatElast3T(ETA,EPSILON)
                 
-                NMAT = NmatElast3T(ETA,EPSILON)
-                
-                XY = MATMUL(NMAT,C)
-                
-                BMAT = BmatElast3T(C(:,1),C(:,2))
-                STRESS = MATMUL(D,MATMUL(BMAT,DST))
+            XY(I,:) = reshape(matmul(NMAT,C),(/2/))
+            
+            BMAT = BmatElast3T(C(:,1),C(:,2))
+            STRESS(:,I) = reshape(MATMUL(D,MATMUL(BMAT,DST)),(/3/))
                 
             WRITE (IOUT,"(1X,I5,4X,E13.6,4X,E13.6,11X,E13.6,4X,E13.6,4X,E13.6)") &
-                    &  N , XY(1,1) , XY(1,2) &
-                    &  , STRESS(1,1) , STRESS(2,1) , STRESS(3,1)
+                    &  N , XY(I,1) , XY(I,2) &
+                    &  , STRESS(1,I) , STRESS(2,I) , STRESS(3,I)
                 
             
         END DO
-                
+        I = (N-1)*3+1
+        J = N*3
+        GaussianCollection (:,I:J) = transpose(XY)
+        StressCollection (:,I:J) = Stress
      END DO
+     call PostProcessor(NPAR1, 2, XYZ((/1,2,4,5,7,8/),:), &
+                           Node, 3, GaussianCollection, StressCollection, U)
 
   ELSE 
      STOP "*** ERROR *** Invalid IND value."

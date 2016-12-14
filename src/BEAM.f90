@@ -392,51 +392,6 @@ SUBROUTINE BEAMELE (ID,X,Y,Z,U,MHT,E,G,AREA,I_X,I_Y,I_Z,J_X,J_Y,J_Z,LM,XYZ,MATP)
 
  END SUBROUTINE BEAMELE
     
-SUBROUTINE WRITEDBEAM (DISP,ID,NEQ,NUMNP)
-! . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-! .                                                                   .
-! .   To PRINT DISPLACEMENT AND ANGLES                                          .
-! . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
-  USE GLOBALS, ONLY : IOUT
-
-  IMPLICIT NONE
-  INTEGER :: NEQ,NUMNP,ID(6,NUMNP)
-  REAL(8) :: DISP(NEQ),D(6)
-  INTEGER :: IC,II,I,KK,IL
-
-! Print displacements
-
-  WRITE (IOUT,"(//,' D I S P L A C E M E N T S',//,'  NODE ',3X,   &
-                    'X-DISPLACEMENT  Y-DISPLACEMENT  Z-DISPLACEMENT  X-ROTATION  Y-ROTATION  Z-ROTATION')")
-
-  IC=4
-
-  DO II=1,NUMNP
-     IC=IC + 1
-     IF (IC.GE.56) THEN
-        WRITE (IOUT,"(//,' D I S P L A C E M E N T S',//,'  NODE ',3X,   &
-                          'X-DISPLACEMENT   Y-DISPLACEMENT  Z-DISPLACEMENT  X-ROTATION  Y-ROTATION  Z-ROTATION')")
-        IC=4
-     END IF
-
-     DO I=1,6
-        D(I)=0.
-     END DO
-
-     DO I=1,6
-        KK=ID(I,II)
-        IF (KK.NE.0) D(I)=DISP(KK)
-     END DO
-
-     WRITE (IOUT,'(1X,I3,5X,6E14.6)') II,D
-
-  END DO
-
-  RETURN
-
-END SUBROUTINE WRITEDBEAM
-    
 
     
 
