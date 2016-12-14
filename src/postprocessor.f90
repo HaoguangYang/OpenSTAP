@@ -10,7 +10,7 @@
 
 
 subroutine PostProcessor (ElementType, Dimen, PositionData, &
-                          Node, QuadratureOrder, GaussianCollection, StressCollection, Displacement)
+                          Node, NGauss, GaussianCollection, StressCollection, Displacement)
 !===============================================================================
 !Function:  Stress Recovery using SPR
 !Author:    Haoguang Yang
@@ -21,12 +21,13 @@ subroutine PostProcessor (ElementType, Dimen, PositionData, &
     
     implicit none
     
-    integer :: Dimen, QuadratureOrder, ElementType, NumberOfStress, ref1, ref2
-    integer :: NodeRelationFlag (NUMNP,NPAR(5)*2+12), Ncoeff, Nval, N, i, j, k, L, &
+    integer :: Dimen, NGauss, ElementType, NumberOfStress, ref1, ref2
+    integer :: NodeRelationFlag(NUMNP,NPAR(5)*2+12), Ncoeff, Nval, N, i, j, k, L, &
                ind0, ind1, ind2, Node(NPAR(2),NPAR(5))
-    real(8) :: coeff(10,6), value(NPAR(5)*QuadratureOrder**Dimen,16), Stress(6,NUMNP), PositionData(3*NPAR(5), NPAR(2)), U(NEQ), &
-               GaussianCollection(3, NPAR(2)*QuadratureOrder**Dimen), StressCollection(6,NPAR(2)*QuadratureOrder**Dimen)
+    real(8) :: coeff(10,6), Stress(6,NUMNP), PositionData(3*NPAR(5), NPAR(2)), U(NEQ), &
+               GaussianCollection(Dimen, NPAR(2)*NGauss), StressCollection(3*Dimen-3,NPAR(2)*NGauss)
     real(8) :: x, y, z, Displacement(NEQ)
+    REAL(8), ALLOCATABLE :: value(:,:)
     character(len=19) :: String
     
     write (IOUT,"(/,/)") 
@@ -36,8 +37,9 @@ subroutine PostProcessor (ElementType, Dimen, PositionData, &
     NodeRelationFlag(:,:) = 0
     ref1 = NPAR(5)*2+11                                             !Set Node-Connection Counter Position Reference
     ref2 = NPAR(5)*2+12                                             !Set First-Node Counter Position Reference
+    
     DO N = 1, NPAR(2)                                               !NumberOfElements
-        do i = 1,QuadratureOrder**Dimen
+        do i = 1,NPAR(5)
             j = NodeRelationFlag(Node(N,i),ref1) + 1                !How many elements connected to the node
             NodeRelationFlag(Node(N,i),ref1) = j
             if (j .EQ. 1) then                                      !Hint 1
@@ -48,41 +50,37 @@ subroutine PostProcessor (ElementType, Dimen, PositionData, &
         end do
     end do
     
+    i = maxval(NodeRelationFlag(:,ref1))*NGauss                     !How many gaussian points will contribute to the SPR
     if (Dimen == 3) then
+        allocate (value(i,16))
         do L =1, NUMNP
             coeff(:,:) = 0
-            Nval = NodeRelationFlag(L,ref1) * QuadratureOrder**3
+            Nval = NodeRelationFlag(L,ref1) * NGauss
             ind0 = 1
-            if (Nval .GE. 18) then
+            if (Nval .GE. 18) then                                  !Chooose whether to use quadratic or linear interplotation
                 Ncoeff = 10
             else
                 Ncoeff = 4
             end if
-            do ind2 = 1, NodeRelationFlag(L,ref1)
+            do ind2 = 1, NodeRelationFlag(L,ref1)                   !Must Run Serial!
                 N = NodeRelationFlag (L, ind2)
+                ind1 = (N-1)*NGauss+1
+                do j = 1, NGauss
+                    x = GaussianCollection (1, ind1+mod(ind0-1,NGauss))
+                    y = GaussianCollection (2, ind1+mod(ind0-1,NGauss))
+                    z = GaussianCollection (3, ind1+mod(ind0-1,NGauss))
+                    Stress(:,L) = StressCollection (:,ind1+mod(ind0-1,NGauss))
                 
-                ind1 = (N-1)*QuadratureOrder**3+1
-                
-                do i = 1, QuadratureOrder
-                    do j = 1, QuadratureOrder
-                        do k = 1, QuadratureOrder
-                            x = GaussianCollection (1, ind1+mod(ind0-1,8))
-                            y = GaussianCollection (2, ind1+mod(ind0-1,8))
-                            z = GaussianCollection (3, ind1+mod(ind0-1,8))
-                            Stress(:,L) = StressCollection (:,ind1+mod(ind0-1,8))
-                            
-                            if (Ncoeff .EQ. 10) &
-                                value(ind0,1:Ncoeff+6) = reshape((/1D0, x, y, z, x*y, y*z, z*x, x**2, y**2, z**2, &
+                    if (Ncoeff .EQ. 10) &
+                        value(ind0,1:Ncoeff+6) = reshape((/1D0, x, y, z, x*y, y*z, z*x, x**2, y**2, z**2, &
                                                                   Stress(1:6,L)/), (/Ncoeff+6/))
-                            if (Ncoeff .EQ. 4) &
-                                value(ind0,1:Ncoeff+6) = reshape((/1D0, x, y, z, Stress(1:6,L)/), (/Ncoeff+6/))
-                            ind0 = ind0 + 1
-                            !write (*,*) x, y, z
-                            !write (*,*) Stress(:,L)
-                            !write(*,*) Nval
-                        end do
-                    end do
+                    if (Ncoeff .EQ. 4) &
+                        value(ind0,1:Ncoeff+6) = reshape((/1D0, x, y, z, Stress(1:6,L)/), (/Ncoeff+6/))
+                    ind0 = ind0 + 1
                 end do
+                !write (*,*) x, y, z
+                !write (*,*) Stress(:,L)
+                !write(*,*) Nval
             end do
             
             !sets = 6
@@ -98,50 +96,52 @@ subroutine PostProcessor (ElementType, Dimen, PositionData, &
         end do
         
     else if (Dimen == 2) then
+        allocate (value(i,9))
         do L =1, NUMNP
             coeff(:,:) = 0
-            Nval = NodeRelationFlag(L,ref1) * QuadratureOrder**2    !Change if using triangular elements
+            Nval = NodeRelationFlag(L,ref1) * NGauss
             ind0 = 1
             if (Nval .GE. 8) then
                 Ncoeff = 6
             else
                 Ncoeff = 3
             end if
-            do ind2 = 1, NodeRelationFlag(L,ref1)
+            do ind2 = 1, NodeRelationFlag(L,ref1)                   !Must Run Serial!
                 N = NodeRelationFlag (L, ind2)
-                ind1 = (N-1)*QuadratureOrder**2+1
-                    do j = 1, QuadratureOrder
-                        do k = 1, QuadratureOrder
-                            x = GaussianCollection (1, ind1+mod(ind0-1,4))
-                            y = GaussianCollection (2, ind1+mod(ind0-1,4))
+                ind1 = (N-1)*NGauss+1
+                do j = 1, NGauss
+                    x = GaussianCollection (1, ind1+mod(ind0-1,NGauss))
+                    y = GaussianCollection (2, ind1+mod(ind0-1,NGauss))
                             
-                            Stress(1:3,L) = StressCollection (1:3,ind1+mod(ind0-1,4))
+                    Stress(1:3,L) = StressCollection (1:3,ind1+mod(ind0-1,NGauss))
                             
-                            if (Ncoeff .EQ. 6) &
-                                value(ind0,1:Ncoeff+3) = reshape((/1D0, x, y, x*y, x**2, y**2, &
+                    if (Ncoeff .EQ. 6) &
+                        value(ind0,1:Ncoeff+3) = reshape((/1D0, x, y, x*y, x**2, y**2, &
                                                                   Stress(1:3,L)/), (/Ncoeff+3/))
-                            if (Ncoeff .EQ. 3) &
-                                value(ind0,1:Ncoeff+3) = reshape((/1D0, x, y, Stress(1:3,L)/), (/Ncoeff+3/))
-                            ind0 = ind0 + 1
-                            !write (*,*) x, y
-                            !write (*,*) Stress(:,L)
-                            !write(*,*) Nval
-                        end do
-                    end do
+                    if (Ncoeff .EQ. 3) &
+                        value(ind0,1:Ncoeff+3) = reshape((/1D0, x, y, Stress(1:3,L)/), (/Ncoeff+3/))
+                    ind0 = ind0 + 1
+                    !write (*,*) x, y
+                    !write (*,*) Stress(:,L)
+                    !write(*,*) Nval
+                    !Error for element number 5 and 6
+                end do
             end do
             !sets = 3
             call LeastSquare (coeff(1:Ncoeff,:), value(1:Nval,1:Ncoeff+3), Ncoeff, Nval, 3)
             !write (*,*) coeff
+            !write (*,*) value
             ind2 = NodeRelationFlag(L,ref2)
             x = PositionData(2*(ind2-1)+1,NodeRelationFlag(L,1))    !(L,1) relative to Hint 1
             y = PositionData(2*(ind2-1)+2,NodeRelationFlag(L,1))
             if (Ncoeff .EQ. 6) Stress(1:3,L) = matmul(transpose(coeff(1:6,1:3)),(/1D0, x, y, x*y, x**2, y**2/))
             if (Ncoeff .EQ. 3) Stress(1:3,L) = matmul(transpose(coeff(1:3,1:3)),(/1D0, x, y/))
-            write (IOUT,"(I6, 3X, E13.6, 5(2X, E13.6))") L, Stress(1:2,L), 0, Stress(3,L), 0, 0
+            write (IOUT,"(I6, 3X, E13.6, 2X, E13.6, A13, 2X, E13.6, 2(2X, A13))") &
+                                                                L, Stress(1:2,L), "---", Stress(3,L), "---", "---"
         end do
     end if
     NEL = NEL+NPAR(2)                                               !renew total number of elements.
-    NCONECT = NCONECT + NPAR(5)*(NPAR(2)+1)                         !Renew total connectivity matrix element number
+    NCONECT = NCONECT + NPAR(2)*(NPAR(5)+1)                         !Renew total connectivity matrix element number
     
     if (Dimen == 3) NumberOfStress = 6
     if (Dimen == 2) NumberOfStress = 3
@@ -170,6 +170,7 @@ subroutine VTKgenerate (Flag)
     
 select case (Flag)
 case (1)                                                            !Called in solution phase IND=1
+    NCONECT = 0
     write (VTKFile,"(A26)") '# vtk DataFile Version 3.0'
     write (VTKFile,*) HED
     write (VTKFile,"(A5)") 'ASCII'
@@ -225,12 +226,12 @@ case (3)                                                            !Called in s
             read (VTKTmpFile) Dat1(1:Dat(1))
             write (VTKFile,*) Dat1(1:Dat(1))
         end do
-        !read (VTKTmpFile) string(1:19), Dat(1:2)                    !Fetch Stress of Load Cases
-        !write (VTKFile,*) string(1:19), Dat(1:2), "double"          !Dat(1) should be <=6 for no more than 6 stress components
-        !do j = 1, NUMNP
-        !    read (VTKTmpFile) Dat1(1:Dat(1))
-        !    write (VTKFile,*) Dat1(1:Dat(1))
-        !end do
+        read (VTKTmpFile) string(1:19), Dat(1:2)                    !Fetch Stress of Load Cases
+        write (VTKFile,*) string(1:19), Dat(1:2), "double"          !Dat(1) should be <=6 for no more than 6 stress components
+        do j = 1, NUMNP
+            read (VTKTmpFile) Dat1(1:Dat(1))
+            write (VTKFile,*) Dat1(1:Dat(1))
+        end do
     end do
 end select
     

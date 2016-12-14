@@ -245,7 +245,7 @@ subroutine HexEight (ID,X,Y,Z,U,MHT,E, PoissonRatio, Density, Gravity, LM, Posit
         END DO
 
         call PostProcessor(ElementType, 3, PositionData, &
-                           Node, QuadratureOrder, GaussianCollection, StressCollection, U)
+                           Node, QuadratureOrder**3, GaussianCollection, StressCollection, U)
                            
                 
     END SELECT
