@@ -27,46 +27,37 @@ SUBROUTINE INPUT (ID,X,Y,Z,NUMNP,NEQ)
 
   USE GLOBALS, ONLY : IIN, IOUT, DIM, HED
 
+  USE GLOBALS, ONLY : IIN, IOUT
+
   IMPLICIT NONE
   INTEGER :: NUMNP,NEQ,ID(DIM,NUMNP)
   REAL(8) :: X(NUMNP),Y(NUMNP),Z(NUMNP)
-  INTEGER :: I, N
-  character (len=256) :: cFmt
+  INTEGER :: I, N !, J
 
-! Read nodal point data
+  ! Read nodal point data
 
   N = 0
-  write (cFmt,"('(',I2,'I5,3F10.0,I5)')") DIM+1
   DO WHILE (N.NE.NUMNP)
-     READ (IIN,cFmt) N,(ID(I,N),I=1,DIM),X(N),Y(N),Z(N)
+     READ (IIN,"(7I5,3F10.0,I5)") N,(ID(I,N),I=1,6),X(N),Y(N),Z(N)
   END DO
 
 ! Write complete nodal data
 
-IF (('HED' == 'SHELL') .OR. (HED .EQ. 'SHELL8Q')) THEN
-        WRITE (IOUT,"(//,' N O D A L   P O I N T   D A T A',/)")
+  WRITE (IOUT,"(//,' N O D A L   P O I N T   D A T A',/)")
 
-        WRITE (IOUT,"('  NODE',10X,'BOUNDARY',25X,'NODAL POINT',/,  &
+  WRITE (IOUT,"('  NODE',10X,'BOUNDARY',25X,'NODAL POINT',/,  &
                 ' NUMBER     CONDITION  CODES',21X,'COORDINATES', /,15X, &
-                'W    BETX BETY U    V',15X,'X',12X,'Y',12X,'Z')")
-ELSE
-        WRITE (IOUT,"(//,' N O D A L   P O I N T   D A T A',/)")
+                'X    Y    Z   RX   RY   RZ',15X,'X',12X,'Y',12X,'Z')")
 
-        WRITE (IOUT,"('  NODE',10X,'BOUNDARY',25X,'NODAL POINT',/,  &
-                ' NUMBER     CONDITION  CODES',21X,'COORDINATES', /,15X, &
-                'X    Y    Z',15X,'X',12X,'Y',12X,'Z')")
-endif
-
-  write (cFmt,"('(I5,6X,',I2,'I5,6X,3F13.3)')") DIM
   DO N=1,NUMNP
-     WRITE (IOUT,cFmt) N,(ID(I,N),I=1,DIM),X(N),Y(N),Z(N)
+     WRITE (IOUT,"(I5,6X,6I5,6X,3F13.3)") N,(ID(I,N),I=1,6),X(N),Y(N),Z(N)
   END DO
 
 ! Number unknowns
 
   NEQ=0
   DO N=1,NUMNP
-     DO I=1,DIM
+     DO I=1,6
         IF (ID(I,N) .EQ. 0) THEN
            NEQ=NEQ + 1
            ID(I,N)=NEQ
@@ -77,27 +68,10 @@ endif
   END DO
 
 ! Write equation numbers
-  IF ((HED .EQ. 'PLATE') .OR. (HED .EQ. 'PLATE8Q') .OR. (HED .EQ. 'PLATE_THIN')) THEN
-    write (cFmt, "(A150,I2,A4)") "(//,' EQUATION NUMBERS',//,'   NODE',9X,  &
-                    'DEGREES OF FREEDOM',/,'  NUMBER',/,  &
-                    '     N',13X,'W    BETAX BETAY',/,(1X,I5,9X,",DIM,"I5))"
-    WRITE (IOUT,cFmt) (N,(ID(I,N),I=1,DIM),N=1,NUMNP)
-  ELSE IF (('HED' == 'SHELL') .OR. (HED .EQ. 'SHELL8Q')) THEN
-      write (cFmt,"(A150,I2,A4)") "(//,' EQUATION NUMBERS',//,'   NODE',9X,  &
+  WRITE (IOUT,"(//,' EQUATION NUMBERS',//,'   NODE',9X,  &
                    'DEGREES OF FREEDOM',/,'  NUMBER',/,  &
-                   '     N',13X,'W    BETAX BETAY U    V',/,(1X,I5,9X,", DIM,"I5))"
-      WRITE (IOUT,cFmt) (N,(ID(I,N),I=1,DIM),N=1,NUMNP)
-  ELSE IF (DIM == 2) THEN
-      write (cFmt,"(A150,I2,A4)") "(//,' EQUATION NUMBERS',//,'   NODE',9X,  &
-                   'DEGREES OF FREEDOM',/,'  NUMBER',/,  &
-                   '     N',13X,'X    Y',/,(1X,I5,9X,", DIM, "I5))"
-      WRITE (IOUT,cFmt) (N,(ID(I,N),I=1,DIM),N=1,NUMNP)
-  ELSE
-      write (cFmt,"(A150,I2,A4)") "(//,' EQUATION NUMBERS',//,'   NODE',9X,  &
-                    'DEGREES OF FREEDOM',/,'  NUMBER',/,  &
-                    '     N',13X,'X    Y    Z',/,(1X,I5,9X,", DIM, "I5))"
-      WRITE (IOUT,cFmt) (N,(ID(I,N),I=1,DIM),N=1,NUMNP)
-  END IF
+                   '     N',13X,'X    Y    Z   RX   RY   RZ',/,(1X,I5,9X,6I5))") (N,(ID(I,N),I=1,6),N=1,NUMNP)
+
   RETURN
 
 END SUBROUTINE INPUT

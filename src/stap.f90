@@ -46,7 +46,13 @@ PROGRAM STAP90
 !            1 : execution
 
   READ (IIN,'(A80,/,4I5)') HED,NUMNP,NUMEG,NLCASE,MODEX
-
+! 桥梁部分做的修改
+! 首先输入一遍所有的单元，记录每种元素都有多少个
+! 默认所有元素都是6个自由度，分别是u,v,w,thea_x, theta_y, theta_z
+  BandwidthOpt = 0
+  CALL PREPROCESS(IA(NP(1))
+! 修改结束  
+! input node
   IF (NUMNP.EQ.0) STOP   ! Data check mode
 
   WRITE (IOUT,"(/,' ',A80,//,  &
@@ -61,25 +67,15 @@ PROGRAM STAP90
 ! Read nodal point data
 
 ! ALLOCATE STORAGE
-!   ID(3,NUMNP) : Boundary condition codes (0=free,1=deleted)
+!   ID(6,NUMNP) : Boundary condition codes (0=free,1=deleted)
 !   IDBEAM(6,NUMNP) : Boundary condition codes for beam (0=free,1=fixed)
 !   X(NUMNP)    : X coordinates
 !   Y(NUMNP)    : Y coordinates
 !   Z(NUMNP)    : Z coordinates
 
-  IF ((HED .EQ. 'PLATE') .OR. (HED .EQ. 'PLATE8Q')) THEN
-      DIM = 3
-  ELSEIF ((HED .EQ. 'SHELL').OR. (HED .EQ. 'SHELL8Q')) THEN
-      DIM = 5
-  ELSE
-      DIM = 3
-  ENDIF
+  DIM = 6
   
-  IF (HED .EQ. 'BEAM') THEN    !ATTENTION: 'IDBEAN' IS THE ID ARRAY USED FOR BEAM ONLY,  BECAUSE EVERY NODE HAS 6 DEGREE OF FREEDOM
-     CALL MEMALLOC(1,"IDBEAM",6*NUMNP,1)
-  ELSE
-     CALL MEMALLOC(1,"ID   ",DIM*NUMNP,1)  !OTHER SITUATIONS EXCEPT BEAM (THE FORMER ONE)
-  ENDIF
+  CALL MEMALLOC(1,"ID   ",DIM*NUMNP,1)  !OTHER SITUATIONS EXCEPT BEAM (THE FORMER ONE)
     
   CALL MEMALLOC(2,"X    ",NUMNP,ITWO)
   CALL MEMALLOC(3,"Y    ",NUMNP,ITWO)
@@ -197,7 +193,7 @@ PROGRAM STAP90
      CALL SECOND (TIM(3))
 
 !    Triangularize stiffness matrix
-     CALL COLSOL (DA(NP(3)),DA(NP(4)),IA(NP(2)),NEQ,NWK,NEQ1,1)
+!change for SparseBLAS     CALL COLSOL (DA(NP(3)),DA(NP(4)),IA(NP(2)),NEQ,NWK,NEQ1,1)
 
      CALL SECOND (TIM(4))
 
@@ -208,8 +204,9 @@ PROGRAM STAP90
         CALL LOADV (DA(NP(4)),NEQ)   ! Read in the load vector
 
 !       Solve the equilibrium equations to calculate the displacements
-        CALL COLSOL (DA(NP(3)),DA(NP(4)),IA(NP(2)),NEQ,NWK,NEQ1,2)
-
+!change for SparseBLAS        CALL COLSOL (DA(NP(3)),DA(NP(4)),IA(NP(2)),NEQ,NWK,NEQ1,2)
+!SparseBLAS
+        CALL SOLVE(DA(NP(3)),DA(NP(4)),IA(NP(2)),NEQ,NWK,NEQ1,2)
         WRITE (IOUT,"(//,' LOAD CASE ',I3)") L
         
         IF (NPAR(1) .EQ. 5) THEN
@@ -379,19 +376,19 @@ SUBROUTINE OPENFILES()
 !    call GETARG(1,FileInp)
 !  end if
 
-  if(COMMAND_ARGUMENT_COUNT().ne.1) then
-     stop 'Usage: STAP90 InputFileName'
-  else
-     call GET_COMMAND_ARGUMENT(1,FileInp)
-  end if
+!  if(COMMAND_ARGUMENT_COUNT().ne.1) then
+!     stop 'Usage: STAP90 InputFileName'
+!  else
+!     call GET_COMMAND_ARGUMENT(1,FileInp)
+!  end if
 
-  INQUIRE(FILE = FileInp, EXIST = EX)
-  IF (.NOT. EX) THEN
-     PRINT *, "*** STOP *** FILE STAP90.IN DOES NOT EXIST !"
-     STOP
-  END IF
+!  INQUIRE(FILE = FileInp, EXIST = EX)
+!  IF (.NOT. EX) THEN
+!     PRINT *, "*** STOP *** FILE STAP90.IN DOES NOT EXIST !"
+!     STOP
+!  END IF
 
-  OPEN(IIN   , FILE = FileInp,  STATUS = "OLD")
+  OPEN(IIN   , FILE = "STAP90.IN",  STATUS = "OLD")
   OPEN(IOUT  , FILE = "STAP90.OUT", STATUS = "REPLACE")
 
   OPEN(IELMNT, FILE = "ELMNT.TMP",  FORM = "UNFORMATTED")

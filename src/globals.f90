@@ -39,8 +39,10 @@ module GLOBALS
 						!   NPAR(2) - Number of elements
 						!   NPAR(3) - Number of different sets of material and 
 						!             cross-sectional  constants
-   integer :: NUMEG		! Total number of element groups, > 0
-
+   integer :: NUMEG		! 有多少种类型的元素
+   integer :: element_type(10)
+   integer :: element_type_count(10) ! 每个里面存储了对于序号对应的类型，有多少个element
+   
    integer :: MODEX		! Solution mode: 0 - data check only;  1 -  execution                                   
 
    real :: TIM(5)		! Timing information
@@ -52,5 +54,4 @@ module GLOBALS
    integer :: MAXEST
 
    integer :: NG
-
 end module GLOBALS
