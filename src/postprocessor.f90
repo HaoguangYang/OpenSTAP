@@ -21,7 +21,7 @@ subroutine PostProcessor (ElementType, Dimen, PositionData, &
     
     implicit none
     
-    integer :: Dimen, NGauss, ElementType, NumberOfStress, ref1, ref2
+    integer :: Dimen, NGauss, ElementType, ref1, ref2, NStress
     integer :: NodeRelationFlag(NUMNP,NPAR(5)*2+12), Ncoeff, Nval, N, i, j, k, L, &
                ind0, ind1, ind2, Node(NPAR(2),NPAR(5))
     real(8) :: coeff(10,6), Stress(6,NUMNP), PositionData(Dimen*NPAR(5), NPAR(2)), U(NEQ), &
@@ -52,23 +52,29 @@ subroutine PostProcessor (ElementType, Dimen, PositionData, &
     
     i = maxval(NodeRelationFlag(:,ref1))*NGauss                     !How many gaussian points will contribute to the SPR
     if (Dimen == 3) then
+        NStress = 6
         allocate (value(i,16))
         do L =1, NUMNP
             coeff(:,:) = 0
             Nval = NodeRelationFlag(L,ref1) * NGauss
             ind0 = 1
-            if (Nval .GE. 18) then                                  !Chooose whether to use quadratic or linear interplotation
+            if (Nval .GE. 16) then                                  !Chooose whether to use quadratic or linear interplotation
                 Ncoeff = 10
-            else
+            else if (Nval .GE. 4) then
                 Ncoeff = 4
+            else
+                Ncoeff = 0
             end if
             do ind2 = 1, NodeRelationFlag(L,ref1)                   !Must Run Serial!
                 N = NodeRelationFlag (L, ind2)
                 ind1 = (N-1)*NGauss+1
                 do j = 1, NGauss
-                    x = GaussianCollection (1, ind1+mod(ind0-1,NGauss))
-                    y = GaussianCollection (2, ind1+mod(ind0-1,NGauss))
-                    z = GaussianCollection (3, ind1+mod(ind0-1,NGauss))
+                    if (Ncoeff .GT. 0) then
+                        x = GaussianCollection (1, ind1+mod(ind0-1,NGauss))
+                        y = GaussianCollection (2, ind1+mod(ind0-1,NGauss))
+                        z = GaussianCollection (3, ind1+mod(ind0-1,NGauss))
+                    end if
+                    
                     Stress(:,L) = StressCollection (:,ind1+mod(ind0-1,NGauss))
                 
                     if (Ncoeff .EQ. 10) &
@@ -76,50 +82,68 @@ subroutine PostProcessor (ElementType, Dimen, PositionData, &
                                                                   Stress(1:6,L)/), (/Ncoeff+6/))
                     if (Ncoeff .EQ. 4) &
                         value(ind0,1:Ncoeff+6) = reshape((/1D0, x, y, z, Stress(1:6,L)/), (/Ncoeff+6/))
+                    if (Ncoeff .EQ. 0) &
+                        value(ind0,1:6) = Stress(1:6,L)
                     ind0 = ind0 + 1
+                    !write (*,*) x, y, z
+                    !write (*,*) Stress(:,L)
+                    !write(*,*) Nval
                 end do
-                !write (*,*) x, y, z
-                !write (*,*) Stress(:,L)
-                !write(*,*) Nval
+                
             end do
             
             !sets = 6
-            call LeastSquare (coeff(1:Ncoeff,:), value(1:Nval,1:Ncoeff+6), Ncoeff, Nval, 6)
-            !write (*,*) coeff
-            ind2 = NodeRelationFlag(L,ref2)
-            x = PositionData(3*(ind2-1)+1,NodeRelationFlag(L,1))    !(L,1) relative to Hint 1
-            y = PositionData(3*(ind2-1)+2,NodeRelationFlag(L,1))
-            z = PositionData(3*(ind2-1)+3,NodeRelationFlag(L,1))
-            if (Ncoeff .EQ. 10) Stress(:,L) = matmul(transpose(coeff),(/1D0, x, y, z, x*y, y*z, z*x, x**2, y**2, z**2/))
-            if (Ncoeff .EQ. 4) Stress(:,L) = matmul(transpose(coeff(1:4,:)),(/1D0, x, y, z/))
+            if (Nval .GT. 0) THEN
+                call LeastSquare (coeff(1:Ncoeff,:), value(1:Nval,1:Ncoeff+6), Ncoeff, Nval, 6)
+                !write (*,*) coeff
+                ind2 = NodeRelationFlag(L,ref2)
+                x = PositionData(3*(ind2-1)+1,NodeRelationFlag(L,1))    !(L,1) relative to Hint 1
+                y = PositionData(3*(ind2-1)+2,NodeRelationFlag(L,1))
+                z = PositionData(3*(ind2-1)+3,NodeRelationFlag(L,1))
+                if (Ncoeff .EQ. 10) Stress(:,L) = matmul(transpose(coeff),(/1D0, x, y, z, x*y, y*z, z*x, x**2, y**2, z**2/))
+                if (Ncoeff .EQ. 4) Stress(:,L) = matmul(transpose(coeff(1:4,:)),(/1D0, x, y, z/))
+            else
+                Stress(:,L) = 1/Nval*(sum(value(1:Nval, 1:6),1))
+            end if
             write (IOUT,"(I6, 3X, E13.6, 5(2X, E13.6))") L, Stress(1:6,L)
         end do
         
     else if (Dimen == 2) then
-        allocate (value(i,9))
+        if (ElementType==7 .OR. ElementType==9) then
+            NStress = 5                                             !Shell
+        else
+            NStress = 3
+        end if
+        allocate (value(i,6+NStress))
         do L =1, NUMNP
             coeff(:,:) = 0
             Nval = NodeRelationFlag(L,ref1) * NGauss
             ind0 = 1
             if (Nval .GE. 9) then
                 Ncoeff = 6
-            else
+            else if (Nval .GE. 3) then
                 Ncoeff = 3
+            else
+                Ncoeff = 0
             end if
             do ind2 = 1, NodeRelationFlag(L,ref1)                   !Must Run Serial!
                 N = NodeRelationFlag (L, ind2)
                 ind1 = (N-1)*NGauss+1
                 do j = 1, NGauss
-                    x = GaussianCollection (1, ind1+mod(ind0-1,NGauss))
-                    y = GaussianCollection (2, ind1+mod(ind0-1,NGauss))
+                    if (Ncoeff .GT. 0) then
+                        x = GaussianCollection (1, ind1+mod(ind0-1,NGauss))
+                        y = GaussianCollection (2, ind1+mod(ind0-1,NGauss))
+                    end if
                             
-                    Stress(1:3,L) = StressCollection (1:3,ind1+mod(ind0-1,NGauss))
+                    Stress(1:NStress,L) = StressCollection (1:NStress,ind1+mod(ind0-1,NGauss))
                             
                     if (Ncoeff .EQ. 6) &
-                        value(ind0,1:Ncoeff+3) = reshape((/1D0, x, y, x*y, x**2, y**2, &
-                                                                  Stress(1:3,L)/), (/Ncoeff+3/))
+                        value(ind0,1:Ncoeff+NStress) = reshape((/1D0, x, y, x*y, x**2, y**2, &
+                                                                  Stress(1:NStress,L)/), (/Ncoeff+NStress/))
                     if (Ncoeff .EQ. 3) &
-                        value(ind0,1:Ncoeff+3) = reshape((/1D0, x, y, Stress(1:3,L)/), (/Ncoeff+3/))
+                        value(ind0,1:Ncoeff+NStress) = reshape((/1D0, x, y, Stress(1:NStress,L)/), (/Ncoeff+NStress/))
+                    if (Ncoeff .EQ. 0) &
+                        value(ind0,1:NStress) = Stress(1:NStress,L)
                     ind0 = ind0 + 1
                     !write (*,*) x, y
                     !write (*,*) Stress(:,L)
@@ -128,28 +152,35 @@ subroutine PostProcessor (ElementType, Dimen, PositionData, &
                 end do
             end do
             !sets = 3
-            call LeastSquare (coeff(1:Ncoeff,:), value(1:Nval,1:Ncoeff+3), Ncoeff, Nval, 3)
-            !write (*,*) coeff
-            !write (*,*) value
-            ind2 = NodeRelationFlag(L,ref2)
-            x = PositionData(2*(ind2-1)+1,NodeRelationFlag(L,1))    !(L,1) relative to Hint 1
-            y = PositionData(2*(ind2-1)+2,NodeRelationFlag(L,1))
-            if (Ncoeff .EQ. 6) Stress(1:3,L) = matmul(transpose(coeff(1:6,1:3)),(/1D0, x, y, x*y, x**2, y**2/))
-            if (Ncoeff .EQ. 3) Stress(1:3,L) = matmul(transpose(coeff(1:3,1:3)),(/1D0, x, y/))
-            write (IOUT,"(I6, 3X, E13.6, 2X, E13.6, A13, 2X, E13.6, 2(2X, A13))") &
+            if (Ncoeff .GT. 0) then
+                call LeastSquare (coeff(1:Ncoeff,:), value(1:Nval,1:Ncoeff+NStress), Ncoeff, Nval, NStress)
+                !write (*,*) coeff
+                !write (*,*) value
+                ind2 = NodeRelationFlag(L,ref2)
+                x = PositionData(2*(ind2-1)+1,NodeRelationFlag(L,1))    !(L,1) relative to Hint 1
+                y = PositionData(2*(ind2-1)+2,NodeRelationFlag(L,1))
+                if (Ncoeff .EQ. 6) Stress(1:NStress,L) = matmul(transpose(coeff(1:6,1:NStress)),(/1D0, x, y, x*y, x**2, y**2/))
+                if (Ncoeff .EQ. 3) Stress(1:NStress,L) = matmul(transpose(coeff(1:3,1:NStress)),(/1D0, x, y/))
+            else
+                Stress(:,L) = 1/Nval*(sum(value(1:Nval, 1:NStress),1))
+            end if
+            if (NStress == 3) then
+                write (IOUT,"(I6, 3X, E13.6, 2X, E13.6, A13, 2X, E13.6, 2(2X, A13))") &
                                                                 L, Stress(1:2,L), "---", Stress(3,L), "---", "---"
+            else if (NStress == 5) then
+                write (IOUT,"(I6, 3X, E13.6, 2X, E13.6, A13, 3(2X, E13.6))") &
+                                                                L, Stress(1:2,L), "---", Stress(3:5,L)
+            end if
         end do
     end if
     deallocate (value)
     NEL = NEL+NPAR(2)                                               !renew total number of elements.
     NCONECT = NCONECT + NPAR(2)*(NPAR(5)+1)                         !Renew total connectivity matrix element number
     
-    if (Dimen == 3) NumberOfStress = 6
-    if (Dimen == 2) NumberOfStress = 3
     write (String, "('Stress_Load_Case',I2.2)") CURLCASE
-    write (VTKTmpFile) String, NumberOfStress, NUMNP
+    write (VTKTmpFile) String, NStress, NUMNP
     do j = 1, NUMNP
-        write (VTKTmpFile) Stress(1:NumberOfStress,j)               !Stresses at each nodal point
+        write (VTKTmpFile) Stress(1:NStress,j)               !Stresses at each nodal point
     end do
     
 end subroutine PostProcessor
@@ -236,10 +267,10 @@ case (3)                                                            !Called in s
     end do
 end select
     
-    !do i = 1, NUMEG
-    !    do i = 1,NPAR(2) !of ELEGP#i
-    !        write (VTKNodeTmp,*) NPAR(5), Nodes(i,:)               !Called in each element case 1 before enddo.
-    !    end do
-    !end do
+    !do i = 1, NUMEG                                            ----|
+    !    do i = 1,NPAR(2) !of ELEGP#i                               |
+    !        write (VTKNodeTmp,*) NPAR(5), Nodes(i,:)               !This part called in each element case 1 before enddo.
+    !    end do                                                     |
+    !end do                                                     ----|
     
 end subroutine VTKgenerate

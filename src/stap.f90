@@ -195,7 +195,7 @@ PROGRAM STAP90
         WRITE (IOUT,"(//,' LOAD CASE ',I3)") CURLCASE
         
         CALL WRITED (DA(NP(4)),IA(NP(1)),NEQ,NUMNP)  ! PRINT DISPLACEMENTS FOR OTHER SITUATIONS(THE FORMER ONE)
-
+        
 !       Calculation of stresses
         CALL STRESS (A(NP(11)))
 
@@ -248,12 +248,13 @@ SUBROUTINE WRITED (DISP,ID,NEQ,NUMNP)
 ! .   To PRINT DISPLACEMENT AND ANGLES                                          .
 ! . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-  USE GLOBALS, ONLY : IOUT
+  USE GLOBALS, ONLY : IOUT, VTKTmpFile, CURLCASE
 
   IMPLICIT NONE
   INTEGER :: NEQ,NUMNP,ID(6,NUMNP)
   REAL(8) :: DISP(NEQ),D(6)
   INTEGER :: IC,II,I,KK,IL
+  character(len=25) :: String
 
 ! Print displacements
 
@@ -262,6 +263,9 @@ SUBROUTINE WRITED (DISP,ID,NEQ,NUMNP)
 
   IC=4
 
+  write(String, "('Displacement_Load_Case',I2.2)") CURLCASE
+  write (VTKTmpFile) String, 3, NUMNP
+  
   DO II=1,NUMNP
      IC=IC + 1
      IF (IC.GE.56) THEN
@@ -280,9 +284,10 @@ SUBROUTINE WRITED (DISP,ID,NEQ,NUMNP)
      END DO
 
      WRITE (IOUT,'(1X,I3,5X,6E14.6)') II,D
+     write (VTKTmpFile) D(1:3)                                    !Displacements
 
   END DO
-
+  
   RETURN
 
 END SUBROUTINE WRITED
@@ -309,11 +314,11 @@ SUBROUTINE OPENFILES()
 !    call GETARG(1,FileInp)
 !  end if
 
-!  if(COMMAND_ARGUMENT_COUNT().ne.1) then
-!     stop 'Usage: STAP90 InputFileName'
-!  else
-!     call GET_COMMAND_ARGUMENT(1,FileInp)
-!  end if
+  if(COMMAND_ARGUMENT_COUNT().ne.1) then
+     stop 'Usage: STAP90 InputFileName'
+  else
+     call GET_COMMAND_ARGUMENT(1,FileInp)
+  end if
 
   INQUIRE(FILE = FileInp, EXIST = EX)
   IF (.NOT. EX) THEN
