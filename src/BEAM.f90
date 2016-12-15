@@ -144,8 +144,8 @@ SUBROUTINE BEAMELE (ID,X,Y,Z,U,MHT,E,G,AREA,I_X,I_Y,I_Z,J_X,J_Y,J_Z,LM,XYZ,MATP,
         END DO
 
         DO L=1,6
-           LM(L,N)=ID(L,I)     ! Connectivity matrix
-           LM(L+6,N)=ID(L,J)
+           LM(L,N)=ID(L,Node(N,1))     ! Connectivity matrix
+           LM(L+6,N)=ID(L,Node(N,2))
         END DO
 
 !       Update column heights and bandwidth
@@ -388,7 +388,7 @@ SUBROUTINE BEAMELE (ID,X,Y,Z,U,MHT,E,G,AREA,I_X,I_Y,I_Z,J_X,J_Y,J_Z,LM,XYZ,MATP,
        
        WRITE (IOUT,"(1X,I5,1X,12(E12.6,1X))") N,(FORCE(I),I=1,12)
        GaussianCollection(:,N) = 0.5*(XYZ(4:6,N)+XYZ(1:3,N))
-       StressCollection(:,N) = 0.5*(FORCE(7:12)-FORCE(1:6))
+       StressCollection((/1,2,3,5,6,4/),N) = 0.5*(FORCE(7:12)-FORCE(1:6))
      END DO
      call PostProcessor(NPAR(1), 3, XYZ, &
                         Node, 1, GaussianCollection, StressCollection, U)

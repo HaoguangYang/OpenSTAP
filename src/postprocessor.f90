@@ -213,7 +213,7 @@ case (2)                                                            !Called in e
      case (4)
         write (VTKElTypTmp) (12,I=1,NPAR(2))
      case (5)
-        write (VTKElTypTmp) (21,I=1,NPAR(2))
+        write (VTKElTypTmp) (3,I=1,NPAR(2))
      case (6)
         write (VTKElTypTmp) (9,I=1,NPAR(2))
      case (7)
