@@ -21,7 +21,7 @@ subroutine PostProcessor (ElementType, Dimen, PositionData, &
     
     implicit none
     
-    integer :: Dimen, NGauss, ElementType, NumberOfStress, ref1, ref2
+    integer :: Dimen, NGauss, ElementType, ref1, ref2, NStress
     integer :: NodeRelationFlag(NUMNP,NPAR(5)*2+12), Ncoeff, Nval, N, i, j, k, L, &
                ind0, ind1, ind2, Node(NPAR(2),NPAR(5))
     real(8) :: coeff(10,6), Stress(6,NUMNP), PositionData(Dimen*NPAR(5), NPAR(2)), U(NEQ), &
@@ -52,6 +52,7 @@ subroutine PostProcessor (ElementType, Dimen, PositionData, &
     
     i = maxval(NodeRelationFlag(:,ref1))*NGauss                     !How many gaussian points will contribute to the SPR
     if (Dimen == 3) then
+        NStress = 6
         allocate (value(i,16))
         do L =1, NUMNP
             coeff(:,:) = 0
@@ -84,10 +85,11 @@ subroutine PostProcessor (ElementType, Dimen, PositionData, &
                     if (Ncoeff .EQ. 0) &
                         value(ind0,1:6) = Stress(1:6,L)
                     ind0 = ind0 + 1
+                    !write (*,*) x, y, z
+                    !write (*,*) Stress(:,L)
+                    !write(*,*) Nval
                 end do
-                !write (*,*) x, y, z
-                !write (*,*) Stress(:,L)
-                !write(*,*) Nval
+                
             end do
             
             !sets = 6
@@ -107,7 +109,12 @@ subroutine PostProcessor (ElementType, Dimen, PositionData, &
         end do
         
     else if (Dimen == 2) then
-        allocate (value(i,9))
+        if (ElementType==7 .OR. ElementType==9) then
+            NStress = 5                                             !Shell
+        else
+            NStress = 3
+        end if
+        allocate (value(i,6+NStress))
         do L =1, NUMNP
             coeff(:,:) = 0
             Nval = NodeRelationFlag(L,ref1) * NGauss
@@ -128,15 +135,15 @@ subroutine PostProcessor (ElementType, Dimen, PositionData, &
                         y = GaussianCollection (2, ind1+mod(ind0-1,NGauss))
                     end if
                             
-                    Stress(1:3,L) = StressCollection (1:3,ind1+mod(ind0-1,NGauss))
+                    Stress(1:NStress,L) = StressCollection (1:NStress,ind1+mod(ind0-1,NGauss))
                             
                     if (Ncoeff .EQ. 6) &
-                        value(ind0,1:Ncoeff+3) = reshape((/1D0, x, y, x*y, x**2, y**2, &
-                                                                  Stress(1:3,L)/), (/Ncoeff+3/))
+                        value(ind0,1:Ncoeff+NStress) = reshape((/1D0, x, y, x*y, x**2, y**2, &
+                                                                  Stress(1:NStress,L)/), (/Ncoeff+NStress/))
                     if (Ncoeff .EQ. 3) &
-                        value(ind0,1:Ncoeff+3) = reshape((/1D0, x, y, Stress(1:3,L)/), (/Ncoeff+3/))
+                        value(ind0,1:Ncoeff+NStress) = reshape((/1D0, x, y, Stress(1:NStress,L)/), (/Ncoeff+NStress/))
                     if (Ncoeff .EQ. 0) &
-                        value(ind0,1:3) = Stress(1:3,L)
+                        value(ind0,1:NStress) = Stress(1:NStress,L)
                     ind0 = ind0 + 1
                     !write (*,*) x, y
                     !write (*,*) Stress(:,L)
@@ -146,31 +153,34 @@ subroutine PostProcessor (ElementType, Dimen, PositionData, &
             end do
             !sets = 3
             if (Ncoeff .GT. 0) then
-                call LeastSquare (coeff(1:Ncoeff,:), value(1:Nval,1:Ncoeff+3), Ncoeff, Nval, 3)
+                call LeastSquare (coeff(1:Ncoeff,:), value(1:Nval,1:Ncoeff+NStress), Ncoeff, Nval, NStress)
                 !write (*,*) coeff
                 !write (*,*) value
                 ind2 = NodeRelationFlag(L,ref2)
                 x = PositionData(2*(ind2-1)+1,NodeRelationFlag(L,1))    !(L,1) relative to Hint 1
                 y = PositionData(2*(ind2-1)+2,NodeRelationFlag(L,1))
-                if (Ncoeff .EQ. 6) Stress(1:3,L) = matmul(transpose(coeff(1:6,1:3)),(/1D0, x, y, x*y, x**2, y**2/))
-                if (Ncoeff .EQ. 3) Stress(1:3,L) = matmul(transpose(coeff(1:3,1:3)),(/1D0, x, y/))
+                if (Ncoeff .EQ. 6) Stress(1:NStress,L) = matmul(transpose(coeff(1:6,1:NStress)),(/1D0, x, y, x*y, x**2, y**2/))
+                if (Ncoeff .EQ. 3) Stress(1:NStress,L) = matmul(transpose(coeff(1:3,1:NStress)),(/1D0, x, y/))
             else
-                Stress(:,L) = 1/Nval*(sum(value(1:Nval, 1:3),1))
+                Stress(:,L) = 1/Nval*(sum(value(1:Nval, 1:NStress),1))
             end if
-            write (IOUT,"(I6, 3X, E13.6, 2X, E13.6, A13, 2X, E13.6, 2(2X, A13))") &
+            if (NStress == 3) then
+                write (IOUT,"(I6, 3X, E13.6, 2X, E13.6, A13, 2X, E13.6, 2(2X, A13))") &
                                                                 L, Stress(1:2,L), "---", Stress(3,L), "---", "---"
+            else if (NStress == 5) then
+                write (IOUT,"(I6, 3X, E13.6, 2X, E13.6, A13, 3(2X, E13.6))") &
+                                                                L, Stress(1:2,L), "---", Stress(3:5,L)
+            end if
         end do
     end if
     deallocate (value)
     NEL = NEL+NPAR(2)                                               !renew total number of elements.
     NCONECT = NCONECT + NPAR(2)*(NPAR(5)+1)                         !Renew total connectivity matrix element number
     
-    if (Dimen == 3) NumberOfStress = 6
-    if (Dimen == 2) NumberOfStress = 3
     write (String, "('Stress_Load_Case',I2.2)") CURLCASE
-    write (VTKTmpFile) String, NumberOfStress, NUMNP
+    write (VTKTmpFile) String, NStress, NUMNP
     do j = 1, NUMNP
-        write (VTKTmpFile) Stress(1:NumberOfStress,j)               !Stresses at each nodal point
+        write (VTKTmpFile) Stress(1:NStress,j)               !Stresses at each nodal point
     end do
     
 end subroutine PostProcessor
@@ -242,18 +252,18 @@ case (3)                                                            !Called in s
     write (VTKFile,*) "FIELD Result ", NLCASE*2
     rewind (VTKTmpFile)
     do i = 1 , NLCASE
-        !read (VTKTmpFile) string(1:25), Dat(1:2)                    !Fetch Displacements of Load Cases
-        !write (VTKFile,*) string(1:25), Dat(1:2), "double"
-        !do j = 1, NUMNP
-        !    read (VTKTmpFile) Dat1(1:Dat(1))
-        !    write (VTKFile,*) Dat1(1:Dat(1))
-        !end do
-        !read (VTKTmpFile) string(1:19), Dat(1:2)                    !Fetch Stress of Load Cases
-        !write (VTKFile,*) string(1:19), Dat(1:2), "double"          !Dat(1) should be <=6 for no more than 6 stress components
-        !do j = 1, NUMNP
-        !    read (VTKTmpFile) Dat1(1:Dat(1))
-        !    write (VTKFile,*) Dat1(1:Dat(1))
-        !end do
+        read (VTKTmpFile) string(1:25), Dat(1:2)                    !Fetch Displacements of Load Cases
+        write (VTKFile,*) string(1:25), Dat(1:2), "double"
+        do j = 1, NUMNP
+            read (VTKTmpFile) Dat1(1:Dat(1))
+            write (VTKFile,*) Dat1(1:Dat(1))
+        end do
+        read (VTKTmpFile) string(1:19), Dat(1:2)                    !Fetch Stress of Load Cases
+        write (VTKFile,*) string(1:19), Dat(1:2), "double"          !Dat(1) should be <=6 for no more than 6 stress components
+        do j = 1, NUMNP
+            read (VTKTmpFile) Dat1(1:Dat(1))
+            write (VTKFile,*) Dat1(1:Dat(1))
+        end do
     end do
 end select
     
