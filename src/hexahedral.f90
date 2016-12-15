@@ -1,3 +1,15 @@
+!===========================================================================================
+! 
+! HEXAHEDRAL ELEMENT SUBROUTINE INCLUDING:
+!    8H Data Read in
+!    8H Element Stiffness Matrix Assembly
+!    Post-processing from Displacements
+! 
+! future support for 27H will be added.
+! 
+! Author:    Haoguang Yang
+! 
+!===========================================================================================
 subroutine hexahedral
     use globals
     use memallocate

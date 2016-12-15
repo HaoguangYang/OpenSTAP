@@ -11,19 +11,17 @@ SUBROUTINE BEAM
   USE MEMALLOCATE
 
   IMPLICIT NONE
-  INTEGER :: NUME, NUMMAT, MM, N101, N102, N103, N104, N105, N106, N107, N108, N109, N110, N111, N112, N113
+  INTEGER :: NUME, NUMMAT, MM, N(14)
 
   NUME = NPAR(2)
   NUMMAT = NPAR(3)
+  NPAR(5) = 2
 
 ! Allocate storage for element group data
   IF (IND == 1) THEN
       MM = 9*NUMMAT*ITWO + 13*NUME + 6*NUME*ITWO
       CALL MEMALLOC(11,"ELEGP",MM,1)
   END IF
-
-  NFIRST=NP(11)   ! Pointer to the first entry in the element group data array
-                  ! in the unit of single precision (corresponding to A)
 
 ! Calculate the pointer to the arrays in the element group data
 ! N101: E(NUMMAT)
@@ -38,32 +36,40 @@ SUBROUTINE BEAM
 ! N110: LM(12,NUME)
 ! N111: XYZ(6,NUME)
 ! N112: MTAP(NUME)
-  N101=NFIRST
-  N102=N101+NUMMAT*ITWO
-  N103=N102+NUMMAT*ITWO
-  N104=N103+NUMMAT*ITWO
-  N105=N104+NUMMAT*ITWO
-  N106=N105+NUMMAT*ITWO
-  N107=N106+NUMMAT*ITWO
-  N108=N107+NUMMAT*ITWO
-  N109=N108+NUMMAT*ITWO
-  N110=N109+NUMMAT*ITWO
-  N111=N110+12*NUME
-  N112=N111+6*NUME*ITWO
-  N113=N112+NUME
-  NLAST=N113
 
-  MIDEST=NLAST - NFIRST
+  N(1)=0
+  N(2)=N(1)+NUMMAT*ITWO
+  N(3)=N(2)+NUMMAT*ITWO
+  N(4)=N(3)+NUMMAT*ITWO
+  N(5)=N(4)+NUMMAT*ITWO
+  N(6)=N(5)+NUMMAT*ITWO
+  N(7)=N(6)+NUMMAT*ITWO
+  N(8)=N(7)+NUMMAT*ITWO
+  N(9)=N(8)+NUMMAT*ITWO
+  N(10)=N(9)+NUMMAT*ITWO
+  N(11)=N(10)+12*NUME
+  N(12)=N(11)+6*NUME*ITWO
+  N(13)=N(12)+NUME
+  N(14)=N(13)+NPAR(5)*NPAR(2)
+  
+  MIDEST=N(14)
+  if (IND .EQ. 1) then
+        ! Allocate storage for element group data
+        call MemAlloc(11,"ELEGP",MIDEST,1)
+  end if
+  NFIRST = NP(11)   ! Pointer to the first entry in the element group data array in the unit of single precision (corresponding to A)
+  N(:) = N(:) + NFIRST
+  NLAST=N(14)
 
   CALL BEAMELE (IA(NP(1)),DA(NP(2)),DA(NP(3)),DA(NP(4)),DA(NP(4)),IA(NP(5)),   &
-       A(N101),A(N102),A(N103),A(N104),A(N105),A(N106),A(N107),A(N108),A(N109),A(N110),A(N111),A(N112))
+       A(N(1)),A(N(2)),A(N(3)),A(N(4)),A(N(5)),A(N(6)),A(N(7)),A(N(8)),A(N(9)),A(N(10)),A(N(11)),A(N(12)),A(N(13)))
 
   RETURN
 
 END SUBROUTINE BEAM
 
 
-SUBROUTINE BEAMELE (ID,X,Y,Z,U,MHT,E,G,AREA,I_X,I_Y,I_Z,J_X,J_Y,J_Z,LM,XYZ,MATP)
+SUBROUTINE BEAMELE (ID,X,Y,Z,U,MHT,E,G,AREA,I_X,I_Y,I_Z,J_X,J_Y,J_Z,LM,XYZ,MATP,Node)
 ! . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 ! .                                                                   .
 ! .   BEAM ELEMENT subroutine                                        .
@@ -80,9 +86,10 @@ SUBROUTINE BEAMELE (ID,X,Y,Z,U,MHT,E,G,AREA,I_X,I_Y,I_Z,J_X,J_Y,J_Z,LM,XYZ,MATP)
              I_X(NPAR(3)),I_Y(NPAR(3)),I_Z(NPAR(3)),J_X(NPAR(3)),J_Y(NPAR(3)),J_Z(NPAR(3)),XYZ(6,NPAR(2)),U(NEQ)
   REAL(8) :: S(12,12),D(3),UELE(12),FORCE(12),SIGMA   !UELE: THE DISPLACEMENT OF ELEMENT N; FORCE: THE INTERNAL FORCE AND MOMENT FOR ELEMENT N
 
-  INTEGER :: NPAR1, NUME, NUMMAT, ND, I, J, L, N
+  INTEGER :: NPAR1, NUME, NUMMAT, ND, I, J, L, N, Node(NPAR(2),NPAR(5))
   INTEGER :: MTYPE, IPRINT
   REAL(8) :: XL2, XL ,CXX,CXY,CXZ,CYX,CYY,CYZ,CZX,CZY,CZZ,T(12,12)!TRANSLATION MATRIX
+  REAL(8) :: StressCollection(6,NPAR(2)), GaussianCollection(3,NPAR(2))
 
   NPAR1  = NPAR(1)
   NUME   = NPAR(2)
@@ -123,16 +130,12 @@ SUBROUTINE BEAMELE (ID,X,Y,Z,U,MHT,E,G,AREA,I_X,I_Y,I_Z,J_X,J_Y,J_Z,LM,XYZ,MATP)
 
      N=0
      DO WHILE (N .NE. NUME)
-        READ (IIN,'(5I5)') N,I,J,MTYPE  ! Read in element information
+        READ (IIN,'(5I5)') N,Node(N,1:NPAR(5)),MTYPE  ! Read in element information
 
 !       Save element information
-        XYZ(1,N)=X(I)  ! Coordinates of the element's left node
-        XYZ(2,N)=Y(I)
-        XYZ(3,N)=Z(I)
-
-        XYZ(4,N)=X(J)  ! Coordinates of the element's right node
-        XYZ(5,N)=Y(J)
-        XYZ(6,N)=Z(J)
+        XYZ(1:NPAR(5)*3-1:3,N)=X(Node(N,:))  ! Coordinates of the element's nodes
+        XYZ(2:NPAR(5)*3  :3,N)=Y(Node(N,:))
+        XYZ(3:NPAR(5)*3+1:3,N)=Z(Node(N,:))
 
         MATP(N)=MTYPE  ! Material type
 
@@ -148,7 +151,8 @@ SUBROUTINE BEAMELE (ID,X,Y,Z,U,MHT,E,G,AREA,I_X,I_Y,I_Z,J_X,J_Y,J_Z,LM,XYZ,MATP)
 !       Update column heights and bandwidth
         CALL COLHT (MHT,ND,LM(1,N))   
 
-        WRITE (IOUT,"(I5,6X,I5,4X,I5,7X,I5)") N,I,J,MTYPE
+        WRITE (IOUT,"(I5,6X,I5,4X,I5,7X,I5)") N,Node(N,1:NPAR(5)),MTYPE
+        write (VTKNodeTmp) NPAR(5), Node(N,:)-1
 
      END DO
 
@@ -383,9 +387,11 @@ SUBROUTINE BEAMELE (ID,X,Y,Z,U,MHT,E,G,AREA,I_X,I_Y,I_Z,J_X,J_Y,J_Z,LM,XYZ,MATP)
        !PRINT THE RESULTS FOR POSTPROCESSING
        
        WRITE (IOUT,"(1X,I5,1X,12(E12.6,1X))") N,(FORCE(I),I=1,12)
-        
+       GaussianCollection(:,N) = 0.5*(XYZ(4:6,N)+XYZ(1:3,N))
+       StressCollection(:,N) = 0.5*(FORCE(7:12)-FORCE(1:6))
      END DO
-
+     call PostProcessor(NPAR(1), 3, XYZ, &
+                        Node, 1, GaussianCollection, StressCollection, U)
   ELSE 
      STOP "*** ERROR *** Invalid IND value."
   END IF
