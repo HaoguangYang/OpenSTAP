@@ -148,6 +148,7 @@ SUBROUTINE SHELL8 (ID,X,Y,Z,U,MHT,E,POSSION,LM,XYZ,MATP, THICK, Node)
         CALL COLHT (MHT,ND,LM(1,N))   
 
         WRITE (IOUT,"(I5,6X,I5,4X,I5,4X,I5,4X,I5,7X,I5)") N,Node(N,1:4),MTYPE
+        write (VTKNodeTmp) NPAR(5), Node(N,:)-1
 
      END DO
 
