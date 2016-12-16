@@ -86,11 +86,11 @@ SUBROUTINE SHELL8 (ID,X,Y,Z,U,MHT,E,POSSION,LM,XYZ,MATP, THICK, Node)
   INTEGER :: NPAR1, NUME, NUMMAT, ND, I, J, K, L, I1,J1,K1,L1, M, N
   INTEGER :: MTYPE, IPRINT, Node(NPAR(2),NPAR(5))
 
-  REAL(8) :: Cb(3, 3), Cs, Etemp, Ptemp, det, Cm(3, 3)
+  REAL(8) :: Cb(3, 3), Cs, Etemp, Ptemp, det, Cm(3, 3), StressCollection(6, NPAR(2)*9)
   REAL(8) :: GAUSS(3) = (/-0.7745966692, 0.7745966692, 0.0/)
   REAL(8) :: GAUSS_COF(3) = (/0.5555555556, 0.5555555556, 0.8888888889/)
   REAL(8) :: G1, G2, GN(2,4), GN8(2,8), Ja(2,2), Ja_inv(2,2), Bk(3,40),By(2,40), S(40,40), BB(2,8), NN0(1,8)
-  REAL(8) :: X_Y(4, 2), STR1(3,1), STR2(2,1), Bm(3,40)
+  REAL(8) :: X_Y(4, 2), STR1(3), STR2(2), Bm(3,40), GaussianCollection(3, NPAR(2)*9)
   NPAR1  = NPAR(1)
   NUME   = NPAR(2)
   NUMMAT = NPAR(3) 
@@ -262,7 +262,7 @@ SUBROUTINE SHELL8 (ID,X,Y,Z,U,MHT,E,POSSION,LM,XYZ,MATP, THICK, Node)
 ! Stress calculations
   ELSE IF (IND .EQ. 3) THEN
      WRITE (IOUT,"(//,' S T R E S S   I N F O R M A T I O N',//,  &
-                  '           TAU_xx        TAU_yy        TAU_xy         TAU_xz       TAU_yz')")
+                  '           TAU_xx        TAU_yy        TAU_xy         TAU_yz       TAU_zx')")
      DO N=1,NUME
         WRITE (IOUT,"('ELEMENT', I3)") N
         MTYPE=MATP(N)
@@ -361,11 +361,15 @@ SUBROUTINE SHELL8 (ID,X,Y,Z,U,MHT,E,POSSION,LM,XYZ,MATP, THICK, Node)
                     Bm(3,5*K)   = BB(1,K)
                 END DO
 
-            STR1 = -THICK(N)/2*matmul(Cb,matmul(Bk,DE))+ matmul(Cm,matmul(Bm,DE))
-            STR2 = Cs*matmul(By, DE)
+            STR1 = reshape(-THICK(N)/2*matmul(Cb,matmul(Bk,DE))+ matmul(Cm,matmul(Bm,DE)),(/3/))
+            STR2(2:1:-1) = reshape(Cs*matmul(By, DE),(/2/))
             WRITE (IOUT,"(5X,5E14.2)") STR1, STR2
+            StressCollection(1:5, 9*N+3*L+M-12) = (/STR1, STR2/)
+            GaussianCollection(1:3, 9*N+3*L+M-12) = reshape(matmul(reshape(XYZ(:,N), (/3,8/)),transpose(NN0)), (/3/))
             END DO
         END DO
+        call PostProcessor(NPAR(1), 2, XYZ((/((/3*k-2,3*k-1/),k=1,8)/),:), Node, 9, GaussianCollection(1:2,:), &
+        StressCollection, U)
     END DO
   ELSE 
      STOP "*** ERROR *** Invalid IND value."

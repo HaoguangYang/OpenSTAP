@@ -25,7 +25,7 @@ subroutine PostProcessor (ElementType, Dimen, PositionData, &
     integer :: NodeRelationFlag(NUMNP,NPAR(5)*2+12), Ncoeff, Nval, N, i, j, k, L, &
                ind0, ind1, ind2, Node(NPAR(2),NPAR(5))
     real(8) :: coeff(10,6), Stress(6,NUMNP), PositionData(Dimen*NPAR(5), NPAR(2)), U(NEQ), &
-               GaussianCollection(Dimen, NPAR(2)*NGauss), StressCollection(3*Dimen-3,NPAR(2)*NGauss)
+               GaussianCollection(Dimen, NPAR(2)*NGauss), StressCollection(6,NPAR(2)*NGauss)
     real(8) :: x, y, z, Displacement(NEQ)
     REAL(8), ALLOCATABLE :: value(:,:)
     character(len=19) :: String
@@ -252,18 +252,18 @@ case (3)                                                            !Called in s
     write (VTKFile,*) "FIELD Result ", NLCASE*2
     rewind (VTKTmpFile)
     do i = 1 , NLCASE
-        !read (VTKTmpFile) string(1:25), Dat(1:2)                    !Fetch Displacements of Load Cases
-        !write (VTKFile,*) string(1:25), Dat(1:2), "double"
-        !do j = 1, NUMNP
-        !    read (VTKTmpFile) Dat1(1:Dat(1))
-        !    write (VTKFile,*) Dat1(1:Dat(1))
-        !end do
-        !read (VTKTmpFile) string(1:19), Dat(1:2)                    !Fetch Stress of Load Cases
-        !write (VTKFile,*) string(1:19), Dat(1:2), "double"          !Dat(1) should be <=6 for no more than 6 stress components
-        !do j = 1, NUMNP
-        !    read (VTKTmpFile) Dat1(1:Dat(1))
-        !    write (VTKFile,*) Dat1(1:Dat(1))
-        !end do
+        read (VTKTmpFile) string(1:25), Dat(1:2)                    !Fetch Displacements of Load Cases
+        write (VTKFile,*) string(1:25), Dat(1:2), "double"
+        do j = 1, NUMNP
+            read (VTKTmpFile) Dat1(1:Dat(1))
+            write (VTKFile,*) Dat1(1:Dat(1))
+        end do
+        read (VTKTmpFile) string(1:19), Dat(1:2)                    !Fetch Stress of Load Cases
+        write (VTKFile,*) string(1:19), Dat(1:2), "double"          !Dat(1) should be <=6 for no more than 6 stress components
+        do j = 1, NUMNP
+            read (VTKTmpFile) Dat1(1:Dat(1))
+            write (VTKFile,*) Dat1(1:Dat(1))
+        end do
     end do
 end select
     
