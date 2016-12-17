@@ -22,22 +22,14 @@ SUBROUTINE SHELL8Q
   USE MEMALLOCATE
 
   IMPLICIT NONE
-  INTEGER :: NUME, NUMMAT, MM, N101, N102, N103, N104, N105, N106, N107
+  INTEGER :: NUME, NUMMAT, MM, N(8)
 
   NUME = NPAR(2)
   NUMMAT = NPAR(3)
+  NPAR(5) = 8
 
-! Allocate storage for element group data
 ! 此处材料要求每一种提供E, Possion
 ! 每个element需要
-  IF (IND == 1) THEN
-      MM = 2*NUMMAT*ITWO + 41*NUME + 25*NUME*ITWO
-      CALL MEMALLOC(11,"ELEGP",MM,1)
-  END IF
-
-  NFIRST=NP(11)   ! Pointer to the first entry in the element group data array
-                  ! in the unit of single precision (corresponding to A)
-
 ! Calculate the pointer to the arrays in the element group data
 ! N101: E(NUMMAT)
 ! N102: POSSION(NUMMAT)
@@ -46,27 +38,33 @@ SUBROUTINE SHELL8Q
 ! N105: MTAP(NUME)
 ! N106: THICK(NUME
 ! N107: NLAST
+  N(1)=0
+  N(2)=N(1)+NUMMAT*ITWO
+  N(3)=N(2)+NUMMAT*ITWO
+  N(4)=N(3)+40*NUME
+  N(5)=N(4)+24*NUME*ITWO
+  N(6)=N(5)+NUME
+  N(7)=N(6)+NUME*ITWO
+  N(8)=N(7)+NPAR(5)*NPAR(2)
   
-  N101=NFIRST
-  N102=N101+NUMMAT*ITWO
-  N103=N102+NUMMAT*ITWO
-  N104=N103+40*NUME
-  N105=N104+24*NUME*ITWO
-  N106=N105+NUME
-  N107=N106+NUME*ITWO
-  NLAST=N107
-
-  MIDEST=NLAST - NFIRST
+  MIDEST=N(8)
+  if (IND .EQ. 1) then
+        ! Allocate storage for element group data
+        call MemAlloc(11,"ELEGP",MIDEST,1)
+  end if
+  NFIRST = NP(11)   ! Pointer to the first entry in the element group data array in the unit of single precision (corresponding to A)
+  N(:) = N(:) + NFIRST
+  NLAST=N(8)
 
   CALL SHELL8 (IA(NP(1)),DA(NP(2)),DA(NP(3)),DA(NP(4)),DA(NP(4)),IA(NP(5)),   &
-       A(N101),A(N102),A(N103),A(N104),A(N105), A(N106))
+       A(N(1)),A(N(2)),A(N(3)),A(N(4)),A(N(5)),A(N(6)),A(N(7)))
 
   RETURN
 
 END SUBROUTINE SHELL8Q
 
 
-SUBROUTINE SHELL8 (ID,X,Y,Z,U,MHT,E,POSSION,LM,XYZ,MATP, THICK)
+SUBROUTINE SHELL8 (ID,X,Y,Z,U,MHT,E,POSSION,LM,XYZ,MATP, THICK, Node)
  USE GLOBALS
   USE MEMALLOCATE
 
@@ -76,14 +74,14 @@ SUBROUTINE SHELL8 (ID,X,Y,Z,U,MHT,E,POSSION,LM,XYZ,MATP, THICK)
              XYZ(24,NPAR(2)),THICK(NPAR(2)),U(NEQ)
 
   REAL(8) :: DE(40,1)
-  INTEGER :: NPAR1, NUME, NUMMAT, ND, I, J, K, L, I1,J1,K1,L1, M, N
-  INTEGER :: MTYPE, IPRINT
+  INTEGER :: NPAR1, NUME, NUMMAT, ND, K, L, M, N
+  INTEGER :: MTYPE, IPRINT, Node(NPAR(2),NPAR(5))
 
-  REAL(8) :: Cb(3, 3), Cs, Etemp, Ptemp, det, Cm(3, 3)
+  REAL(8) :: Cb(3, 3), Cs, Etemp, Ptemp, det, Cm(3, 3), StressCollection(6, NPAR(2)*9)
   REAL(8) :: GAUSS(3) = (/-0.7745966692, 0.7745966692, 0.0/)
   REAL(8) :: GAUSS_COF(3) = (/0.5555555556, 0.5555555556, 0.8888888889/)
   REAL(8) :: G1, G2, GN(2,4), GN8(2,8), Ja(2,2), Ja_inv(2,2), Bk(3,40),By(2,40), S(40,40), BB(2,8), NN0(1,8)
-  REAL(8) :: X_Y(4, 2), STR1(3,1), STR2(2,1), Bm(3,40)
+  REAL(8) :: X_Y(4, 2), STR1(3), STR2(2), Bm(3,40), GaussianCollection(3, NPAR(2)*9)
   NPAR1  = NPAR(1)
   NUME   = NPAR(2)
   NUMMAT = NPAR(3) 
@@ -110,71 +108,38 @@ SUBROUTINE SHELL8 (ID,X,Y,Z,U,MHT,E,POSSION,LM,XYZ,MATP, THICK)
      WRITE (IOUT,"('  SET       YOUNG''S     CROSS-SECTIONAL',/,  &
                    ' NUMBER     MODULUS',10X,'AREA')")
 
-     DO I=1,NUMMAT
+     DO K=1,NUMMAT
         READ (IIN,'(I5,2F10.0)') N,E(N),POSSION(N)  ! Read material information
         WRITE (IOUT,"(I5,4X,E12.5,2X,E14.6)") N,E(N),POSSION(N)
      END DO
 
      WRITE (IOUT,"(//,' E L E M E N T   I N F O R M A T I O N',//,  &
-                      ' ELEMENT     NODE     NODE     NODE     NODE       MATERIAL',/,   &
-                      ' NUMBER-N      I        J        K        L       SET NUMBER')")
+                      ' ELEMENT        |------------------------- NODES -------------------------|       MATERIAL',/,   &
+                      ' NUMBER-N        1       2       3       4       5       6       7       8       SET NUMBER')")
      
      N=0
      LM = 0
      DO WHILE (N .NE. NUME)
-        READ (IIN,'(10I5, F10.0, I5)') N,I,J,K,L,I1,J1,K1,L1,MTYPE,THICK(N)  ! Read in element information
+        READ (IIN,'(10I5, F10.0, I5)') N,Node(N,1:NPAR(5)),MTYPE,THICK(N)  ! Read in element information
 
 !       Save element information
-        XYZ(1,N)=X(I)  
-        XYZ(2,N)=Y(I)
-        
-        XYZ(4,N)=X(J) 
-        XYZ(5,N)=Y(J)
-
-        XYZ(7,N)=X(K) 
-        XYZ(8,N)=Y(K)
-        
-        XYZ(10,N)=X(L)
-        XYZ(11,N)=Y(L)
-
-        XYZ(13,N)=X(I1)  
-        XYZ(14,N)=Y(I1)
-        
-        XYZ(16,N)=X(J1) 
-        XYZ(17,N)=Y(J1)
-
-        XYZ(19,N)=X(K1) 
-        XYZ(20,N)=Y(K1)
-        
-        XYZ(22,N)=X(L1)
-        XYZ(23,N)=Y(L1)
+        XYZ(1:NPAR(5)*3-1:3,N)=X(Node(N,:))  ! Coordinates of the element's nodes
+        XYZ(2:NPAR(5)*3  :3,N)=Y(Node(N,:))
+        XYZ(3:NPAR(5)*3+1:3,N)=Z(Node(N,:))
         MATP(N)=MTYPE  ! Material type
 
         DO M=1,3
-           LM(M,N)=ID(M+2,I)     ! Connectivity matrix
-           LM(M+5,N)=ID(M+2,J)
-           LM(M+10,N)=ID(M+2,K)
-           LM(M+15,N)=ID(M+2,L)
-           LM(M+20,N)=ID(M+2,I1)     
-           LM(M+25,N)=ID(M+2,J1)
-           LM(M+30,N)=ID(M+2,K1)
-           LM(M+35,N)=ID(M+2,L1)
+           LM(M:M+36:5,N)=ID(M+2,Node(N,:))     ! Connectivity matrix
         END DO
         
         DO M=4,5
-           LM(M,N)=ID(M-3,I)     ! Connectivity matrix
-           LM(M+5,N)=ID(M-3,J)
-           LM(M+10,N)=ID(M-3,K)
-           LM(M+15,N)=ID(M-3,L)
-           LM(M+20,N)=ID(M-3,I1)     
-           LM(M+25,N)=ID(M-3,J1)
-           LM(M+30,N)=ID(M-3,K1)
-           LM(M+35,N)=ID(M-3,L1)
+           LM(M:M+36:5,N)=ID(M-3,Node(N,:))     ! Connectivity matrix
         END DO
 !       Update column heights and bandwidth
         CALL COLHT (MHT,ND,LM(1,N))   
 
-        WRITE (IOUT,"(I5,6X,I5,4X,I5,4X,I5,4X,I5,7X,I5)") N,I,J,K,L,MTYPE
+        WRITE (IOUT,"(I7,5X,7(I7,1X),I7,4X,I5)") N,Node(N,1:NPAR(5)),MTYPE
+        write (VTKNodeTmp) NPAR(5), Node(N,:)-1
 
      END DO
 
@@ -222,14 +187,14 @@ SUBROUTINE SHELL8 (ID,X,Y,Z,U,MHT,E,POSSION,LM,XYZ,MATP, THICK)
                 Ja_inv(2,2) = Ja(1,1)
                 Ja_inv = Ja_inv/det
 ! 因为可能写不成一行了，所以直接依次赋值了~
-            NN0(1,1)=(1-G1)*(1-G2)*(-G1-G2-1)/4
-            NN0(1,2)=(1+G1)*(1-G2)*(G1-G2-1)/4
-            NN0(1,3)=(1+G1)*(1+G2)*(G1+G2-1)/4
-            NN0(1,4)=(1-G1)*(1+G2)*(-G1+G2-1)/4
-            NN0(1,5)=(1-G1*G1)*(1-G2)/2
-            NN0(1,6)=(1-G2*G2)*(1+G1)/2
-            NN0(1,7)=(1-G1*G1)*(1+G2)/2
-            NN0(1,8)=(1-G2*G2)*(1-G1)/2
+                NN0(1,1)=(1-G1)*(1-G2)*(-G1-G2-1)/4
+                NN0(1,2)=(1+G1)*(1-G2)*(G1-G2-1)/4
+                NN0(1,3)=(1+G1)*(1+G2)*(G1+G2-1)/4
+                NN0(1,4)=(1-G1)*(1+G2)*(-G1+G2-1)/4
+                NN0(1,5)=(1-G1*G1)*(1-G2)/2
+                NN0(1,6)=(1-G2*G2)*(1+G1)/2
+                NN0(1,7)=(1-G1*G1)*(1+G2)/2
+                NN0(1,8)=(1-G2*G2)*(1-G1)/2
                          
 
                 GN8(1,1) = (1-G2)*(2*G1+G2)
@@ -288,7 +253,7 @@ SUBROUTINE SHELL8 (ID,X,Y,Z,U,MHT,E,POSSION,LM,XYZ,MATP, THICK)
 ! Stress calculations
   ELSE IF (IND .EQ. 3) THEN
      WRITE (IOUT,"(//,' S T R E S S   I N F O R M A T I O N',//,  &
-                  '           TAU_xx        TAU_yy        TAU_xy         TAU_xz       TAU_yz')")
+                  '           TAU_xx        TAU_yy        TAU_xy         TAU_yz       TAU_zx')")
      DO N=1,NUME
         WRITE (IOUT,"('ELEMENT', I3)") N
         MTYPE=MATP(N)
@@ -335,14 +300,14 @@ SUBROUTINE SHELL8 (ID,X,Y,Z,U,MHT,E,POSSION,LM,XYZ,MATP, THICK)
                 Ja_inv = Ja_inv/det
                 BB = matmul(Ja_inv, GN8)
                 
-            NN0(1,1)=(1-G1)*(1-G2)*(-G1-G2-1)/4
-            NN0(1,2)=(1+G1)*(1-G2)*(G1-G2-1)/4
-            NN0(1,3)=(1+G1)*(1+G2)*(G1+G2-1)/4
-            NN0(1,4)=(1-G1)*(1+G2)*(-G1+G2-1)/4
-            NN0(1,5)=(1-G1*G1)*(1-G2)/2
-            NN0(1,6)=(1-G2*G2)*(1+G1)/2
-            NN0(1,7)=(1-G1*G1)*(1+G2)/2
-            NN0(1,8)=(1-G2*G2)*(1-G1)/2
+                NN0(1,1)=(1-G1)*(1-G2)*(-G1-G2-1)/4
+                NN0(1,2)=(1+G1)*(1-G2)*(G1-G2-1)/4
+                NN0(1,3)=(1+G1)*(1+G2)*(G1+G2-1)/4
+                NN0(1,4)=(1-G1)*(1+G2)*(-G1+G2-1)/4
+                NN0(1,5)=(1-G1*G1)*(1-G2)/2
+                NN0(1,6)=(1-G2*G2)*(1+G1)/2
+                NN0(1,7)=(1-G1*G1)*(1+G2)/2
+                NN0(1,8)=(1-G2*G2)*(1-G1)/2
 ! 因为可能写不成一行了，所以直接依次赋值了~
                 GN8(1,1) = (1-G2)*(2*G1+G2)
                 GN8(2,1) = (1-G1)*(G1+2*G2)
@@ -387,12 +352,16 @@ SUBROUTINE SHELL8 (ID,X,Y,Z,U,MHT,E,POSSION,LM,XYZ,MATP, THICK)
                     Bm(3,5*K)   = BB(1,K)
                 END DO
 
-            STR1 = -THICK(N)/2*matmul(Cb,matmul(Bk,DE))+ matmul(Cm,matmul(Bm,DE))
-            STR2 = Cs*matmul(By, DE)
+            STR1 = reshape(-THICK(N)/2*matmul(Cb,matmul(Bk,DE))+ matmul(Cm,matmul(Bm,DE)),(/3/))
+            STR2(2:1:-1) = reshape(Cs*matmul(By, DE),(/2/))
             WRITE (IOUT,"(5X,5E14.2)") STR1, STR2
+            StressCollection(1:5, 9*N+3*L+M-12) = (/STR1, STR2/)
+            GaussianCollection(1:3, 9*N+3*L+M-12) = reshape(matmul(reshape(XYZ(:,N), (/3,8/)),transpose(NN0)), (/3/))
             END DO
         END DO
     END DO
+  call PostProcessor(NPAR(1), 2, XYZ((/((/3*k-2,3*k-1/),k=1,8)/),:), Node, 9, GaussianCollection(1:2,:), &
+                     StressCollection, U)
   ELSE 
      STOP "*** ERROR *** Invalid IND value."
   END IF

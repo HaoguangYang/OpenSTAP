@@ -17,12 +17,6 @@ SUBROUTINE BEAM
   NUMMAT = NPAR(3)
   NPAR(5) = 2
 
-! Allocate storage for element group data
-  IF (IND == 1) THEN
-      MM = 9*NUMMAT*ITWO + 13*NUME + 6*NUME*ITWO
-      CALL MEMALLOC(11,"ELEGP",MM,1)
-  END IF
-
 ! Calculate the pointer to the arrays in the element group data
 ! N101: E(NUMMAT)
 ! N102: G(NUMMAT)

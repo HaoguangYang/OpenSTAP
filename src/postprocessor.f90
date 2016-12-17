@@ -25,7 +25,7 @@ subroutine PostProcessor (ElementType, Dimen, PositionData, &
     integer :: NodeRelationFlag(NUMNP,NPAR(5)*2+12), Ncoeff, Nval, N, i, j, k, L, &
                ind0, ind1, ind2, Node(NPAR(2),NPAR(5))
     real(8) :: coeff(10,6), Stress(6,NUMNP), PositionData(Dimen*NPAR(5), NPAR(2)), U(NEQ), &
-               GaussianCollection(Dimen, NPAR(2)*NGauss), StressCollection(3*Dimen-3,NPAR(2)*NGauss)
+               GaussianCollection(Dimen, NPAR(2)*NGauss), StressCollection(6,NPAR(2)*NGauss)
     real(8) :: x, y, z, Displacement(NEQ)
     REAL(8), ALLOCATABLE :: value(:,:)
     character(len=19) :: String
