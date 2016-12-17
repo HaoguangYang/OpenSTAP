@@ -292,7 +292,7 @@ end subroutine HexN
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !!       Calculate Gradiient of Shape Function Matrix       !!
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-!Still Problematic.
+
 subroutine HexB (BMatrix, DetJ, ElementShapeNodes, Transformed, Original)
     USE MathKernel
     implicit none
