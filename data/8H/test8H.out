@@ -141,7 +141,7 @@ Solution phase ...
 
      NUMBER OF EQUATIONS . . . . . . . . . . . . . .(NEQ) =    66
      NUMBER OF MATRIX ELEMENTS . . . . . . . . . . .(NWK) =  1611
-     MAXIMUM HALF BANDWIDTH  . . . . . . . . . . . .(MK) =    42
+     MAXIMUM HALF BANDWIDTH  . . . . . . . . . . . .(MK ) =    42
      MEAN HALF BANDWIDTH . . . . . . . . . . . . . .(MM ) =    24
 
 
