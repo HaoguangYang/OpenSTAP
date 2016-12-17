@@ -125,39 +125,3 @@
 
  ELEMENT        |------------------------- NODES -------------------------|       MATERIAL
  NUMBER-N        1       2       3       4       5       6       7       8       SET NUMBER
-      1           1       2       3       4       5       6       7       8        1
-      2           9      10      11      12      13      14      15      16        1
-
- E L E M E N T   D E F I N I T I O N
-
- ELEMENT TYPE  . . . . . . . . . . . . .( NPAR(1) ) . . =    6
-     EQ.1, TRUSS ELEMENTS
-     EQ.2, ELEMENTS CURRENTLY
-     EQ.3, NOT AVAILABLE
-
- NUMBER OF ELEMENTS. . . . . . . . . . .( NPAR(2) ) . . =    2
-
- M A T E R I A L   D E F I N I T I O N
-
- NUMBER OF DIFFERENT SETS OF MATERIAL
- AND CROSS-SECTIONAL  CONSTANTS  . . . .( NPAR(3) ) . . =    1
-
-  SET       YOUNG'S     CROSS-SECTIONAL
- NUMBER     MODULUS          AREA
-    1     0.10000E+11    0.300000E+00
-
-
- E L E M E N T   I N F O R M A T I O N
-
- ELEMENT     NODE     NODE     NODE     NODE       MATERIAL
- NUMBER-N      I        J        K        L       SET NUMBER
-    1          7       17       18        8           2
-    2         17       14       13       18           2
-
-
- TOTAL SYSTEM DATA
-
-     NUMBER OF EQUATIONS . . . . . . . . . . . . . .(NEQ) =    42
-     NUMBER OF MATRIX ELEMENTS . . . . . . . . . . .(NWK) =   395
-     MAXIMUM HALF BANDWIDTH  . . . . . . . . . . . .(MK ) =    34
-     MEAN HALF BANDWIDTH . . . . . . . . . . . . . .(MM ) =     9

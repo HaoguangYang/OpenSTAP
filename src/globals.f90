@@ -64,5 +64,6 @@ module GLOBALS
 
    integer :: NG
    
-   integer :: BandwidthOpt
+   logical :: BANDWIDTHOPT = .TRUE.
+   logical :: PARDISO = .FALSE.
 end module GLOBALS

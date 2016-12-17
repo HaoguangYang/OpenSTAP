@@ -278,8 +278,8 @@ SUBROUTINE ELEMENT_4Q_MAIN (ID,X,Y,Z,U,MHT,E,POISSON,LM,XYZ,MATP,Node)
         J = N*4
         GaussianCollection (:,I:J) = transpose(X_GUASS)
      END DO
-     call PostProcessor(NPAR(1), 2, XYZ((/1,2,4,5,7,8,10,11/),:), Node, 4, GaussianCollection, &
-         TRANSPOSE(reshape((/transpose(STRESS_XX),transpose(STRESS_YY),transpose(STRESS_XY)/),(/4*NPAR(2),3/))), U)
+     !call PostProcessor(NPAR(1), 2, XYZ((/1,2,4,5,7,8,10,11/),:), Node, 4, GaussianCollection, &
+     !    TRANSPOSE(reshape((/transpose(STRESS_XX),transpose(STRESS_YY),transpose(STRESS_XY)/),(/4*NPAR(2),3/))), U)
   ELSE 
      STOP "*** ERROR *** Invalid IND value."
   END IF
