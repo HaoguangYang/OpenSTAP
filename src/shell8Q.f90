@@ -28,17 +28,8 @@ SUBROUTINE SHELL8Q
   NUMMAT = NPAR(3)
   NPAR(5) = 8
 
-! Allocate storage for element group data
 ! 此处材料要求每一种提供E, Possion
 ! 每个element需要
-  IF (IND == 1) THEN
-      MM = 2*NUMMAT*ITWO + 41*NUME + 25*NUME*ITWO
-      CALL MEMALLOC(11,"ELEGP",MM,1)
-  END IF
-
-  NFIRST=NP(11)   ! Pointer to the first entry in the element group data array
-                  ! in the unit of single precision (corresponding to A)
-
 ! Calculate the pointer to the arrays in the element group data
 ! N101: E(NUMMAT)
 ! N102: POSSION(NUMMAT)
@@ -83,7 +74,7 @@ SUBROUTINE SHELL8 (ID,X,Y,Z,U,MHT,E,POSSION,LM,XYZ,MATP, THICK, Node)
              XYZ(24,NPAR(2)),THICK(NPAR(2)),U(NEQ)
 
   REAL(8) :: DE(40,1)
-  INTEGER :: NPAR1, NUME, NUMMAT, ND, I, J, K, L, I1,J1,K1,L1, M, N
+  INTEGER :: NPAR1, NUME, NUMMAT, ND, K, L, M, N
   INTEGER :: MTYPE, IPRINT, Node(NPAR(2),NPAR(5))
 
   REAL(8) :: Cb(3, 3), Cs, Etemp, Ptemp, det, Cm(3, 3), StressCollection(6, NPAR(2)*9)
@@ -117,14 +108,14 @@ SUBROUTINE SHELL8 (ID,X,Y,Z,U,MHT,E,POSSION,LM,XYZ,MATP, THICK, Node)
      WRITE (IOUT,"('  SET       YOUNG''S     CROSS-SECTIONAL',/,  &
                    ' NUMBER     MODULUS',10X,'AREA')")
 
-     DO I=1,NUMMAT
+     DO K=1,NUMMAT
         READ (IIN,'(I5,2F10.0)') N,E(N),POSSION(N)  ! Read material information
         WRITE (IOUT,"(I5,4X,E12.5,2X,E14.6)") N,E(N),POSSION(N)
      END DO
 
      WRITE (IOUT,"(//,' E L E M E N T   I N F O R M A T I O N',//,  &
-                      ' ELEMENT     NODE     NODE     NODE     NODE       MATERIAL',/,   &
-                      ' NUMBER-N      I        J        K        L       SET NUMBER')")
+                      ' ELEMENT        |------------------------- NODES -------------------------|       MATERIAL',/,   &
+                      ' NUMBER-N        1       2       3       4       5       6       7       8       SET NUMBER')")
      
      N=0
      LM = 0
@@ -147,7 +138,7 @@ SUBROUTINE SHELL8 (ID,X,Y,Z,U,MHT,E,POSSION,LM,XYZ,MATP, THICK, Node)
 !       Update column heights and bandwidth
         CALL COLHT (MHT,ND,LM(1,N))   
 
-        WRITE (IOUT,"(I5,6X,I5,4X,I5,4X,I5,4X,I5,7X,I5)") N,Node(N,1:4),MTYPE
+        WRITE (IOUT,"(I7,5X,7(I7,1X),I7,4X,I5)") N,Node(N,1:NPAR(5)),MTYPE
         write (VTKNodeTmp) NPAR(5), Node(N,:)-1
 
      END DO
@@ -368,9 +359,9 @@ SUBROUTINE SHELL8 (ID,X,Y,Z,U,MHT,E,POSSION,LM,XYZ,MATP, THICK, Node)
             GaussianCollection(1:3, 9*N+3*L+M-12) = reshape(matmul(reshape(XYZ(:,N), (/3,8/)),transpose(NN0)), (/3/))
             END DO
         END DO
-        call PostProcessor(NPAR(1), 2, XYZ((/((/3*k-2,3*k-1/),k=1,8)/),:), Node, 9, GaussianCollection(1:2,:), &
-        StressCollection, U)
     END DO
+  call PostProcessor(NPAR(1), 2, XYZ((/((/3*k-2,3*k-1/),k=1,8)/),:), Node, 9, GaussianCollection(1:2,:), &
+                     StressCollection, U)
   ELSE 
      STOP "*** ERROR *** Invalid IND value."
   END IF

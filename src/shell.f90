@@ -28,13 +28,7 @@ SUBROUTINE SHELL
   NUMMAT = NPAR(3)
   NPAR(5) = 4
 
-! Allocate storage for element group data
 ! 此处材料要求每一种提供E, Possion
-! 每个element需要
-  IF (IND == 1) THEN
-      MM = 2*NUMMAT*ITWO + 22*NUME + 12*NUME*ITWO
-      CALL MEMALLOC(11,"ELEGP",MM,1)
-  END IF
 
 ! Calculate the pointer to the arrays in the element group data
 ! N101: E(NUMMAT)
