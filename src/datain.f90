@@ -74,7 +74,7 @@ SUBROUTINE INPUT (ID,X,Y,Z,NUMNP,NEQ)
 
   ! Add bandwidth optimization and pardiso
 ! Adding those two function need extra input
-IF( (BANDWIDTHOPT .EQ. .TRUE.) .OR. (PARDISO .EQ. .TRUE.) ) THEN
+IF( (BANDWIDTHOPT .EQV. .TRUE.) .OR. (PARDISO .EQV. .TRUE.) ) THEN
     CALL SOLVERMODE(ID)
 END IF
   

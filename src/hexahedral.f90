@@ -256,8 +256,8 @@ subroutine HexEight (ID,X,Y,Z,U,MHT,E, PoissonRatio, Density, Gravity, LM, Posit
             StressCollection (:,ind1:ind2) = Stress
         END DO
 
-        !call PostProcessor(ElementType, 3, PositionData, &
-        !                   Node, QuadratureOrder**3, GaussianCollection, StressCollection, U)
+        call PostProcessor(ElementType, 3, PositionData, &
+                           Node, QuadratureOrder**3, GaussianCollection, StressCollection, U)
                            
                 
     END SELECT

@@ -75,6 +75,7 @@ SUBROUTINE ELEMENT_4Q_MAIN (ID,X,Y,Z,U,MHT,E,POISSON,LM,XYZ,MATP,Node)
 
   USE GLOBALS
   USE MEMALLOCATE
+  USE MathKernel
 
   IMPLICIT NONE
 
@@ -109,10 +110,11 @@ SUBROUTINE ELEMENT_4Q_MAIN (ID,X,Y,Z,U,MHT,E,POISSON,LM,XYZ,MATP,Node)
   COMMON DETJ
   
   !定义gauss积分常数
-  GP(1)=-sqrt(3D0)/3.           !-0.57735027
-  GP(2)=sqrt(3D0)/3.            !0.57735027
-  W(1)=1.0
-  W(2)=1.0
+  CALL GaussianMask(GP, W, 2)
+  !GP(1)=-sqrt(3D0)/3.           !-0.57735027
+  !GP(2)=sqrt(3D0)/3.            !0.57735027
+  !W(1)=1.0
+  !W(2)=1.0
 
   NPAR1  = NPAR(1)
   NUME   = NPAR(2)
@@ -278,8 +280,8 @@ SUBROUTINE ELEMENT_4Q_MAIN (ID,X,Y,Z,U,MHT,E,POISSON,LM,XYZ,MATP,Node)
         J = N*4
         GaussianCollection (:,I:J) = transpose(X_GUASS)
      END DO
-     !call PostProcessor(NPAR(1), 2, XYZ((/1,2,4,5,7,8,10,11/),:), Node, 4, GaussianCollection, &
-     !    TRANSPOSE(reshape((/transpose(STRESS_XX),transpose(STRESS_YY),transpose(STRESS_XY)/),(/4*NPAR(2),3/))), U)
+     call PostProcessor(NPAR(1), 2, XYZ((/1,2,4,5,7,8,10,11/),:), Node, 4, GaussianCollection, &
+         TRANSPOSE(reshape((/transpose(STRESS_XX),transpose(STRESS_YY),transpose(STRESS_XY)/),(/4*NPAR(2),3/))), U)
   ELSE 
      STOP "*** ERROR *** Invalid IND value."
   END IF

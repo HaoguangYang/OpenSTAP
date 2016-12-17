@@ -64,6 +64,6 @@ module GLOBALS
 
    integer :: NG
    
-   logical :: BANDWIDTHOPT = .TRUE.
+   logical :: BANDWIDTHOPT = .FALSE.
    logical :: PARDISO = .FALSE.
 end module GLOBALS

@@ -12,6 +12,7 @@ SUBROUTINE SOLVERMODE(ID)
     INTEGER :: I, J, K ! 循环变量
     INTEGER :: temp_length, TEMP_INDEX
     INTEGER :: FREE_DOF ! 单元中自由的自由度
+    character (len = 10) :: cFmt
     DO I = 1,NUMNP
         DO J = 1,6
             IF(ID(J,I) .NE. 0) THEN
@@ -23,7 +24,8 @@ SUBROUTINE SOLVERMODE(ID)
      READ (IIN,"(I5)") NUME ! 总element数
      DO I = 1,NUME
          READ (IIN,"(I5)") N ! 这个element对应的节点数
-         READ (IIN, "(<N>I5)") (TEMP_NODE(J), J = 1,N)
+         WRITE (IOUT, "('(',I5,'I5)')") N
+         READ (IIN, "(8I5)") (TEMP_NODE(J), J = 1,N)
          FREE_DOF = 0
          DO J = 1,N
              DO K = 1,6

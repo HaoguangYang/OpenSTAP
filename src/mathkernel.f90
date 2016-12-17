@@ -1,4 +1,22 @@
 MODULE MathKernel
+
+!=======================================================================================
+! Common Math Operation Collections
+! Includes:
+!       Det : Detting determinant of a matrix
+!       InvMat : General purpose matrix inversion
+!       InvMat3 : Matrix inversion for 3x3 Matrix
+!       InvMat2 : Matrix inversion for 2x2 Matrix
+!       Cross : Vector cross product
+!       IsPlanar : Judging if 4 points are on the same plane
+!       GaussianMask : Generating gaussian points and weights for caritsian coordinates
+!       AxialRotate : Rotate a group of points along a given axis for given angle
+!       LeastSquare : Return the least-square coefficients for a given series of data
+! 
+! Author: Haoguang Yang
+! 
+!=======================================================================================
+
     
     implicit none
 
