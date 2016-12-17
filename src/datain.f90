@@ -25,13 +25,15 @@ SUBROUTINE INPUT (ID,X,Y,Z,NUMNP,NEQ)
 ! .                                                                       .
 ! . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-  USE GLOBALS, ONLY : IIN, IOUT, DIM
-
+  USE GLOBALS, ONLY : IIN, IOUT, DIM, BANDWIDTHOPT, PARDISO
+  ! For bandwith optimization and pardiso
+  USE NODE_CLASS
+  USE LIST_CLASS
   IMPLICIT NONE
   INTEGER :: NUMNP,NEQ,ID(DIM,NUMNP)
   REAL(8) :: X(NUMNP),Y(NUMNP),Z(NUMNP)
   INTEGER :: I, N !, J
-
+  
   ! Read nodal point data
 
   N = 0
@@ -70,8 +72,18 @@ SUBROUTINE INPUT (ID,X,Y,Z,NUMNP,NEQ)
                    'DEGREES OF FREEDOM',/,'  NUMBER',/,  &
                    '     N',13X,'X    Y    Z   RX   RY   RZ',/,(1X,I5,9X,6I5))") (N,(ID(I,N),I=1,6),N=1,NUMNP)
 
-  RETURN
+  ! Add bandwidth optimization and pardiso
+! Adding those two function need extra input
+IF( (BANDWIDTHOPT .EQ. .TRUE.) .OR. (PARDISO .EQ. .TRUE.) ) THEN
+    CALL SOLVERMODE(ID)
+END IF
+  
+! Write equation numbers
+  WRITE (IOUT,"(//,' EQUATION NUMBERS',//,'   NODE',9X,  &
+                   'DEGREES OF FREEDOM',/,'  NUMBER',/,  &
+                   '     N',13X,'X    Y    Z   RX   RY   RZ',/,(1X,I5,9X,6I5))") (N,(ID(I,N),I=1,6),N=1,NUMNP)
 
+  RETURN
 END SUBROUTINE INPUT
 
 

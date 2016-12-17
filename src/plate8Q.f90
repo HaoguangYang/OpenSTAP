@@ -356,8 +356,8 @@ SUBROUTINE PLATE8 (ID,X,Y,Z,U,MHT,E,POSSION,LM,XYZ,MATP,THICK, Node)
             END DO
         END DO
     END DO
-    call PostProcessor(NPAR(1), 2, XYZ((/((/3*k-2,3*k-1/),k=1,8)/),:), Node, 9, GaussianCollection(1:2,:), &
-                       StressCollection, U)
+    !call PostProcessor(NPAR(1), 2, XYZ((/((/3*k-2,3*k-1/),k=1,8)/),:), Node, 9, GaussianCollection(1:2,:), &
+    !                   StressCollection, U)
   ELSE 
      STOP "*** ERROR *** Invalid IND value."
   END IF

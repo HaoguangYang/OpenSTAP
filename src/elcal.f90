@@ -40,7 +40,7 @@ SUBROUTINE ELCAL
 
      WRITE (IELMNT) MIDEST,NPAR,(A(I),I=NFIRST,NLAST)
      
-     call VTKgenerate (2)
+     !call VTKgenerate (2)
 
   END DO
 

@@ -150,7 +150,7 @@ subroutine HexEight (ID,X,Y,Z,U,MHT,E, PoissonRatio, Density, Gravity, LM, Posit
             WRITE (IOUT,"(I7,5X,7(I7,1X),I7,4X,I5)") N,Node(N,1:ElementShapeNodes),MaterialType
             
             !write (IOUT,*) 'MHT',MHT
-            write (VTKNodeTmp) NPAR(5), Node(N,:)-1
+            !write (VTKNodeTmp) NPAR(5), Node(N,:)-1
             
         enddo
         return
@@ -256,8 +256,8 @@ subroutine HexEight (ID,X,Y,Z,U,MHT,E, PoissonRatio, Density, Gravity, LM, Posit
             StressCollection (:,ind1:ind2) = Stress
         END DO
 
-        call PostProcessor(ElementType, 3, PositionData, &
-                           Node, QuadratureOrder**3, GaussianCollection, StressCollection, U)
+        !call PostProcessor(ElementType, 3, PositionData, &
+        !                   Node, QuadratureOrder**3, GaussianCollection, StressCollection, U)
                            
                 
     END SELECT

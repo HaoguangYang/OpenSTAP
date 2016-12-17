@@ -4,11 +4,17 @@ module list_class
 private
     
     type list
-        integer :: index_
+        integer :: row_    = 0
+        integer :: column_ = 0
         integer :: length_ = 0
+        integer :: sign_ = 0
         type(node), pointer :: head_ => null()
         type(node), pointer :: tail_ => null()
     end type list
+    
+    interface set
+        module procedure set_this
+    end interface
     
     interface length
         module procedure length_this
@@ -26,7 +32,11 @@ private
         module procedure delete_this
     end interface
     
-    public node, list, length, add, search, add_with_search, delete
+    interface delete_all
+        module procedure delete_all_this
+    end interface
+    
+    public node, list, length, add, search, add_with_search, delete, set, delete_all
 
     contains
     !new a node
@@ -38,12 +48,21 @@ private
         this%index_ = index
     end subroutine new_this
     
+    ! set the row and colum for the list
+    subroutine set_this(this, row, column)
+        type(list) :: this
+        integer :: row
+        integer :: column
+        this%row_ = row
+        this%column_ = column
+    end subroutine set_this
+    
     ! return length of the list
     integer function length_this(this)
         type(list) :: this
         length_this = this%length_
     end function length_this
-    
+
     ! search for p_node0
     logical function search_this(this, p_node0)
         type(list), intent(in) :: this
@@ -126,4 +145,12 @@ private
             p_node => p_node%next_
         end do
     end subroutine delete_this
+    
+    !  Õ∑≈ø’º‰
+    subroutine delete_all_this(this)
+    type(list) this
+    do while(associated(this%head_))
+        call delete_this(this, this%head_)
+    end do
+    end subroutine delete_all_this
 end module list_class
