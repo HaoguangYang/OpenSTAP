@@ -359,9 +359,9 @@ SUBROUTINE SHELL8 (ID,X,Y,Z,U,MHT,E,POSSION,LM,XYZ,MATP, THICK, Node)
             GaussianCollection(1:3, 9*N+3*L+M-12) = reshape(matmul(reshape(XYZ(:,N), (/3,8/)),transpose(NN0)), (/3/))
             END DO
         END DO
-    END DO
-  call PostProcessor(NPAR(1), 2, XYZ((/((/3*k-2,3*k-1/),k=1,8)/),:), Node, 9, GaussianCollection(1:2,:), &
-                     StressCollection, U)
+     END DO
+  !call Processor(NPAR(1), 2, XYZ((/((/3*k-2,3*k-1/),k=1,8)/),:), Node, 9, GaussianCollection(1:2,:), &
+  !                   StressCollection, U)
   ELSE 
      STOP "*** ERROR *** Invalid IND value."
   END IF

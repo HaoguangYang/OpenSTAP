@@ -330,7 +330,7 @@ SUBROUTINE OPENFILES()
   !  if (FileInp(i:i) .EQ. '.') exit
   !end do
   
-  OPEN(IIN   , FILE = "stap90_with_bandwidthopt.in",  STATUS = "OLD")
+  OPEN(IIN   , FILE = "stap90_with_bo_shell_8H.in",  STATUS = "OLD")
   OPEN(IOUT  , FILE = "stap90.OUT", STATUS = "REPLACE")
   OPEN(IELMNT, FILE = "ELMNT.TMP",  FORM = "UNFORMATTED")
   OPEN(ILOAD , FILE = "LOAD.TMP",   FORM = "UNFORMATTED")

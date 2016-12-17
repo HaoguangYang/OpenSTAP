@@ -32,7 +32,11 @@ private
         module procedure delete_this
     end interface
     
-    public node, list, length, add, search, add_with_search, delete, set
+    interface delete_all
+        module procedure delete_all_this
+    end interface
+    
+    public node, list, length, add, search, add_with_search, delete, set, delete_all
 
     contains
     !new a node
@@ -141,4 +145,12 @@ private
             p_node => p_node%next_
         end do
     end subroutine delete_this
+    
+    !  Õ∑≈ø’º‰
+    subroutine delete_all_this(this)
+    type(list) this
+    do while(associated(this%head_))
+        call delete_this(this, this%head_)
+    end do
+    end subroutine delete_all_this
 end module list_class

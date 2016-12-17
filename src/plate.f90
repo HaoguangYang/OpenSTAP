@@ -304,9 +304,9 @@ SUBROUTINE PLATE4Q (ID,X,Y,Z,U,MHT,E,POSSION,LM,XYZ,MATP,THICK, Node)
             StressCollection(1:5, N*4+2*L+M-6) = (/STR1, STR2/)
             END DO
         END DO
-    END DO
+     END DO
     
-    call PostProcessor(NPAR(1), 2, XYZ, Node, 4, GaussianCollection, StressCollection, U)
+     !call PostProcessor(NPAR(1), 2, XYZ, Node, 4, GaussianCollection, StressCollection, U)
     
   ELSE 
      STOP "*** ERROR *** Invalid IND value."

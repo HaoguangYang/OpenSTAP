@@ -82,4 +82,7 @@ SUBROUTINE SOLVERMODE(ID)
         end do
         lists(temp_index)%sign_ = -1
      end do
+     do i = 1, neq
+         call delete_all(lists(i))
+     end do
 END SUBROUTINE SOLVERMODE
