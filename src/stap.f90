@@ -127,7 +127,7 @@ PROGRAM STAP90
 
   IND=1    ! Read and generate element information
   CALL ELCAL
-  !CALL VTKgenerate (IND)        !Prepare Post-Processing Files.
+  CALL VTKgenerate (IND)        !Prepare Post-Processing Files.
 
   CALL SECOND (TIM(2))
 
@@ -200,7 +200,7 @@ PROGRAM STAP90
         CALL STRESS (A(NP(11)))
 
      END DO
-     !CALL VTKgenerate (IND)
+     CALL VTKgenerate (IND)
      CALL SECOND (TIM(5))
   END IF
 
@@ -264,7 +264,7 @@ SUBROUTINE WRITED (DISP,ID,NEQ,NUMNP)
   IC=4
 
   write(String, "('Displacement_Load_Case',I2.2)") CURLCASE
-  !write (VTKTmpFile) String, 3, NUMNP
+  write (VTKTmpFile) String, 3, NUMNP
   
   DO II=1,NUMNP
      IC=IC + 1
@@ -284,7 +284,7 @@ SUBROUTINE WRITED (DISP,ID,NEQ,NUMNP)
      END DO
 
      WRITE (IOUT,'(1X,I3,5X,6E14.6)') II,D
-     !write (VTKTmpFile) D(1:3)                                    !Displacements
+     write (VTKTmpFile) D(1:3)                                    !Displacements
 
   END DO
   
