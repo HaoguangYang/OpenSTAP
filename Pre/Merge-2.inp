@@ -7494,555 +7494,459 @@
  357,  360,    1
 *Nset, nset=M_SET-6_CNS_, internal, instance=PART-1-1
  2,
-*Nset, nset=M_SET-6_CNS__CNS_, internal, instance=PART-1-1
- 2,
 *Nset, nset=M_SET-8_CNS_, internal, instance=PART-1-1
- 3,
-*Nset, nset=M_SET-8_CNS__CNS_, internal, instance=PART-1-1
  3,
 *Nset, nset=M_SET-10_CNS_, internal, instance=PART-1-1
  5,
-*Nset, nset=M_SET-10_CNS__CNS_, internal, instance=PART-1-1
- 5,
 *Nset, nset=M_SET-12_CNS_, internal, instance=PART-1-1
- 22,
-*Nset, nset=M_SET-12_CNS__CNS_, internal, instance=PART-1-1
  22,
 *Nset, nset=M_SET-13_CNS_, internal, instance=PART-1-1
  7,
-*Nset, nset=M_SET-13_CNS__CNS_, internal, instance=PART-1-1
- 7,
 *Nset, nset=M_SET-14_CNS_, internal, instance=PART-1-1
- 21,
-*Nset, nset=M_SET-14_CNS__CNS_, internal, instance=PART-1-1
  21,
 *Nset, nset=M_SET-16_CNS_, internal, instance=PART-1-1
  1,
-*Nset, nset=M_SET-16_CNS__CNS_, internal, instance=PART-1-1
- 1,
 *Nset, nset=M_SET-18_CNS_, internal, instance=PART-1-1
- 4,
-*Nset, nset=M_SET-18_CNS__CNS_, internal, instance=PART-1-1
  4,
 *Nset, nset=M_SET-20_CNS_, internal, instance=PART-1-1
  6,
-*Nset, nset=M_SET-20_CNS__CNS_, internal, instance=PART-1-1
- 6,
 *Nset, nset=M_SET-22_CNS_, internal, instance=PART-1-1
- 8,
-*Nset, nset=M_SET-22_CNS__CNS_, internal, instance=PART-1-1
  8,
 *Nset, nset=M_SET-24_CNS_, internal, instance=PART-1-1
  19,
-*Nset, nset=M_SET-24_CNS__CNS_, internal, instance=PART-1-1
- 19,
 *Nset, nset=M_SET-26_CNS_, internal, instance=PART-1-1
- 17,
-*Nset, nset=M_SET-26_CNS__CNS_, internal, instance=PART-1-1
  17,
 *Nset, nset=M_SET-28_CNS_, internal, instance=PART-1-1
  15,
-*Nset, nset=M_SET-28_CNS__CNS_, internal, instance=PART-1-1
- 15,
 *Nset, nset=M_SET-30_CNS_, internal, instance=PART-1-1
- 13,
-*Nset, nset=M_SET-30_CNS__CNS_, internal, instance=PART-1-1
  13,
 *Nset, nset=M_SET-32_CNS_, internal, instance=PART-1-1
  11,
-*Nset, nset=M_SET-32_CNS__CNS_, internal, instance=PART-1-1
- 11,
 *Nset, nset=M_SET-34_CNS_, internal, instance=PART-1-1
- 20,
-*Nset, nset=M_SET-34_CNS__CNS_, internal, instance=PART-1-1
  20,
 *Nset, nset=M_SET-36_CNS_, internal, instance=PART-1-1
  18,
-*Nset, nset=M_SET-36_CNS__CNS_, internal, instance=PART-1-1
- 18,
 *Nset, nset=M_SET-38_CNS_, internal, instance=PART-1-1
- 16,
-*Nset, nset=M_SET-38_CNS__CNS_, internal, instance=PART-1-1
  16,
 *Nset, nset=M_SET-40_CNS_, internal, instance=PART-1-1
  14,
-*Nset, nset=M_SET-40_CNS__CNS_, internal, instance=PART-1-1
- 14,
 *Nset, nset=M_SET-42_CNS_, internal, instance=PART-1-1
- 12,
-*Nset, nset=M_SET-42_CNS__CNS_, internal, instance=PART-1-1
  12,
 *Nset, nset=M_SET-46_CNS_, internal, instance=PART-1-1
  2,
-*Nset, nset=M_SET-46_CNS__CNS_, internal, instance=PART-1-1
- 2,
 *Nset, nset=M_SET-48_CNS_, internal, instance=PART-1-1
- 3,
-*Nset, nset=M_SET-48_CNS__CNS_, internal, instance=PART-1-1
  3,
 *Nset, nset=M_SET-50_CNS_, internal, instance=PART-1-1
  5,
-*Nset, nset=M_SET-50_CNS__CNS_, internal, instance=PART-1-1
- 5,
 *Nset, nset=M_SET-52_CNS_, internal, instance=PART-1-1
- 7,
-*Nset, nset=M_SET-52_CNS__CNS_, internal, instance=PART-1-1
  7,
 *Nset, nset=M_SET-54_CNS_, internal, instance=PART-1-1
  9,
-*Nset, nset=M_SET-54_CNS__CNS_, internal, instance=PART-1-1
- 9,
 *Nset, nset=M_SET-56_CNS_, internal, instance=PART-1-1
- 11,
-*Nset, nset=M_SET-56_CNS__CNS_, internal, instance=PART-1-1
  11,
 *Nset, nset=M_SET-58_CNS_, internal, instance=PART-1-1
  13,
-*Nset, nset=M_SET-58_CNS__CNS_, internal, instance=PART-1-1
- 13,
 *Nset, nset=M_SET-60_CNS_, internal, instance=PART-1-1
- 15,
-*Nset, nset=M_SET-60_CNS__CNS_, internal, instance=PART-1-1
  15,
 *Nset, nset=M_SET-62_CNS_, internal, instance=PART-1-1
  17,
-*Nset, nset=M_SET-62_CNS__CNS_, internal, instance=PART-1-1
- 17,
 *Nset, nset=M_SET-64_CNS_, internal, instance=PART-1-1
- 1,
-*Nset, nset=M_SET-64_CNS__CNS_, internal, instance=PART-1-1
  1,
 *Nset, nset=M_SET-66_CNS_, internal, instance=PART-1-1
  4,
-*Nset, nset=M_SET-66_CNS__CNS_, internal, instance=PART-1-1
- 4,
 *Nset, nset=M_SET-68_CNS_, internal, instance=PART-1-1
- 6,
-*Nset, nset=M_SET-68_CNS__CNS_, internal, instance=PART-1-1
  6,
 *Nset, nset=M_SET-70_CNS_, internal, instance=PART-1-1
  8,
-*Nset, nset=M_SET-70_CNS__CNS_, internal, instance=PART-1-1
- 8,
 *Nset, nset=M_SET-72_CNS_, internal, instance=PART-1-1
- 10,
-*Nset, nset=M_SET-72_CNS__CNS_, internal, instance=PART-1-1
  10,
 *Nset, nset=M_SET-74_CNS_, internal, instance=PART-1-1
  12,
-*Nset, nset=M_SET-74_CNS__CNS_, internal, instance=PART-1-1
- 12,
 *Nset, nset=M_SET-76_CNS_, internal, instance=PART-1-1
- 14,
-*Nset, nset=M_SET-76_CNS__CNS_, internal, instance=PART-1-1
  14,
 *Nset, nset=M_SET-78_CNS_, internal, instance=PART-1-1
  16,
-*Nset, nset=M_SET-78_CNS__CNS_, internal, instance=PART-1-1
- 16,
 *Nset, nset=M_SET-80_CNS_, internal, instance=PART-1-1
- 18,
-*Nset, nset=M_SET-80_CNS__CNS_, internal, instance=PART-1-1
  18,
 *Nset, nset=M_SET-82_CNS_, internal, instance=PART-1-1
  2833,
-*Nset, nset=M_SET-82_CNS__CNS_, internal, instance=PART-1-1
- 2833,
 *Nset, nset=M_SET-84_CNS_, internal, instance=PART-1-1
- 2834,
-*Nset, nset=M_SET-84_CNS__CNS_, internal, instance=PART-1-1
  2834,
 *Nset, nset=M_SET-86_CNS_, internal, instance=PART-1-1
  2235,
-*Nset, nset=M_SET-86_CNS__CNS_, internal, instance=PART-1-1
- 2235,
 *Nset, nset=M_SET-88_CNS_, internal, instance=PART-1-1
- 2232,
-*Nset, nset=M_SET-88_CNS__CNS_, internal, instance=PART-1-1
  2232,
 *Nset, nset=M_SET-94_CNS_, internal, instance=PART-1-1
  513,
-*Nset, nset=M_SET-94_CNS__CNS_, internal, instance=PART-1-1
- 513,
 *Nset, nset=M_SET-96_CNS_, internal, instance=PART-1-1
- 513,
-*Nset, nset=M_SET-96_CNS__CNS_, internal, instance=PART-1-1
  513,
 *Nset, nset=M_SET-98_CNS_, internal, instance=PART-1-1
  1371,
-*Nset, nset=M_SET-98_CNS__CNS_, internal, instance=PART-1-1
- 1371,
 *Nset, nset=M_SET-100_CNS_, internal, instance=PART-1-1
- 1371,
-*Nset, nset=M_SET-100_CNS__CNS_, internal, instance=PART-1-1
  1371,
 *Nset, nset=S_SET-90_CNS_, internal, instance=PART-1-1
   21,  22, 224, 225, 226
-*Nset, nset=S_SET-90_CNS__CNS_, internal, instance=PART-1-1
-  21,  22, 224, 225, 226
 *Nset, nset=S_SET-92_CNS_, internal, instance=PART-1-1
   19,  20, 203, 204, 205
-*Nset, nset=S_SET-92_CNS__CNS_, internal, instance=PART-1-1
-  19,  20, 203, 204, 205
-*Surface, type=NODE, name=M_SET-6_CNS__CNS__CNS_, internal
-M_SET-6_CNS__CNS_, 1.
-*Surface, type=NODE, name=S_SET-6_CNS__CNS__CNS_, internal
-S_SET-6_CNS__CNS_, 1.
-*Surface, type=NODE, name=M_SET-8_CNS__CNS__CNS_, internal
-M_SET-8_CNS__CNS_, 1.
-*Surface, type=NODE, name=S_SET-8_CNS__CNS__CNS_, internal
-S_SET-8_CNS__CNS_, 1.
-*Surface, type=NODE, name=M_SET-10_CNS__CNS__CNS_, internal
-M_SET-10_CNS__CNS_, 1.
-*Surface, type=NODE, name=S_SET-10_CNS__CNS__CNS_, internal
-S_SET-10_CNS__CNS_, 1.
-*Surface, type=NODE, name=M_SET-12_CNS__CNS__CNS_, internal
-M_SET-12_CNS__CNS_, 1.
-*Surface, type=NODE, name=S_SET-12_CNS__CNS__CNS_, internal
-S_SET-12_CNS__CNS_, 1.
-*Surface, type=NODE, name=M_SET-13_CNS__CNS__CNS_, internal
-M_SET-13_CNS__CNS_, 1.
-*Surface, type=NODE, name=S_SET-13_CNS__CNS__CNS_, internal
-S_SET-13_CNS__CNS_, 1.
-*Surface, type=NODE, name=M_SET-14_CNS__CNS__CNS_, internal
-M_SET-14_CNS__CNS_, 1.
-*Surface, type=NODE, name=S_SET-14_CNS__CNS__CNS_, internal
-S_SET-14_CNS__CNS_, 1.
-*Surface, type=NODE, name=M_SET-16_CNS__CNS__CNS_, internal
-M_SET-16_CNS__CNS_, 1.
-*Surface, type=NODE, name=S_SET-16_CNS__CNS__CNS_, internal
-S_SET-16_CNS__CNS_, 1.
-*Surface, type=NODE, name=M_SET-18_CNS__CNS__CNS_, internal
-M_SET-18_CNS__CNS_, 1.
-*Surface, type=NODE, name=S_SET-18_CNS__CNS__CNS_, internal
-S_SET-18_CNS__CNS_, 1.
-*Surface, type=NODE, name=M_SET-20_CNS__CNS__CNS_, internal
-M_SET-20_CNS__CNS_, 1.
-*Surface, type=NODE, name=S_SET-20_CNS__CNS__CNS_, internal
-S_SET-20_CNS__CNS_, 1.
-*Surface, type=NODE, name=M_SET-22_CNS__CNS__CNS_, internal
-M_SET-22_CNS__CNS_, 1.
-*Surface, type=NODE, name=S_SET-22_CNS__CNS__CNS_, internal
-S_SET-22_CNS__CNS_, 1.
-*Surface, type=NODE, name=M_SET-24_CNS__CNS__CNS_, internal
-M_SET-24_CNS__CNS_, 1.
-*Surface, type=NODE, name=S_SET-24_CNS__CNS__CNS_, internal
-S_SET-24_CNS__CNS_, 1.
-*Surface, type=NODE, name=M_SET-26_CNS__CNS__CNS_, internal
-M_SET-26_CNS__CNS_, 1.
-*Surface, type=NODE, name=S_SET-26_CNS__CNS__CNS_, internal
-S_SET-26_CNS__CNS_, 1.
-*Surface, type=NODE, name=M_SET-28_CNS__CNS__CNS_, internal
-M_SET-28_CNS__CNS_, 1.
-*Surface, type=NODE, name=S_SET-28_CNS__CNS__CNS_, internal
-S_SET-28_CNS__CNS_, 1.
-*Surface, type=NODE, name=M_SET-30_CNS__CNS__CNS_, internal
-M_SET-30_CNS__CNS_, 1.
-*Surface, type=NODE, name=S_SET-30_CNS__CNS__CNS_, internal
-S_SET-30_CNS__CNS_, 1.
-*Surface, type=NODE, name=M_SET-32_CNS__CNS__CNS_, internal
-M_SET-32_CNS__CNS_, 1.
-*Surface, type=NODE, name=S_SET-32_CNS__CNS__CNS_, internal
-S_SET-32_CNS__CNS_, 1.
-*Surface, type=NODE, name=M_SET-34_CNS__CNS__CNS_, internal
-M_SET-34_CNS__CNS_, 1.
-*Surface, type=NODE, name=S_SET-34_CNS__CNS__CNS_, internal
-S_SET-34_CNS__CNS_, 1.
-*Surface, type=NODE, name=M_SET-36_CNS__CNS__CNS_, internal
-M_SET-36_CNS__CNS_, 1.
-*Surface, type=NODE, name=S_SET-36_CNS__CNS__CNS_, internal
-S_SET-36_CNS__CNS_, 1.
-*Surface, type=NODE, name=M_SET-38_CNS__CNS__CNS_, internal
-M_SET-38_CNS__CNS_, 1.
-*Surface, type=NODE, name=S_SET-38_CNS__CNS__CNS_, internal
-S_SET-38_CNS__CNS_, 1.
-*Surface, type=NODE, name=M_SET-40_CNS__CNS__CNS_, internal
-M_SET-40_CNS__CNS_, 1.
-*Surface, type=NODE, name=S_SET-40_CNS__CNS__CNS_, internal
-S_SET-40_CNS__CNS_, 1.
-*Surface, type=NODE, name=M_SET-42_CNS__CNS__CNS_, internal
-M_SET-42_CNS__CNS_, 1.
-*Surface, type=NODE, name=S_SET-42_CNS__CNS__CNS_, internal
-S_SET-42_CNS__CNS_, 1.
-*Surface, type=NODE, name=M_SET-46_CNS__CNS__CNS_, internal
-M_SET-46_CNS__CNS_, 1.
-*Surface, type=NODE, name=S_SET-46_CNS__CNS__CNS_, internal
-S_SET-46_CNS__CNS_, 1.
-*Surface, type=NODE, name=M_SET-48_CNS__CNS__CNS_, internal
-M_SET-48_CNS__CNS_, 1.
-*Surface, type=NODE, name=S_SET-48_CNS__CNS__CNS_, internal
-S_SET-48_CNS__CNS_, 1.
-*Surface, type=NODE, name=M_SET-50_CNS__CNS__CNS_, internal
-M_SET-50_CNS__CNS_, 1.
-*Surface, type=NODE, name=S_SET-50_CNS__CNS__CNS_, internal
-S_SET-50_CNS__CNS_, 1.
-*Surface, type=NODE, name=M_SET-52_CNS__CNS__CNS_, internal
-M_SET-52_CNS__CNS_, 1.
-*Surface, type=NODE, name=S_SET-52_CNS__CNS__CNS_, internal
-S_SET-52_CNS__CNS_, 1.
-*Surface, type=NODE, name=M_SET-54_CNS__CNS__CNS_, internal
-M_SET-54_CNS__CNS_, 1.
-*Surface, type=NODE, name=S_SET-54_CNS__CNS__CNS_, internal
-S_SET-54_CNS__CNS_, 1.
-*Surface, type=NODE, name=M_SET-56_CNS__CNS__CNS_, internal
-M_SET-56_CNS__CNS_, 1.
-*Surface, type=NODE, name=S_SET-56_CNS__CNS__CNS_, internal
-S_SET-56_CNS__CNS_, 1.
-*Surface, type=NODE, name=M_SET-58_CNS__CNS__CNS_, internal
-M_SET-58_CNS__CNS_, 1.
-*Surface, type=NODE, name=S_SET-58_CNS__CNS__CNS_, internal
-S_SET-58_CNS__CNS_, 1.
-*Surface, type=NODE, name=M_SET-60_CNS__CNS__CNS_, internal
-M_SET-60_CNS__CNS_, 1.
-*Surface, type=NODE, name=S_SET-60_CNS__CNS__CNS_, internal
-S_SET-60_CNS__CNS_, 1.
-*Surface, type=NODE, name=M_SET-62_CNS__CNS__CNS_, internal
-M_SET-62_CNS__CNS_, 1.
-*Surface, type=NODE, name=S_SET-62_CNS__CNS__CNS_, internal
-S_SET-62_CNS__CNS_, 1.
-*Surface, type=NODE, name=M_SET-64_CNS__CNS__CNS_, internal
-M_SET-64_CNS__CNS_, 1.
-*Surface, type=NODE, name=S_SET-64_CNS__CNS__CNS_, internal
-S_SET-64_CNS__CNS_, 1.
-*Surface, type=NODE, name=M_SET-66_CNS__CNS__CNS_, internal
-M_SET-66_CNS__CNS_, 1.
-*Surface, type=NODE, name=S_SET-66_CNS__CNS__CNS_, internal
-S_SET-66_CNS__CNS_, 1.
-*Surface, type=NODE, name=M_SET-68_CNS__CNS__CNS_, internal
-M_SET-68_CNS__CNS_, 1.
-*Surface, type=NODE, name=S_SET-68_CNS__CNS__CNS_, internal
-S_SET-68_CNS__CNS_, 1.
-*Surface, type=NODE, name=M_SET-70_CNS__CNS__CNS_, internal
-M_SET-70_CNS__CNS_, 1.
-*Surface, type=NODE, name=S_SET-70_CNS__CNS__CNS_, internal
-S_SET-70_CNS__CNS_, 1.
-*Surface, type=NODE, name=M_SET-72_CNS__CNS__CNS_, internal
-M_SET-72_CNS__CNS_, 1.
-*Surface, type=NODE, name=S_SET-72_CNS__CNS__CNS_, internal
-S_SET-72_CNS__CNS_, 1.
-*Surface, type=NODE, name=M_SET-74_CNS__CNS__CNS_, internal
-M_SET-74_CNS__CNS_, 1.
-*Surface, type=NODE, name=S_SET-74_CNS__CNS__CNS_, internal
-S_SET-74_CNS__CNS_, 1.
-*Surface, type=NODE, name=M_SET-76_CNS__CNS__CNS_, internal
-M_SET-76_CNS__CNS_, 1.
-*Surface, type=NODE, name=S_SET-76_CNS__CNS__CNS_, internal
-S_SET-76_CNS__CNS_, 1.
-*Surface, type=NODE, name=M_SET-78_CNS__CNS__CNS_, internal
-M_SET-78_CNS__CNS_, 1.
-*Surface, type=NODE, name=S_SET-78_CNS__CNS__CNS_, internal
-S_SET-78_CNS__CNS_, 1.
-*Surface, type=NODE, name=M_SET-80_CNS__CNS__CNS_, internal
-M_SET-80_CNS__CNS_, 1.
-*Surface, type=NODE, name=S_SET-80_CNS__CNS__CNS_, internal
-S_SET-80_CNS__CNS_, 1.
-*Surface, type=NODE, name=M_SET-82_CNS__CNS__CNS_, internal
-M_SET-82_CNS__CNS_, 1.
-*Surface, type=NODE, name=S_SET-82_CNS__CNS__CNS_, internal
-S_SET-82_CNS__CNS_, 1.
-*Surface, type=NODE, name=M_SET-84_CNS__CNS__CNS_, internal
-M_SET-84_CNS__CNS_, 1.
-*Surface, type=NODE, name=S_SET-84_CNS__CNS__CNS_, internal
-S_SET-84_CNS__CNS_, 1.
-*Surface, type=NODE, name=M_SET-86_CNS__CNS__CNS_, internal
-M_SET-86_CNS__CNS_, 1.
-*Surface, type=NODE, name=S_SET-86_CNS__CNS__CNS_, internal
-S_SET-86_CNS__CNS_, 1.
-*Surface, type=NODE, name=M_SET-88_CNS__CNS__CNS_, internal
-M_SET-88_CNS__CNS_, 1.
-*Surface, type=NODE, name=S_SET-88_CNS__CNS__CNS_, internal
-S_SET-88_CNS__CNS_, 1.
-*Surface, type=NODE, name=M_SET-90_CNS__CNS__CNS_, internal
-M_SET-90_CNS__CNS_, 1.
-*Surface, type=NODE, name=S_SET-90_CNS__CNS__CNS_, internal
-S_SET-90_CNS__CNS_, 1.
-*Surface, type=NODE, name=M_SET-92_CNS__CNS__CNS_, internal
-M_SET-92_CNS__CNS_, 1.
-*Surface, type=NODE, name=S_SET-92_CNS__CNS__CNS_, internal
-S_SET-92_CNS__CNS_, 1.
-*Surface, type=NODE, name=M_SET-94_CNS__CNS__CNS_, internal
-M_SET-94_CNS__CNS_, 1.
-*Surface, type=NODE, name=S_SET-94_CNS__CNS__CNS_, internal
-S_SET-94_CNS__CNS_, 1.
-*Surface, type=NODE, name=M_SET-96_CNS__CNS__CNS_, internal
-M_SET-96_CNS__CNS_, 1.
-*Surface, type=NODE, name=S_SET-96_CNS__CNS__CNS_, internal
-S_SET-96_CNS__CNS_, 1.
-*Surface, type=NODE, name=M_SET-98_CNS__CNS__CNS_, internal
-M_SET-98_CNS__CNS_, 1.
-*Surface, type=NODE, name=S_SET-98_CNS__CNS__CNS_, internal
-S_SET-98_CNS__CNS_, 1.
-*Surface, type=NODE, name=M_SET-100_CNS__CNS__CNS_, internal
-M_SET-100_CNS__CNS_, 1.
-*Surface, type=NODE, name=S_SET-100_CNS__CNS__CNS_, internal
-S_SET-100_CNS__CNS_, 1.
-** Constraint: CONSTRAINT-2-1-1
-*Tie, name=CONSTRAINT-2-1-1, adjust=yes, no rotation
-S_SET-6_CNS__CNS__CNS_, M_SET-6_CNS__CNS__CNS_
-** Constraint: CONSTRAINT-3-1-1
-*Tie, name=CONSTRAINT-3-1-1, adjust=yes, no rotation
-S_SET-8_CNS__CNS__CNS_, M_SET-8_CNS__CNS__CNS_
-** Constraint: CONSTRAINT-4-1-1
-*Tie, name=CONSTRAINT-4-1-1, adjust=yes, no rotation
-S_SET-10_CNS__CNS__CNS_, M_SET-10_CNS__CNS__CNS_
-** Constraint: CONSTRAINT-5-1-1
-*Tie, name=CONSTRAINT-5-1-1, adjust=yes, no rotation
-S_SET-12_CNS__CNS__CNS_, M_SET-12_CNS__CNS__CNS_
-** Constraint: CONSTRAINT-6-1-1
-*Tie, name=CONSTRAINT-6-1-1, adjust=yes, no rotation
-S_SET-13_CNS__CNS__CNS_, M_SET-13_CNS__CNS__CNS_
-** Constraint: CONSTRAINT-7-1-1
-*Tie, name=CONSTRAINT-7-1-1, adjust=yes
-S_SET-14_CNS__CNS__CNS_, M_SET-14_CNS__CNS__CNS_
-** Constraint: CONSTRAINT-8-1-1
-*Tie, name=CONSTRAINT-8-1-1, adjust=yes
-S_SET-16_CNS__CNS__CNS_, M_SET-16_CNS__CNS__CNS_
-** Constraint: CONSTRAINT-9-1-1
-*Tie, name=CONSTRAINT-9-1-1, adjust=no
-S_SET-18_CNS__CNS__CNS_, M_SET-18_CNS__CNS__CNS_
-** Constraint: CONSTRAINT-10-1-1
-*Tie, name=CONSTRAINT-10-1-1, adjust=yes, no rotation
-S_SET-20_CNS__CNS__CNS_, M_SET-20_CNS__CNS__CNS_
-** Constraint: CONSTRAINT-11-1-1
-*Tie, name=CONSTRAINT-11-1-1, adjust=yes, no rotation
-S_SET-22_CNS__CNS__CNS_, M_SET-22_CNS__CNS__CNS_
-** Constraint: CONSTRAINT-12-1-1
-*Tie, name=CONSTRAINT-12-1-1, adjust=yes, no rotation
-S_SET-24_CNS__CNS__CNS_, M_SET-24_CNS__CNS__CNS_
-** Constraint: CONSTRAINT-13-1-1
-*Tie, name=CONSTRAINT-13-1-1, adjust=yes, no rotation
-S_SET-26_CNS__CNS__CNS_, M_SET-26_CNS__CNS__CNS_
-** Constraint: CONSTRAINT-14-1-1
-*Tie, name=CONSTRAINT-14-1-1, adjust=yes, no rotation
-S_SET-28_CNS__CNS__CNS_, M_SET-28_CNS__CNS__CNS_
-** Constraint: CONSTRAINT-15-1-1
-*Tie, name=CONSTRAINT-15-1-1, adjust=yes, no rotation
-S_SET-30_CNS__CNS__CNS_, M_SET-30_CNS__CNS__CNS_
-** Constraint: CONSTRAINT-16-1-1
-*Tie, name=CONSTRAINT-16-1-1, adjust=yes, no rotation
-S_SET-32_CNS__CNS__CNS_, M_SET-32_CNS__CNS__CNS_
-** Constraint: CONSTRAINT-17-1-1
-*Tie, name=CONSTRAINT-17-1-1, adjust=yes, no rotation
-S_SET-34_CNS__CNS__CNS_, M_SET-34_CNS__CNS__CNS_
-** Constraint: CONSTRAINT-18-1-1
-*Tie, name=CONSTRAINT-18-1-1, adjust=yes, no rotation
-S_SET-36_CNS__CNS__CNS_, M_SET-36_CNS__CNS__CNS_
-** Constraint: CONSTRAINT-19-1-1
-*Tie, name=CONSTRAINT-19-1-1, adjust=yes, no rotation
-S_SET-38_CNS__CNS__CNS_, M_SET-38_CNS__CNS__CNS_
-** Constraint: CONSTRAINT-20-1-1
-*Tie, name=CONSTRAINT-20-1-1, adjust=yes, no rotation
-S_SET-40_CNS__CNS__CNS_, M_SET-40_CNS__CNS__CNS_
-** Constraint: CONSTRAINT-21-1-1
-*Tie, name=CONSTRAINT-21-1-1, adjust=yes, no rotation
-S_SET-42_CNS__CNS__CNS_, M_SET-42_CNS__CNS__CNS_
-** Constraint: CONSTRAINT-22-1-1
-*Tie, name=CONSTRAINT-22-1-1, adjust=yes, no rotation
-S_SET-46_CNS__CNS__CNS_, M_SET-46_CNS__CNS__CNS_
-** Constraint: CONSTRAINT-23-1-1
-*Tie, name=CONSTRAINT-23-1-1, adjust=yes, no rotation
-S_SET-48_CNS__CNS__CNS_, M_SET-48_CNS__CNS__CNS_
-** Constraint: CONSTRAINT-24-1-1
-*Tie, name=CONSTRAINT-24-1-1, adjust=yes, no rotation
-S_SET-50_CNS__CNS__CNS_, M_SET-50_CNS__CNS__CNS_
-** Constraint: CONSTRAINT-25-1-1
-*Tie, name=CONSTRAINT-25-1-1, adjust=yes, no rotation
-S_SET-52_CNS__CNS__CNS_, M_SET-52_CNS__CNS__CNS_
-** Constraint: CONSTRAINT-26-1-1
-*Tie, name=CONSTRAINT-26-1-1, adjust=yes, no rotation
-S_SET-54_CNS__CNS__CNS_, M_SET-54_CNS__CNS__CNS_
-** Constraint: CONSTRAINT-27-1-1
-*Tie, name=CONSTRAINT-27-1-1, adjust=yes, no rotation
-S_SET-56_CNS__CNS__CNS_, M_SET-56_CNS__CNS__CNS_
-** Constraint: CONSTRAINT-28-1-1
-*Tie, name=CONSTRAINT-28-1-1, adjust=yes, no rotation
-S_SET-58_CNS__CNS__CNS_, M_SET-58_CNS__CNS__CNS_
-** Constraint: CONSTRAINT-29-1-1
-*Tie, name=CONSTRAINT-29-1-1, adjust=yes, no rotation
-S_SET-60_CNS__CNS__CNS_, M_SET-60_CNS__CNS__CNS_
-** Constraint: CONSTRAINT-30-1-1
-*Tie, name=CONSTRAINT-30-1-1, adjust=yes, no rotation
-S_SET-62_CNS__CNS__CNS_, M_SET-62_CNS__CNS__CNS_
-** Constraint: CONSTRAINT-31-1-1
-*Tie, name=CONSTRAINT-31-1-1, adjust=yes, no rotation
-S_SET-64_CNS__CNS__CNS_, M_SET-64_CNS__CNS__CNS_
-** Constraint: CONSTRAINT-32-1-1
-*Tie, name=CONSTRAINT-32-1-1, adjust=yes, no rotation
-S_SET-66_CNS__CNS__CNS_, M_SET-66_CNS__CNS__CNS_
-** Constraint: CONSTRAINT-33-1-1
-*Tie, name=CONSTRAINT-33-1-1, adjust=yes, no rotation
-S_SET-68_CNS__CNS__CNS_, M_SET-68_CNS__CNS__CNS_
-** Constraint: CONSTRAINT-34-1-1
-*Tie, name=CONSTRAINT-34-1-1, adjust=yes, no rotation
-S_SET-70_CNS__CNS__CNS_, M_SET-70_CNS__CNS__CNS_
-** Constraint: CONSTRAINT-35-1-1
-*Tie, name=CONSTRAINT-35-1-1, adjust=yes, no rotation
-S_SET-72_CNS__CNS__CNS_, M_SET-72_CNS__CNS__CNS_
-** Constraint: CONSTRAINT-36-1-1
-*Tie, name=CONSTRAINT-36-1-1, adjust=yes, no rotation
-S_SET-74_CNS__CNS__CNS_, M_SET-74_CNS__CNS__CNS_
-** Constraint: CONSTRAINT-37-1-1
-*Tie, name=CONSTRAINT-37-1-1, adjust=yes, no rotation
-S_SET-76_CNS__CNS__CNS_, M_SET-76_CNS__CNS__CNS_
-** Constraint: CONSTRAINT-38-1-1
-*Tie, name=CONSTRAINT-38-1-1, adjust=yes, no rotation
-S_SET-78_CNS__CNS__CNS_, M_SET-78_CNS__CNS__CNS_
-** Constraint: CONSTRAINT-39-1-1
-*Tie, name=CONSTRAINT-39-1-1, adjust=yes, no rotation
-S_SET-80_CNS__CNS__CNS_, M_SET-80_CNS__CNS__CNS_
-** Constraint: CONSTRAINT-40-1-1
-*Tie, name=CONSTRAINT-40-1-1, adjust=yes, no rotation
-S_SET-82_CNS__CNS__CNS_, M_SET-82_CNS__CNS__CNS_
-** Constraint: CONSTRAINT-41-1-1
-*Tie, name=CONSTRAINT-41-1-1, adjust=yes, no rotation
-S_SET-84_CNS__CNS__CNS_, M_SET-84_CNS__CNS__CNS_
-** Constraint: CONSTRAINT-42-1-1
-*Tie, name=CONSTRAINT-42-1-1, adjust=yes, no rotation
-S_SET-86_CNS__CNS__CNS_, M_SET-86_CNS__CNS__CNS_
-** Constraint: CONSTRAINT-43-1-1
-*Tie, name=CONSTRAINT-43-1-1, adjust=yes, no rotation
-S_SET-88_CNS__CNS__CNS_, M_SET-88_CNS__CNS__CNS_
-** Constraint: CONSTRAINT-44-1-1
-*Tie, name=CONSTRAINT-44-1-1, adjust=yes, no rotation
-S_SET-90_CNS__CNS__CNS_, M_SET-90_CNS__CNS__CNS_
-** Constraint: CONSTRAINT-45-1-1
-*Tie, name=CONSTRAINT-45-1-1, adjust=yes, no rotation
-S_SET-92_CNS__CNS__CNS_, M_SET-92_CNS__CNS__CNS_
-** Constraint: CONSTRAINT-46-1-1
-*Tie, name=CONSTRAINT-46-1-1, adjust=yes, no rotation
-S_SET-94_CNS__CNS__CNS_, M_SET-94_CNS__CNS__CNS_
-** Constraint: CONSTRAINT-47-1-1
-*Tie, name=CONSTRAINT-47-1-1, adjust=yes, no rotation
-S_SET-96_CNS__CNS__CNS_, M_SET-96_CNS__CNS__CNS_
-** Constraint: CONSTRAINT-48-1-1
-*Tie, name=CONSTRAINT-48-1-1, adjust=yes, no rotation
-S_SET-98_CNS__CNS__CNS_, M_SET-98_CNS__CNS__CNS_
-** Constraint: CONSTRAINT-49-1-1
-*Tie, name=CONSTRAINT-49-1-1, adjust=yes, no rotation
-S_SET-100_CNS__CNS__CNS_, M_SET-100_CNS__CNS__CNS_
+*Surface, type=NODE, name=M_SET-6_CNS__CNS_, internal
+M_SET-6_CNS_, 1.
+*Surface, type=NODE, name=S_SET-6_CNS__CNS_, internal
+S_SET-6_CNS_, 1.
+*Surface, type=NODE, name=M_SET-8_CNS__CNS_, internal
+M_SET-8_CNS_, 1.
+*Surface, type=NODE, name=S_SET-8_CNS__CNS_, internal
+S_SET-8_CNS_, 1.
+*Surface, type=NODE, name=M_SET-10_CNS__CNS_, internal
+M_SET-10_CNS_, 1.
+*Surface, type=NODE, name=S_SET-10_CNS__CNS_, internal
+S_SET-10_CNS_, 1.
+*Surface, type=NODE, name=M_SET-12_CNS__CNS_, internal
+M_SET-12_CNS_, 1.
+*Surface, type=NODE, name=S_SET-12_CNS__CNS_, internal
+S_SET-12_CNS_, 1.
+*Surface, type=NODE, name=M_SET-13_CNS__CNS_, internal
+M_SET-13_CNS_, 1.
+*Surface, type=NODE, name=S_SET-13_CNS__CNS_, internal
+S_SET-13_CNS_, 1.
+*Surface, type=NODE, name=M_SET-14_CNS__CNS_, internal
+M_SET-14_CNS_, 1.
+*Surface, type=NODE, name=S_SET-14_CNS__CNS_, internal
+S_SET-14_CNS_, 1.
+*Surface, type=NODE, name=M_SET-16_CNS__CNS_, internal
+M_SET-16_CNS_, 1.
+*Surface, type=NODE, name=S_SET-16_CNS__CNS_, internal
+S_SET-16_CNS_, 1.
+*Surface, type=NODE, name=M_SET-18_CNS__CNS_, internal
+M_SET-18_CNS_, 1.
+*Surface, type=NODE, name=S_SET-18_CNS__CNS_, internal
+S_SET-18_CNS_, 1.
+*Surface, type=NODE, name=M_SET-20_CNS__CNS_, internal
+M_SET-20_CNS_, 1.
+*Surface, type=NODE, name=S_SET-20_CNS__CNS_, internal
+S_SET-20_CNS_, 1.
+*Surface, type=NODE, name=M_SET-22_CNS__CNS_, internal
+M_SET-22_CNS_, 1.
+*Surface, type=NODE, name=S_SET-22_CNS__CNS_, internal
+S_SET-22_CNS_, 1.
+*Surface, type=NODE, name=M_SET-24_CNS__CNS_, internal
+M_SET-24_CNS_, 1.
+*Surface, type=NODE, name=S_SET-24_CNS__CNS_, internal
+S_SET-24_CNS_, 1.
+*Surface, type=NODE, name=M_SET-26_CNS__CNS_, internal
+M_SET-26_CNS_, 1.
+*Surface, type=NODE, name=S_SET-26_CNS__CNS_, internal
+S_SET-26_CNS_, 1.
+*Surface, type=NODE, name=M_SET-28_CNS__CNS_, internal
+M_SET-28_CNS_, 1.
+*Surface, type=NODE, name=S_SET-28_CNS__CNS_, internal
+S_SET-28_CNS_, 1.
+*Surface, type=NODE, name=M_SET-30_CNS__CNS_, internal
+M_SET-30_CNS_, 1.
+*Surface, type=NODE, name=S_SET-30_CNS__CNS_, internal
+S_SET-30_CNS_, 1.
+*Surface, type=NODE, name=M_SET-32_CNS__CNS_, internal
+M_SET-32_CNS_, 1.
+*Surface, type=NODE, name=S_SET-32_CNS__CNS_, internal
+S_SET-32_CNS_, 1.
+*Surface, type=NODE, name=M_SET-34_CNS__CNS_, internal
+M_SET-34_CNS_, 1.
+*Surface, type=NODE, name=S_SET-34_CNS__CNS_, internal
+S_SET-34_CNS_, 1.
+*Surface, type=NODE, name=M_SET-36_CNS__CNS_, internal
+M_SET-36_CNS_, 1.
+*Surface, type=NODE, name=S_SET-36_CNS__CNS_, internal
+S_SET-36_CNS_, 1.
+*Surface, type=NODE, name=M_SET-38_CNS__CNS_, internal
+M_SET-38_CNS_, 1.
+*Surface, type=NODE, name=S_SET-38_CNS__CNS_, internal
+S_SET-38_CNS_, 1.
+*Surface, type=NODE, name=M_SET-40_CNS__CNS_, internal
+M_SET-40_CNS_, 1.
+*Surface, type=NODE, name=S_SET-40_CNS__CNS_, internal
+S_SET-40_CNS_, 1.
+*Surface, type=NODE, name=M_SET-42_CNS__CNS_, internal
+M_SET-42_CNS_, 1.
+*Surface, type=NODE, name=S_SET-42_CNS__CNS_, internal
+S_SET-42_CNS_, 1.
+*Surface, type=NODE, name=M_SET-46_CNS__CNS_, internal
+M_SET-46_CNS_, 1.
+*Surface, type=NODE, name=S_SET-46_CNS__CNS_, internal
+S_SET-46_CNS_, 1.
+*Surface, type=NODE, name=M_SET-48_CNS__CNS_, internal
+M_SET-48_CNS_, 1.
+*Surface, type=NODE, name=S_SET-48_CNS__CNS_, internal
+S_SET-48_CNS_, 1.
+*Surface, type=NODE, name=M_SET-50_CNS__CNS_, internal
+M_SET-50_CNS_, 1.
+*Surface, type=NODE, name=S_SET-50_CNS__CNS_, internal
+S_SET-50_CNS_, 1.
+*Surface, type=NODE, name=M_SET-52_CNS__CNS_, internal
+M_SET-52_CNS_, 1.
+*Surface, type=NODE, name=S_SET-52_CNS__CNS_, internal
+S_SET-52_CNS_, 1.
+*Surface, type=NODE, name=M_SET-54_CNS__CNS_, internal
+M_SET-54_CNS_, 1.
+*Surface, type=NODE, name=S_SET-54_CNS__CNS_, internal
+S_SET-54_CNS_, 1.
+*Surface, type=NODE, name=M_SET-56_CNS__CNS_, internal
+M_SET-56_CNS_, 1.
+*Surface, type=NODE, name=S_SET-56_CNS__CNS_, internal
+S_SET-56_CNS_, 1.
+*Surface, type=NODE, name=M_SET-58_CNS__CNS_, internal
+M_SET-58_CNS_, 1.
+*Surface, type=NODE, name=S_SET-58_CNS__CNS_, internal
+S_SET-58_CNS_, 1.
+*Surface, type=NODE, name=M_SET-60_CNS__CNS_, internal
+M_SET-60_CNS_, 1.
+*Surface, type=NODE, name=S_SET-60_CNS__CNS_, internal
+S_SET-60_CNS_, 1.
+*Surface, type=NODE, name=M_SET-62_CNS__CNS_, internal
+M_SET-62_CNS_, 1.
+*Surface, type=NODE, name=S_SET-62_CNS__CNS_, internal
+S_SET-62_CNS_, 1.
+*Surface, type=NODE, name=M_SET-64_CNS__CNS_, internal
+M_SET-64_CNS_, 1.
+*Surface, type=NODE, name=S_SET-64_CNS__CNS_, internal
+S_SET-64_CNS_, 1.
+*Surface, type=NODE, name=M_SET-66_CNS__CNS_, internal
+M_SET-66_CNS_, 1.
+*Surface, type=NODE, name=S_SET-66_CNS__CNS_, internal
+S_SET-66_CNS_, 1.
+*Surface, type=NODE, name=M_SET-68_CNS__CNS_, internal
+M_SET-68_CNS_, 1.
+*Surface, type=NODE, name=S_SET-68_CNS__CNS_, internal
+S_SET-68_CNS_, 1.
+*Surface, type=NODE, name=M_SET-70_CNS__CNS_, internal
+M_SET-70_CNS_, 1.
+*Surface, type=NODE, name=S_SET-70_CNS__CNS_, internal
+S_SET-70_CNS_, 1.
+*Surface, type=NODE, name=M_SET-72_CNS__CNS_, internal
+M_SET-72_CNS_, 1.
+*Surface, type=NODE, name=S_SET-72_CNS__CNS_, internal
+S_SET-72_CNS_, 1.
+*Surface, type=NODE, name=M_SET-74_CNS__CNS_, internal
+M_SET-74_CNS_, 1.
+*Surface, type=NODE, name=S_SET-74_CNS__CNS_, internal
+S_SET-74_CNS_, 1.
+*Surface, type=NODE, name=M_SET-76_CNS__CNS_, internal
+M_SET-76_CNS_, 1.
+*Surface, type=NODE, name=S_SET-76_CNS__CNS_, internal
+S_SET-76_CNS_, 1.
+*Surface, type=NODE, name=M_SET-78_CNS__CNS_, internal
+M_SET-78_CNS_, 1.
+*Surface, type=NODE, name=S_SET-78_CNS__CNS_, internal
+S_SET-78_CNS_, 1.
+*Surface, type=NODE, name=M_SET-80_CNS__CNS_, internal
+M_SET-80_CNS_, 1.
+*Surface, type=NODE, name=S_SET-80_CNS__CNS_, internal
+S_SET-80_CNS_, 1.
+*Surface, type=NODE, name=M_SET-82_CNS__CNS_, internal
+M_SET-82_CNS_, 1.
+*Surface, type=NODE, name=S_SET-82_CNS__CNS_, internal
+S_SET-82_CNS_, 1.
+*Surface, type=NODE, name=M_SET-84_CNS__CNS_, internal
+M_SET-84_CNS_, 1.
+*Surface, type=NODE, name=S_SET-84_CNS__CNS_, internal
+S_SET-84_CNS_, 1.
+*Surface, type=NODE, name=M_SET-86_CNS__CNS_, internal
+M_SET-86_CNS_, 1.
+*Surface, type=NODE, name=S_SET-86_CNS__CNS_, internal
+S_SET-86_CNS_, 1.
+*Surface, type=NODE, name=M_SET-88_CNS__CNS_, internal
+M_SET-88_CNS_, 1.
+*Surface, type=NODE, name=S_SET-88_CNS__CNS_, internal
+S_SET-88_CNS_, 1.
+*Surface, type=NODE, name=M_SET-90_CNS__CNS_, internal
+M_SET-90_CNS_, 1.
+*Surface, type=NODE, name=S_SET-90_CNS__CNS_, internal
+S_SET-90_CNS_, 1.
+*Surface, type=NODE, name=M_SET-92_CNS__CNS_, internal
+M_SET-92_CNS_, 1.
+*Surface, type=NODE, name=S_SET-92_CNS__CNS_, internal
+S_SET-92_CNS_, 1.
+*Surface, type=NODE, name=M_SET-94_CNS__CNS_, internal
+M_SET-94_CNS_, 1.
+*Surface, type=NODE, name=S_SET-94_CNS__CNS_, internal
+S_SET-94_CNS_, 1.
+*Surface, type=NODE, name=M_SET-96_CNS__CNS_, internal
+M_SET-96_CNS_, 1.
+*Surface, type=NODE, name=S_SET-96_CNS__CNS_, internal
+S_SET-96_CNS_, 1.
+*Surface, type=NODE, name=M_SET-98_CNS__CNS_, internal
+M_SET-98_CNS_, 1.
+*Surface, type=NODE, name=S_SET-98_CNS__CNS_, internal
+S_SET-98_CNS_, 1.
+*Surface, type=NODE, name=M_SET-100_CNS__CNS_, internal
+M_SET-100_CNS_, 1.
+*Surface, type=NODE, name=S_SET-100_CNS__CNS_, internal
+S_SET-100_CNS_, 1.
+** Constraint: CONSTRAINT-2-1
+*Tie, name=CONSTRAINT-2-1, adjust=yes, no rotation
+S_SET-6_CNS__CNS_, M_SET-6_CNS__CNS_
+** Constraint: CONSTRAINT-3-1
+*Tie, name=CONSTRAINT-3-1, adjust=yes, no rotation
+S_SET-8_CNS__CNS_, M_SET-8_CNS__CNS_
+** Constraint: CONSTRAINT-4-1
+*Tie, name=CONSTRAINT-4-1, adjust=yes, no rotation
+S_SET-10_CNS__CNS_, M_SET-10_CNS__CNS_
+** Constraint: CONSTRAINT-5-1
+*Tie, name=CONSTRAINT-5-1, adjust=yes, no rotation
+S_SET-12_CNS__CNS_, M_SET-12_CNS__CNS_
+** Constraint: CONSTRAINT-6-1
+*Tie, name=CONSTRAINT-6-1, adjust=yes, no rotation
+S_SET-13_CNS__CNS_, M_SET-13_CNS__CNS_
+** Constraint: CONSTRAINT-7-1
+*Tie, name=CONSTRAINT-7-1, adjust=yes
+S_SET-14_CNS__CNS_, M_SET-14_CNS__CNS_
+** Constraint: CONSTRAINT-8-1
+*Tie, name=CONSTRAINT-8-1, adjust=yes
+S_SET-16_CNS__CNS_, M_SET-16_CNS__CNS_
+** Constraint: CONSTRAINT-9-1
+*Tie, name=CONSTRAINT-9-1, adjust=no
+S_SET-18_CNS__CNS_, M_SET-18_CNS__CNS_
+** Constraint: CONSTRAINT-10-1
+*Tie, name=CONSTRAINT-10-1, adjust=yes, no rotation
+S_SET-20_CNS__CNS_, M_SET-20_CNS__CNS_
+** Constraint: CONSTRAINT-11-1
+*Tie, name=CONSTRAINT-11-1, adjust=yes, no rotation
+S_SET-22_CNS__CNS_, M_SET-22_CNS__CNS_
+** Constraint: CONSTRAINT-12-1
+*Tie, name=CONSTRAINT-12-1, adjust=yes, no rotation
+S_SET-24_CNS__CNS_, M_SET-24_CNS__CNS_
+** Constraint: CONSTRAINT-13-1
+*Tie, name=CONSTRAINT-13-1, adjust=yes, no rotation
+S_SET-26_CNS__CNS_, M_SET-26_CNS__CNS_
+** Constraint: CONSTRAINT-14-1
+*Tie, name=CONSTRAINT-14-1, adjust=yes, no rotation
+S_SET-28_CNS__CNS_, M_SET-28_CNS__CNS_
+** Constraint: CONSTRAINT-15-1
+*Tie, name=CONSTRAINT-15-1, adjust=yes, no rotation
+S_SET-30_CNS__CNS_, M_SET-30_CNS__CNS_
+** Constraint: CONSTRAINT-16-1
+*Tie, name=CONSTRAINT-16-1, adjust=yes, no rotation
+S_SET-32_CNS__CNS_, M_SET-32_CNS__CNS_
+** Constraint: CONSTRAINT-17-1
+*Tie, name=CONSTRAINT-17-1, adjust=yes, no rotation
+S_SET-34_CNS__CNS_, M_SET-34_CNS__CNS_
+** Constraint: CONSTRAINT-18-1
+*Tie, name=CONSTRAINT-18-1, adjust=yes, no rotation
+S_SET-36_CNS__CNS_, M_SET-36_CNS__CNS_
+** Constraint: CONSTRAINT-19-1
+*Tie, name=CONSTRAINT-19-1, adjust=yes, no rotation
+S_SET-38_CNS__CNS_, M_SET-38_CNS__CNS_
+** Constraint: CONSTRAINT-20-1
+*Tie, name=CONSTRAINT-20-1, adjust=yes, no rotation
+S_SET-40_CNS__CNS_, M_SET-40_CNS__CNS_
+** Constraint: CONSTRAINT-21-1
+*Tie, name=CONSTRAINT-21-1, adjust=yes, no rotation
+S_SET-42_CNS__CNS_, M_SET-42_CNS__CNS_
+** Constraint: CONSTRAINT-22-1
+*Tie, name=CONSTRAINT-22-1, adjust=yes, no rotation
+S_SET-46_CNS__CNS_, M_SET-46_CNS__CNS_
+** Constraint: CONSTRAINT-23-1
+*Tie, name=CONSTRAINT-23-1, adjust=yes, no rotation
+S_SET-48_CNS__CNS_, M_SET-48_CNS__CNS_
+** Constraint: CONSTRAINT-24-1
+*Tie, name=CONSTRAINT-24-1, adjust=yes, no rotation
+S_SET-50_CNS__CNS_, M_SET-50_CNS__CNS_
+** Constraint: CONSTRAINT-25-1
+*Tie, name=CONSTRAINT-25-1, adjust=yes, no rotation
+S_SET-52_CNS__CNS_, M_SET-52_CNS__CNS_
+** Constraint: CONSTRAINT-26-1
+*Tie, name=CONSTRAINT-26-1, adjust=yes, no rotation
+S_SET-54_CNS__CNS_, M_SET-54_CNS__CNS_
+** Constraint: CONSTRAINT-27-1
+*Tie, name=CONSTRAINT-27-1, adjust=yes, no rotation
+S_SET-56_CNS__CNS_, M_SET-56_CNS__CNS_
+** Constraint: CONSTRAINT-28-1
+*Tie, name=CONSTRAINT-28-1, adjust=yes, no rotation
+S_SET-58_CNS__CNS_, M_SET-58_CNS__CNS_
+** Constraint: CONSTRAINT-29-1
+*Tie, name=CONSTRAINT-29-1, adjust=yes, no rotation
+S_SET-60_CNS__CNS_, M_SET-60_CNS__CNS_
+** Constraint: CONSTRAINT-30-1
+*Tie, name=CONSTRAINT-30-1, adjust=yes, no rotation
+S_SET-62_CNS__CNS_, M_SET-62_CNS__CNS_
+** Constraint: CONSTRAINT-31-1
+*Tie, name=CONSTRAINT-31-1, adjust=yes, no rotation
+S_SET-64_CNS__CNS_, M_SET-64_CNS__CNS_
+** Constraint: CONSTRAINT-32-1
+*Tie, name=CONSTRAINT-32-1, adjust=yes, no rotation
+S_SET-66_CNS__CNS_, M_SET-66_CNS__CNS_
+** Constraint: CONSTRAINT-33-1
+*Tie, name=CONSTRAINT-33-1, adjust=yes, no rotation
+S_SET-68_CNS__CNS_, M_SET-68_CNS__CNS_
+** Constraint: CONSTRAINT-34-1
+*Tie, name=CONSTRAINT-34-1, adjust=yes, no rotation
+S_SET-70_CNS__CNS_, M_SET-70_CNS__CNS_
+** Constraint: CONSTRAINT-35-1
+*Tie, name=CONSTRAINT-35-1, adjust=yes, no rotation
+S_SET-72_CNS__CNS_, M_SET-72_CNS__CNS_
+** Constraint: CONSTRAINT-36-1
+*Tie, name=CONSTRAINT-36-1, adjust=yes, no rotation
+S_SET-74_CNS__CNS_, M_SET-74_CNS__CNS_
+** Constraint: CONSTRAINT-37-1
+*Tie, name=CONSTRAINT-37-1, adjust=yes, no rotation
+S_SET-76_CNS__CNS_, M_SET-76_CNS__CNS_
+** Constraint: CONSTRAINT-38-1
+*Tie, name=CONSTRAINT-38-1, adjust=yes, no rotation
+S_SET-78_CNS__CNS_, M_SET-78_CNS__CNS_
+** Constraint: CONSTRAINT-39-1
+*Tie, name=CONSTRAINT-39-1, adjust=yes, no rotation
+S_SET-80_CNS__CNS_, M_SET-80_CNS__CNS_
+** Constraint: CONSTRAINT-40-1
+*Tie, name=CONSTRAINT-40-1, adjust=yes, no rotation
+S_SET-82_CNS__CNS_, M_SET-82_CNS__CNS_
+** Constraint: CONSTRAINT-41-1
+*Tie, name=CONSTRAINT-41-1, adjust=yes, no rotation
+S_SET-84_CNS__CNS_, M_SET-84_CNS__CNS_
+** Constraint: CONSTRAINT-42-1
+*Tie, name=CONSTRAINT-42-1, adjust=yes, no rotation
+S_SET-86_CNS__CNS_, M_SET-86_CNS__CNS_
+** Constraint: CONSTRAINT-43-1
+*Tie, name=CONSTRAINT-43-1, adjust=yes, no rotation
+S_SET-88_CNS__CNS_, M_SET-88_CNS__CNS_
+** Constraint: CONSTRAINT-44-1
+*Tie, name=CONSTRAINT-44-1, adjust=yes, no rotation
+S_SET-90_CNS__CNS_, M_SET-90_CNS__CNS_
+** Constraint: CONSTRAINT-45-1
+*Tie, name=CONSTRAINT-45-1, adjust=yes, no rotation
+S_SET-92_CNS__CNS_, M_SET-92_CNS__CNS_
+** Constraint: CONSTRAINT-46-1
+*Tie, name=CONSTRAINT-46-1, adjust=yes, no rotation
+S_SET-94_CNS__CNS_, M_SET-94_CNS__CNS_
+** Constraint: CONSTRAINT-47-1
+*Tie, name=CONSTRAINT-47-1, adjust=yes, no rotation
+S_SET-96_CNS__CNS_, M_SET-96_CNS__CNS_
+** Constraint: CONSTRAINT-48-1
+*Tie, name=CONSTRAINT-48-1, adjust=yes, no rotation
+S_SET-98_CNS__CNS_, M_SET-98_CNS__CNS_
+** Constraint: CONSTRAINT-49-1
+*Tie, name=CONSTRAINT-49-1, adjust=yes, no rotation
+S_SET-100_CNS__CNS_, M_SET-100_CNS__CNS_
 *End Assembly
 ** 
 ** MATERIALS
 ** 
-**   For the SupportBeam
+**  For the SupportBeam
 *Material, name=ALUMINUM
 *Density
 2710.,
 *Elastic
  7e+10, 0.346
-**   For the Pier and the Floor
+**  For the Pier and the Floor
 *Material, name=CONCRETE
 *Density
 2320.,
 *Elastic
  2.5e+10, 0.3
-**   For the RiverBank
+**  For the RiverBank
 *Material, name=GRANITE
 *Density
 2770.,
 *Elastic
  6e+10, 0.27
-**   For the Cable
+**  For the Cable
 *Material, name=STEEL
 *Density
 7860.,

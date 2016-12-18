@@ -185,18 +185,8 @@ def readmaterial(beg):
     return material
     
 #-----------读取PART信息-------------
-#部件信息
-'''
-part = [[] for x in range(partnum)]       #包含对于不同部件的所有信息
 
-for i in range(0,partnum):
-    part[i].append(readpartname(keyloc[0][i]))
-    part[i].append(readnode(keyloc[1][i]+1,keyloc[2][i]-1))
-    for j in range(len(keyloc[2])):
-        part[i].append(readelementname(keyloc[2][j]))
-        part[i].append(readelement(keyloc[2][j]+1,keyloc[3][j]))
-'''
-        
+#部件信息     
 partname = readpartname(keyloc[0][0])
 
 node = readnode(keyloc[1][0]+1,keyloc[2][0]-1)
