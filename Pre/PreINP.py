@@ -194,9 +194,9 @@ node = readnode(keyloc[1][0]+1,keyloc[2][0]-1)
 node_b = []         #Node_Boundary
 for i in range(len(node[0])):
     if node[0][i] in boundary:
-        node_b.append([1,1,1])
+        node_b.append([1,1,1,0,0,0])
     else:
-        node_b.append([0,0,0])
+        node_b.append([0,0,0,0,0,0])
         
 element = [[] for x in range(len(keyloc[2]))]
 for i in range(0,len(keyloc[2])):
@@ -283,13 +283,14 @@ material_e[4].append([0.25])
 print(material_e)  
 
 
-#-----------输出LOAD信息-------------
+#-----------输出LOAD信息 扩充ID到6维-------------
 load_floor = 58e6/(material_e[0][2][1]-material_e[0][2][0])
 load_pier = 348e6/(material_e[1][2][1]-material_e[1][2][0])
 load_supportbeam = 17.134e6/(material_e[2][2][1]-material_e[2][2][0])
 load_riverbank = 346.25e6/(material_e[3][2][1]-material_e[3][2][0])
 load_cables = 0
 load_e = [load_floor,load_pier,load_supportbeam,load_riverbank,load_cables]
+ID_6 = [[0,0,1],[1,1,1],[0,0,0],[1,1,1],[1,1,1]]
 #print(load)
 
 load = [0 for x in range(len(node[0])+1)]    #从load[1]开始对于node[0]
@@ -300,7 +301,9 @@ for i in range(len(keyloc[2])):
         for s in range(len(material_e)):
             if material_e[s][2][0] < e_num < material_e[s][2][1]:
                 for k in e_node:
-                    load[k] = load[k] + load_e[s]     
+                    load[k] = load[k] + load_e[s]
+                    for p in range(3):
+                        node_b[k-1][p+3]=ID_6[s][p]
 
 #rint(load)                    
                 
@@ -361,7 +364,7 @@ inp.write('%5d'*4%(len(node[0]),len(keyloc[2]),1,1) + '\n')
 
 #输入节点信息
 for i in range(len(node[0])):
-    inp.write('%5d'*4%(node[0][i],node_b[i][0],node_b[i][1],node_b[i][2]))
+    inp.write('%5d'*7%(node[0][i],node_b[i][0],node_b[i][1],node_b[i][2],node_b[i][3],node_b[i][4],node_b[i][5]))
     inp.write('%10.3f'*3%(node[1][i][0],node[1][i][1],node[1][i][2]))
     inp.write('%5d'%0 + '\n')
 
@@ -396,8 +399,8 @@ for i in range(len(keyloc[2])):
     elif element[i][0] == 'B31':
         inp.write('%5d'*3%(5,len(element[i][1][0]),1) + '\n')
         inp.write('%5d'%1 + '%10.3e'%(material_e[2][1][2][0]) + '%10.3f'%(material_e[2][1][2][1]) + '%10.3f'%(0.25))
-        inp.write('%10.3e'%(100) + '%10.3e'%(100) + '%10.3e'%(100))
-        inp.write('%10.3e'%(200) + '%10.3e'%(200) + '%10.3e'%(200) + '\n')
+        inp.write('%10.3e'%(0.4853333) + '%10.3e'%(0.4853333) + '%10.3e'%(0.4853333))
+        inp.write('%10.3e'%(0.9170666) + '%10.3e'%(0.9170666) + '%10.3e'%(0.9170666) + '\n')
         for j in range(len(element[i][1][0])):
             el_num = j+1
             el_node = element[i][1][1][j]
