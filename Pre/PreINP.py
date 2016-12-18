@@ -48,14 +48,17 @@ line_len = len(line)            #INP文件全长度
 keylocation = [0 for x in range(line_len)] 
 
 for i in range(0,line_len-1):
-    if line[i].find('** PART INSTANCE')!=-1:           #'Part'--1
+    if line[i].find('*Part')!=-1:           #'Part'--1
         keylocation[i] = 1
     if line[i].find('*Node')!=-1:           #'Node'--2
         keylocation[i] = 2
     if line[i].find('*Element')!=-1:        #'Element'--3
         keylocation[i] = 3
+    if line[i].find('*Material')!=-1:
+        keylocation[i] = 5
+    if line[i].find('*Boundary')!=-1:
+        keylocation[i] = 6
     #继续添加关键字---------
-#print (keylocation)
 
 j = 0
 for i in range(0,line_len-1):
@@ -63,10 +66,10 @@ for i in range(0,line_len-1):
         j = 1
         continue
     if j == 1:
-        if line[i][:1] == '*':
-            keylocation[i-1] = 4            #每个element结束位置--4
+        if line[i+1][:1] == '*':
+            keylocation[i] = 4            #每个element结束位置--4
             j = 0
-        
+#print (keylocation)        
 
 keynum = max(keylocation)    #关键字个数
 keyloc = [[] for x in range(keynum)]          
@@ -76,8 +79,31 @@ for i in range(0,line_len-1):
             keyloc[j].append(i)
             
 partnum = len(keyloc[0])     #PART个数
-#print(keyloc)    
-    
+#print(keyloc)
+
+
+#-----------读取固定边界信息-------------
+i = 0
+j = 0
+k = 0
+boundary = []
+b_line = line[keyloc[5][0]+1]
+b_set = b_line[:b_line.find(',')]
+print(b_set)
+for i in range(line_len):
+    if line[i].find('*Nset, nset='+b_set)!=-1:
+        j = 1
+        continue
+    if j==1:
+        temp = line[i]
+        while temp.find(',')!=-1:
+            boundary.append(int(temp[:temp.find(',')]))
+            temp = temp[temp.find(',')+1:]
+        boundary.append(int(temp))
+        if line[i+1].find('*')!=-1:
+            j = 0
+            
+#print(boundary)    
         
 #-----------读取NODE信息-------------
 def readnode(beg,end):
@@ -92,7 +118,7 @@ def readnode(beg,end):
     for i in range(beg,end+1):
     
         nodeline = line[i][line[i].find(',')+1:]        #'          -5.,          -5.,          10.' in 8H
-        node_num.append(j+1)
+        node_num.append(int(line[i][:line[i].find(',')]))
         node_xyz.append([])                             #为了能添加内容所初始化
         
         while nodeline.find(',') != -1 :
@@ -119,7 +145,7 @@ def readelement(beg,end):
     for i in range(beg,end+1):
     
         elementline = line[i][line[i].find(',')+1:]    #' 10, 11, 14, 13,  1,  2,  5,  4' in 8H
-        element_num.append(j+1)
+        element_num.append(int(line[i][:line[i].find(',')]))
         element_node.append([])                        #为了能添加内容所初始化
         
         while elementline.find(',') != -1 :
@@ -135,7 +161,7 @@ def readelement(beg,end):
 #-----------读取PART名称-------------
 def readpartname(beg):
     
-    partname = line[beg][line[beg].find(':')+2:]
+    partname = line[beg][line[beg].find('name')+5:]
     return partname
 
 
@@ -146,47 +172,128 @@ def readelementname(beg):
     return elementname
     
     
+#-----------读取MATERIAL名称----------
+def readmaterial(beg):
+    
+    material = [[] for x in range(3)] 
+    density = line[beg+2]
+    elastic = line[beg+4]
+    material[0] = line[beg][line[beg].find('name')+5:]
+    material[1] = float(density[:density.find(',')])
+    material[2].append(float(elastic[:elastic.find(',')]))
+    material[2].append(float(elastic[elastic.find(',')+1:]))
+    return material
+    
 #-----------读取PART信息-------------
 #部件信息
+'''
 part = [[] for x in range(partnum)]       #包含对于不同部件的所有信息
 
 for i in range(0,partnum):
     part[i].append(readpartname(keyloc[0][i]))
     part[i].append(readnode(keyloc[1][i]+1,keyloc[2][i]-1))
-    part[i].append(readelementname(keyloc[2][i]))
-    part[i].append(readelement(keyloc[2][i]+1,keyloc[3][i]))
+    for j in range(len(keyloc[2])):
+        part[i].append(readelementname(keyloc[2][j]))
+        part[i].append(readelement(keyloc[2][j]+1,keyloc[3][j]))
+'''
+        
+partname = readpartname(keyloc[0][0])
+
+node = readnode(keyloc[1][0]+1,keyloc[2][0]-1)
+
+node_b = []         #Node_Boundary
+for i in range(len(node[0])):
+    if node[0][i] in boundary:
+        node_b.append([1,1,1])
+    else:
+        node_b.append([0,0,0])
+        
+element = [[] for x in range(len(keyloc[2]))]
+for i in range(0,len(keyloc[2])):
+    element[i].append(readelementname(keyloc[2][i]))
+    element[i].append(readelement(keyloc[2][i]+1,keyloc[3][i]))
+    
+material = []
+for i in range(0,len(keyloc[4])):
+    material.append(readmaterial(keyloc[4][i]))
 
     
+for i in range(len(keyloc[2])):
+    if element[i][0] == 'C3D8R' or element[i][0] == 'S4R':
+        for j in range(len(keyloc[4])):
+            if material[j][0] == 'CONCRETE':
+                element[i].append(material[j])
+    elif element[i][0] == 'B31':
+        for j in range(len(keyloc[4])):
+            if material[j][0] == 'ALUMINUM':
+                element[i].append(material[j])
+    elif element[i][0] == 'C3D8R':
+        for j in range(len(keyloc[4])):
+            if material[j][0] == 'CONCRETE':
+                element[i].append(material[j])        
+
 
 #-----------输出PART信息-------------
-for i in range(len(part)):
-    print('···········第' + str(i+1) + '单元···········')
-    print('-------------部件名称---------------')
-    print(part[i][0])
-    print('\n')     #换行
-    print('-------------节点编号---------------')
-    print(part[i][1][0])
-    print('\n')
-    print('-------------节点坐标---------------')
-    print(part[i][1][1])
-    print('\n')
+
+print('···········第' + str(i+1) + '单元···········')
+print('-------------部件名称---------------')
+print(partname)
+print('\n')     #换行
+print('-------------节点编号---------------')
+print(node[0])
+print('\n')
+print('-------------节点坐标---------------')
+print(node[1])
+print('\n')
+print('-------------ID矩阵---------------')
+print(node_b)
+print('\n')
+
+for i in range(len(keyloc[2])):
+    
     print('-------------单元类型---------------')
-    print(part[i][2])
+    print(element[i][0])
     print('\n')
     print('-------------单元编号---------------')
-    print(part[i][3][0])
+    print(element[i][1][0])
     print('\n')
     print('-------------单元节点---------------')
-    print(part[i][3][1])
+    print(element[i][1][1])
+    print('\n')
+
+for i in range(len(keyloc[4])):
+    
+    print('-------------材料类型---------------')
+    print(material[i][0])
+    print('\n')
+    print('-------------密度---------------')
+    print(material[i][1])
+    print('\n')
+    print('-------------弹性---------------')
+    print(material[i][2])
     print('\n')
     
-    print('·····························')
-    print('\n'*5)
+print('·····························')
+print('\n'*5)
+
+
+#-----------输出PART信息到文件-------------   
+location_write = path[2:].replace('\\','/') + '/' + filename + '-HQ' + '.inp' 
+inp = open(location_write, 'w')
+
+#输入名称
+inp.write(filename + '\n')
+
+#输入节点号
+inp.write('%5d'*4%(len(node[0]),len(keyloc[2]),1,1) + '\n')
+
+#输入节点信息
+for i in range(len(node[0])):
+    inp.write('%5d'*4%(node[0][i],node_b[i][0],node_b[i][1],node_b[i][2]))
+    inp.write('%10.3f'*3%(node[1][i][0],node[1][i][1],node[1][i][2]))
+    inp.write('%5d'%0 + '\n')
     
-    
-    
-    
-    
+inp.close()    
     
     
     
