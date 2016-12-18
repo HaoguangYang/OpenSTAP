@@ -20,6 +20,7 @@ subroutine hexahedral
     
     NPAR(5) = 8
     NPAR(6) = 8
+    NPAR(4) = 0
     
     NumberOfElements = NPAR(2)
     NumberOfMaterials = NPAR(3)
@@ -69,7 +70,7 @@ subroutine hexahedral
         HexEight (IA(NP(1)),DA(NP(2)),DA(NP(3)),DA(NP(4)),DA(NP(4)),IA(NP(5)),   &
                   A(N(1)),A(N(2)),A(N(3)),A(N(4)),A(N(5)),A(N(6)),A(N(7)),A(N(8)))
     
-    !Reuse DA(NP(4)) at Solution Phase 3 as displacement U    
+    !Reuse DA(NP(4)) at Solution Phase 3 as displacement U
     return
 end subroutine hexahedral
 
