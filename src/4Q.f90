@@ -75,6 +75,7 @@ SUBROUTINE ELEMENT_4Q_MAIN (ID,X,Y,Z,U,MHT,E,POISSON,LM,XYZ,MATP,Node)
 
   USE GLOBALS
   USE MEMALLOCATE
+  USE MathKernel
 
   IMPLICIT NONE
 
@@ -109,10 +110,11 @@ SUBROUTINE ELEMENT_4Q_MAIN (ID,X,Y,Z,U,MHT,E,POISSON,LM,XYZ,MATP,Node)
   COMMON DETJ
   
   !定义gauss积分常数
-  GP(1)=-sqrt(3D0)/3.           !-0.57735027
-  GP(2)=sqrt(3D0)/3.            !0.57735027
-  W(1)=1.0
-  W(2)=1.0
+  CALL GaussianMask(GP, W, 2)
+  !GP(1)=-sqrt(3D0)/3.           !-0.57735027
+  !GP(2)=sqrt(3D0)/3.            !0.57735027
+  !W(1)=1.0
+  !W(2)=1.0
 
   NPAR1  = NPAR(1)
   NUME   = NPAR(2)

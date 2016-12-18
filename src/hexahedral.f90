@@ -1,3 +1,15 @@
+!===========================================================================================
+! 
+! HEXAHEDRAL ELEMENT SUBROUTINE INCLUDING:
+!    8H Data Read in
+!    8H Element Stiffness Matrix Assembly
+!    Post-processing from Displacements
+! 
+! future support for 27H will be added.
+! 
+! Author:    Haoguang Yang
+! 
+!===========================================================================================
 subroutine hexahedral
     use globals
     use memallocate
@@ -138,7 +150,7 @@ subroutine HexEight (ID,X,Y,Z,U,MHT,E, PoissonRatio, Density, Gravity, LM, Posit
             WRITE (IOUT,"(I7,5X,7(I7,1X),I7,4X,I5)") N,Node(N,1:ElementShapeNodes),MaterialType
             
             !write (IOUT,*) 'MHT',MHT
-            write (VTKNodeTmp) NPAR(5), Node(N,:)-1
+            !write (VTKNodeTmp) NPAR(5), Node(N,:)-1
             
         enddo
         return
@@ -280,7 +292,7 @@ end subroutine HexN
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !!       Calculate Gradiient of Shape Function Matrix       !!
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-!Still Problematic.
+
 subroutine HexB (BMatrix, DetJ, ElementShapeNodes, Transformed, Original)
     USE MathKernel
     implicit none

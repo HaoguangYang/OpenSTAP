@@ -37,13 +37,15 @@
 		<File RelativePath="..\..\src\elcal.f90"/>
 		<File RelativePath="..\..\src\globals.f90"/>
 		<File RelativePath="..\..\src\hexahedral.f90"/>
+		<File RelativePath="..\..\src\module\list.f90"/>
 		<File RelativePath="..\..\src\mathkernel.f90"/>
 		<File RelativePath="..\..\src\memalloc.f90"/>
+		<File RelativePath="..\..\src\module\node.f90"/>
 		<File RelativePath="..\..\src\plate.f90"/>
 		<File RelativePath="..\..\src\plate8Q.f90"/>
-		<File RelativePath=".\preprocess.f90"/>
 		<File RelativePath="..\..\src\shell.f90"/>
 		<File RelativePath="..\..\src\shell8Q.f90"/>
+		<File RelativePath="..\..\src\solver_mode.f90"/>
 		<File RelativePath="..\..\src\stap.f90"/>
 		<File RelativePath="..\..\src\truss.f90"/></Filter>
 		<File RelativePath="..\Readme.txt"/></Files>
