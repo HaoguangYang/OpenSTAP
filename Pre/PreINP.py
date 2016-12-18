@@ -194,9 +194,9 @@ node = readnode(keyloc[1][0]+1,keyloc[2][0]-1)
 node_b = []         #Node_Boundary
 for i in range(len(node[0])):
     if node[0][i] in boundary:
-        node_b.append([1,1,1,1,1,1])
+        node_b.append([1,1,1,0,0,0])
     else:
-        node_b.append([0,0,0,1,1,1])
+        node_b.append([0,0,0,0,0,0])
         
 element = [[] for x in range(len(keyloc[2]))]
 for i in range(0,len(keyloc[2])):
@@ -299,13 +299,18 @@ for i in range(len(keyloc[2])):
         e_num = element[i][1][0][j]
         e_node = element[i][1][1][j]
         for s in range(len(material_e)):
-            if material_e[s][2][0] < e_num < material_e[s][2][1]:
+            if material_e[s][2][0] <= e_num <= material_e[s][2][1]:
                 for k in e_node:
                     load[k] = load[k] + load_e[s]
                     for p in range(3):
-                        node_b[k-1][p+3]=ID_6[s][p]
+                        node_b[k-1][p+3]=node_b[k-1][p+3]+ID_6[s][p]
+                        if node_b[k-1][p+3]==2:
+                            node_b[k-1][p+3] = 1
+                     
 
-#rint(load)                    
+
+                    
+#print(load)                    
                 
               
 #-----------输出PART信息-------------
@@ -398,7 +403,7 @@ for i in range(len(keyloc[2])):
             inp.write('%5d'%(1) + '%10.1e'%(1.0) + '%5d'%(0) + '\n')
     elif element[i][0] == 'B31':
         inp.write('%5d'*3%(5,len(element[i][1][0]),1) + '\n')
-        inp.write('%5d'%1 + '%10.3e'%(material_e[2][1][2][0]) + '%10.3f'%(material_e[2][1][2][1]) + '%10.3f'%(0.25))
+        inp.write('%5d'%1 + '%10.3e'%(material_e[2][1][2][0]) + '%10.3e'%(4.62085e10) + '%10.3f'%(0.25))
         inp.write('%10.3e'%(0.4853333) + '%10.3e'%(0.4853333) + '%10.3e'%(0.4853333))
         inp.write('%10.3e'%(0.9170666) + '%10.3e'%(0.9170666) + '%10.3e'%(0.9170666) + '\n')
         for j in range(len(element[i][1][0])):

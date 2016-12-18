@@ -176,15 +176,26 @@ SUBROUTINE BEAMELE (ID,X,Y,Z,U,MHT,E,G,AREA,I_X,I_Y,I_Z,J_X,J_Y,J_Z,LM,XYZ,MATP,
         ENDDO
         
         !ASSUME THE DIRECTION FOR PRINCIPLE AXIS        
+        
         CXX=(XYZ(4,N)-XYZ(1,N))/XL
         CXY=(XYZ(5,N)-XYZ(2,N))/XL
         CXZ=(XYZ(6,N)-XYZ(3,N))/XL
-        CYX=-CXX*CXZ/SQRT(CXX*CXX+CXY*CXY)
-        CYY=-CXY*CXZ/SQRT(CXX*CXX+CXY*CXY)
-        CYZ=SQRT(CXX*CXX+CXY*CXY)
-        CZX=CXY/SQRT(CXX*CXX+CXY*CXY)
-        CZY=-CXX/SQRT(CXX*CXX+CXY*CXY)
-        CZZ=0.0
+        IF ((ABS(CXX-0.0)<10E-5).AND.(ABS(CXY-0.0)<10E-5))THEN
+          CYX=1.0
+          CYY=0.0
+          CYZ=0.0
+          CZX=0.0
+          CZY=1.0
+          CZZ=0.0 
+        
+        ELSE
+          CYX=-CXX*CXZ/SQRT(CXX*CXX+CXY*CXY)
+          CYY=-CXY*CXZ/SQRT(CXX*CXX+CXY*CXY)
+          CYZ=SQRT(CXX*CXX+CXY*CXY)
+          CZX=CXY/SQRT(CXX*CXX+CXY*CXY)
+          CZY=-CXX/SQRT(CXX*CXX+CXY*CXY)
+          CZZ=0.0  
+        ENDIF
         
         T(1,1)=CXX
         T(1,2)=CXY

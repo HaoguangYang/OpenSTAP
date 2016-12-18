@@ -161,7 +161,7 @@ PROGRAM STAP90
 
   WRITE (IOUT,"(//,' TOTAL SYSTEM DATA',//,   &
                    '     NUMBER OF EQUATIONS',14(' .'),'(NEQ) = ',I5,/,   &
-                   '     NUMBER OF MATRIX ELEMENTS',11(' .'),'(NWK) = ',I5,/,   &
+                   '     NUMBER OF MATRIX ELEMENTS',11(' .'),'(NWK) = ',I11,/,   &
                    '     MAXIMUM HALF BANDWIDTH ',12(' .'),'(MK ) = ',I5,/,     &
                    '     MEAN HALF BANDWIDTH',14(' .'),'(MM ) = ',I5)") NEQ,NWK,MK,MM
 
@@ -283,7 +283,7 @@ SUBROUTINE WRITED (DISP,ID,NEQ,NUMNP)
         IF (KK.NE.0) D(I)=DISP(KK)
      END DO
 
-     WRITE (IOUT,'(1X,I3,5X,6E14.6)') II,D
+     WRITE (IOUT,'(1X,I5,5X,6E14.6)') II,D
      write (VTKTmpFile) D(1:3)                                    !Displacements
 
   END DO
