@@ -403,7 +403,7 @@ for i in range(len(keyloc[2])):
             inp.write('%5d'%(1) + '%10.1e'%(1.0) + '%5d'%(0) + '\n')
     elif element[i][0] == 'B31':
         inp.write('%5d'*3%(5,len(element[i][1][0]),1) + '\n')
-        inp.write('%5d'%1 + '%10.3e'%(material_e[2][1][2][0]) + '%10.3e'%(4.62085e10) + '%10.3f'%(0.25))
+        inp.write('%5d'%1 + '%10.3e'%(material_e[2][1][2][0]) + '%10.3e'%(4.62085e10) + '%10.3f'%(0.76))
         inp.write('%10.3e'%(0.4853333) + '%10.3e'%(0.4853333) + '%10.3e'%(0.4853333))
         inp.write('%10.3e'%(0.9170666) + '%10.3e'%(0.9170666) + '%10.3e'%(0.9170666) + '\n')
         for j in range(len(element[i][1][0])):
@@ -413,7 +413,7 @@ for i in range(len(keyloc[2])):
             inp.write('%5d'%(1) + '%5d'%(0) + '\n')
     elif element[i][0] == 'T3D2':
         inp.write('%5d'*3%(1,len(element[i][1][0]),1) + '\n')
-        inp.write('%5d'%1 + '%10.3e'%(material_e[4][1][2][0]) + '%10.3f'%(material_e[4][1][2][1]) + '\n')
+        inp.write('%5d'%1 + '%10.3e'%(material_e[4][1][2][0]) + '%10.3f'%(0.25) + '\n')
         for j in range(len(element[i][1][0])):
             el_num = j+1
             el_node = element[i][1][1][j]
