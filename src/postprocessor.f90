@@ -93,7 +93,7 @@ subroutine PostProcessor (ElementType, Dimen, PositionData, &
             end do
             
             !sets = 6
-            if (Nval .GT. 0) THEN
+            if (Ncoeff .GT. 0) THEN
                 call LeastSquare (coeff(1:Ncoeff,:), value(1:Nval,1:Ncoeff+6), Ncoeff, Nval, 6)
                 !write (*,*) coeff
                 ind2 = NodeRelationFlag(L,ref2)
