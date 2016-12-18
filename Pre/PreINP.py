@@ -194,9 +194,9 @@ node = readnode(keyloc[1][0]+1,keyloc[2][0]-1)
 node_b = []         #Node_Boundary
 for i in range(len(node[0])):
     if node[0][i] in boundary:
-        node_b.append([1,1,1,0,0,0])
+        node_b.append([1,1,1,1,1,1])
     else:
-        node_b.append([0,0,0,0,0,0])
+        node_b.append([0,0,0,1,1,1])
         
 element = [[] for x in range(len(keyloc[2]))]
 for i in range(0,len(keyloc[2])):
