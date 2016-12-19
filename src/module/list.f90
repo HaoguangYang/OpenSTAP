@@ -36,7 +36,7 @@ private
         module procedure delete_all_this
     end interface
     
-    public node, list, length, add, search, add_with_search, delete, set, delete_all
+    public node, list, length, add, search, add_with_search, delete, set, delete_all, add_with_sort
 
     contains
     !new a node
@@ -94,6 +94,7 @@ private
         this%length_ = this%length_ + 1
     end subroutine add_this
     
+    ! 在最后添加，不重复
     subroutine add_with_search(this, p_node0)
     type(list):: this
     type(node), pointer :: p_node0
@@ -109,6 +110,44 @@ private
         end if
     end subroutine add_with_search
     
+    ! 插入排序的方式插入
+    subroutine add_with_sort(this, p_node0)
+    type(list):: this
+    type(node), pointer :: p_node0
+    type(node), pointer :: p_node
+    if(.not. associated(this%head_)) then ! 空链表
+        this%head_ => p_node0
+        this%tail_ => p_node0
+        nullify(p_node0%prev_)
+        nullify(p_node0%next_)
+    else if( p_node0 .LT. this%head_ ) then
+        this%head_%prev_ => p_node0
+        p_node0%next_ => this%head_
+        this%head_ => p_node0
+        nullify(p_node0%prev_)
+    else
+        p_node => this%head_
+        do while(associated(p_node))
+            if(p_node0 .EQ. p_node) then
+                return
+            else if(p_node0 .LT. p_node) then
+                p_node%prev_%next_ => p_node0
+                p_node0%prev_ => p_node%prev_
+                p_node%prev_ => p_node0
+                p_node0%next_ => p_node
+                return
+            end if
+            p_node => p_node%next_
+        end do
+        ! 剩下一种可能就是这个是最大的
+        p_node0%prev_ => this%tail_
+        this%tail_ => p_node0
+        nullify(p_node0%next_)
+        return
+    end if
+    end subroutine add_with_sort
+                
+    ! 删除对应节点
     subroutine delete_this(this, p_node0)
         type(list) :: this
         type(node), pointer    :: p_node0

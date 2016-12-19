@@ -122,11 +122,11 @@ PROGRAM STAP90
 ! Clear storage
 !   MHT(NEQ) - Vector of column heights
 
-  CALL MEMFREEFROM(5)
+  CALL MEMFREEFROMTO(5,8)
   CALL MEMALLOC(5,"MHT  ",NEQ,1)
 
   IND=1    ! Read and generate element information
-  CALL ELCAL
+  CALL ELCAL ! 到这里2,3,4才没用的
   !CALL VTKgenerate (IND)        !Prepare Post-Processing Files.
 
   CALL SECOND (TIM(2))
@@ -138,7 +138,9 @@ PROGRAM STAP90
   WRITE(*,'("Solution phase ... ")')
 
 ! Assemble stiffness matrix
-
+if(pardiso .eq. .true.) then
+    
+else 
 ! ALLOCATE STORAGE
 !    MAXA(NEQ+1)
   CALL MEMFREEFROM(7)
@@ -166,7 +168,7 @@ PROGRAM STAP90
                    '     MEAN HALF BANDWIDTH',14(' .'),'(MM ) = ',I5)") NEQ,NWK,MK,MM
 
 ! In data check only mode we skip all further calculations
-
+end if
   IF (MODEX.LE.0) THEN
      CALL SECOND (TIM(3))
      CALL SECOND (TIM(4))
@@ -181,8 +183,7 @@ PROGRAM STAP90
      NEQ1=NEQ + 1
      CALL COLSOL (DA(NP(3)),DA(NP(4)),IA(NP(2)),NEQ,NWK,NEQ1,1)
 
-     CALL SECOND (TIM(4))
-
+     CALL SECOND (TIM(4)) 
      IND=3    ! Stress calculations
 
      REWIND ILOAD

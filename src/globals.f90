@@ -28,7 +28,7 @@ module GLOBALS
    integer :: NUMNP		! Total number of nodal points
 						! = 0 : Program stop
    integer :: NEQ		! Number of equations
-   integer :: NWK		! Number of matrix elements
+   integer :: NWK		! Number of matrix elements 注意这个东西在skyline和pardiso的情况下不同
    integer :: MK		! Maximum half bandwidth
 
    integer :: IND		! Solution phase indicator
@@ -64,6 +64,6 @@ module GLOBALS
 
    integer :: NG
    
-   logical :: BANDWIDTHOPT = .TRUE.
-   logical :: PARDISO = .FALSE.
+   logical :: BANDWIDTHOPT = .FALSE.
+   logical :: PARDISO = .TRUE.
 end module GLOBALS
