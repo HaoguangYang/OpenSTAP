@@ -342,4 +342,5 @@ subroutine pardiso_solver(A,V, rowIndex, columns)
       DO i = 1, neq
         WRITE(*,*) ' x(',i,') = ', x(i)
       END DO
+      V = x
 end subroutine pardiso_solver

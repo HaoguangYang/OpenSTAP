@@ -65,7 +65,6 @@ subroutine hexahedral
     NFIRST = NP(11)
     N(:) = N(:) + NFIRST
     NLAST  = N(9)
-    
     if ((NPAR(5) .EQ. 8) .AND. (NPAR(6) .EQ. 8)) call &
         HexEight (IA(NP(1)),DA(NP(2)),DA(NP(3)),DA(NP(4)),DA(NP(4)),IA(NP(7)),   &
                   A(N(1)),A(N(2)),A(N(3)),A(N(4)),A(N(5)),A(N(6)),A(N(7)),A(N(8)))

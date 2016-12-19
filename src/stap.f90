@@ -150,8 +150,7 @@ if(.not. pardisodoor) then
 !    R(NEQ) - Load vector R and then displacement solution U
 
   MM=NWK/NEQ
-  CALL MEMFREEFROM(8)
-  CALL MEMFREEFROMTO(2,4)
+
   CALL MEMALLOC(4,"R    ",NEQ,ITWO)
   CALL MEMALLOC(8,"STFF ",NWK,ITWO)
   CALL MEMALLOC(11,"ELEGP",MAXEST,1)
