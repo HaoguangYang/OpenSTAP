@@ -27,27 +27,35 @@
 		<Filter Name="Header Files" Filter="fi;fd"/>
 		<Filter Name="Resource Files" Filter="rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe"/>
 		<Filter Name="Source Files" Filter="f90;for;f;fpp;ftn;def;odl;idl">
-		<Filter Name="Data">
-		<File RelativePath="..\..\src\3T.f90"/>
-		<File RelativePath="..\..\src\4Q.f90"/>
-		<File RelativePath="..\..\src\9Q.f90"/>
+		<Filter Name="Elements">
+		<File RelativePath="..\..\src\elements\27H.f90"/>
+		<File RelativePath="..\..\src\elements\3T.f90"/>
+		<File RelativePath="..\..\src\elements\4Q.f90"/>
+		<File RelativePath="..\..\src\elements\8H.f90"/>
+		<File RelativePath="..\..\src\elements\9Q.f90"/>
+		<File RelativePath="..\..\src\elements\BEAM.f90"/>
+		<File RelativePath="..\..\src\elements\plate.f90"/>
+		<File RelativePath="..\..\src\elements\plate8Q.f90"/>
+		<File RelativePath="..\..\src\elements\shell.f90"/>
+		<File RelativePath="..\..\src\elements\shell8Q.f90"/>
+		<File RelativePath="..\..\src\elements\truss.f90"/></Filter>
+		<Filter Name="Modal">
+		<File RelativePath="..\..\src\modal\jacobi.f90"/>
+		<File RelativePath="..\..\src\modal\LANCZOS.f90"/>
+		<File RelativePath="..\..\src\modal\mathops.f90"/>
+		<File RelativePath="..\..\src\modal\ORTHMGS.f90"/></Filter>
+		<Filter Name="Modules">
+		<File RelativePath="..\..\src\module\list.f90"/>
+		<File RelativePath="..\..\src\module\mathkernel.f90"/>
+		<File RelativePath="..\..\src\module\node.f90"/>
+		<File RelativePath="..\..\src\module\solver_mode.f90"/></Filter>
+		<Filter Name="Utils">
 		<File RelativePath="..\..\src\assem.f90"/>
-		<File RelativePath="..\..\src\BEAM.f90"/>
 		<File RelativePath="..\..\src\datain.f90"/>
 		<File RelativePath="..\..\src\elcal.f90"/>
 		<File RelativePath="..\..\src\globals.f90"/>
-		<File RelativePath="..\..\src\hexahedral.f90"/>
-		<File RelativePath="..\..\src\mathkernel.f90"/>
 		<File RelativePath="..\..\src\memalloc.f90"/>
-		<File RelativePath="..\..\src\plate.f90"/>
-		<File RelativePath="..\..\src\plate8Q.f90"/>
 		<File RelativePath="..\..\src\postprocessor.f90"/>
-		<File RelativePath="..\..\src\shell.f90"/>
-		<File RelativePath="..\..\src\shell8Q.f90"/>
-		<File RelativePath="..\..\src\solver_mode.f90"/>
-		<File RelativePath="..\..\src\stap.f90"/>
-		<File RelativePath="..\..\src\truss.f90"/></Filter>
-		<File RelativePath="..\..\src\module\list.f90"/>
-		<File RelativePath="..\..\src\module\node.f90"/></Filter>
+		<File RelativePath="..\..\src\stap.f90"/></Filter></Filter>
 		<File RelativePath="..\Readme.txt"/></Files>
 	<Globals/></VisualStudioProject>

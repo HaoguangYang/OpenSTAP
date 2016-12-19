@@ -10,7 +10,7 @@
 ! Author:    Haoguang Yang
 ! 
 !===========================================================================================
-subroutine hexahedral
+subroutine EightHex
     use globals
     use memallocate
     
@@ -19,7 +19,6 @@ subroutine hexahedral
     integer :: N(11) !Pointers
     
     NPAR(5) = 8
-    NPAR(6) = 8
     NPAR(4) = 0
     
     NumberOfElements = NPAR(2)
@@ -66,13 +65,12 @@ subroutine hexahedral
     N(:) = N(:) + NFIRST
     NLAST  = N(9)
     
-    if ((NPAR(5) .EQ. 8) .AND. (NPAR(6) .EQ. 8)) call &
-        HexEight (IA(NP(1)),DA(NP(2)),DA(NP(3)),DA(NP(4)),DA(NP(4)),IA(NP(5)),   &
+    call HexEight (IA(NP(1)),DA(NP(2)),DA(NP(3)),DA(NP(4)),DA(NP(4)),IA(NP(5)),   &
                   A(N(1)),A(N(2)),A(N(3)),A(N(4)),A(N(5)),A(N(6)),A(N(7)),A(N(8)))
     
     !Reuse DA(NP(4)) at Solution Phase 3 as displacement U
     return
-end subroutine hexahedral
+end subroutine EightHex
 
 subroutine HexEight (ID,X,Y,Z,U,MHT,E, PoissonRatio, Density, Gravity, LM, PositionData, MaterialData, Node)
     use globals
@@ -334,23 +332,3 @@ subroutine HexB (BMatrix, DetJ, ElementShapeNodes, Transformed, Original)
     end select
 end subroutine HexB
 
-
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-!!                Calculate Stiffness Matrix                !!
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-subroutine GetDMat (Young, Poisson, DMatrix)
-    implicit none
-    real(8),dimension(6,6)  ::  DMatrix
-    real(8), intent(in)     ::  Young, Poisson
-    real(8)                 ::  G, lambda
-    integer                 ::  i
-    
-    DMatrix(:,:) = 0
-    G = Young/(2*(1+Poisson))
-    lambda = Poisson*Young/(1+Poisson)/(1-2*Poisson)
-    DMatrix(1:3,1:3) = lambda
-    do i = 1,6
-        DMatrix(i,i) = DMatrix(i,i) + 2*G
-    end do
-    return
-end subroutine GetDMat

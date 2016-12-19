@@ -357,5 +357,26 @@ subroutine LeastSquare (coeff, value, Ncoeff, Nval, sets)
     end do
     
 end subroutine LeastSquare
-END MODULE MathKernel
+    END MODULE MathKernel
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!!                Calculate Stiffness Matrix                !!
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+subroutine GetDMat (Young, Poisson, DMatrix)
+    implicit none
+    real(8),dimension(6,6)  ::  DMatrix
+    real(8), intent(in)     ::  Young, Poisson
+    real(8)                 ::  G, lambda
+    integer                 ::  i
+    
+    DMatrix(:,:) = 0
+    G = Young/(2*(1+Poisson))
+    lambda = Poisson*Young/(1+Poisson)/(1-2*Poisson)
+    DMatrix(1:3,1:3) = lambda
+    do i = 1,6
+        DMatrix(i,i) = DMatrix(i,i) + 2*G
+    end do
+    return
+end subroutine GetDMat
 

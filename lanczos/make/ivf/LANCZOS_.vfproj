@@ -24,8 +24,9 @@
 				<Tool Name="VFPostBuildEventTool"/>
 				<Tool Name="VFManifestTool" SuppressStartupBanner="true"/></Configuration></Configurations>
 	<Files>
-		<File RelativePath=".\LANCZOS.f90"/>
-		<File RelativePath=".\ORTHMGS.f90"/>
-		<File RelativePath=".\SSPACE90.f90"/>
-		<File RelativePath=".\subsp.f90"/></Files>
+		<File RelativePath="..\..\jacobi.f90"/>
+		<File RelativePath="..\..\LANCZOS.f90"/>
+		<File RelativePath="..\..\ORTHMGS.f90"/>
+		<File RelativePath="..\..\sub.f90"/>
+		<File RelativePath="..\..\subsp.f90"/></Files>
 	<Globals/></VisualStudioProject>
