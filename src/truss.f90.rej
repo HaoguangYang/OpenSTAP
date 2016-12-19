@@ -1,0 +1,10 @@
+diff a/src/truss.f90 b/src/truss.f90	(rejected hunks)
+@@ -51,7 +51,7 @@
+   N(:) = N(:) + NFIRST
+   NLAST=N(7)
+ 
+-  CALL RUSS (IA(NP(1)),DA(NP(2)),DA(NP(3)),DA(NP(4)),DA(NP(4)),IA(NP(5)),   &
++  CALL RUSS (IA(NP(1)),DA(NP(2)),DA(NP(3)),DA(NP(4)),DA(NP(4)),IA(NP(7)),   &
+         A(N(1)),A(N(2)),A(N(3)),A(N(4)),A(N(5)),A(N(6)),A(N(7)))
+ 
+   RETURN
