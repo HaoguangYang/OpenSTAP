@@ -71,9 +71,15 @@ SUBROUTINE INPUT (ID,X,Y,Z,NUMNP,NEQ)
                    'DEGREES OF FREEDOM',/,'  NUMBER',/,  &
                    '     N',13X,'X    Y    Z   RX   RY   RZ',/,(1X,I5,9X,6I5))") (N,(ID(I,N),I=1,6),N=1,NUMNP)
 
+<<<<<<< HEAD
 ! Add bandwidth optimization and pardiso
 ! *******Adding those two function need extra input
 IF( (BANDWIDTHOPT .EQ. .TRUE.) .OR. (PARDISO .EQ. .TRUE.) ) THEN
+=======
+  ! Add bandwidth optimization and pardiso
+! Adding those two function need extra input
+IF( (BANDWIDTHOPT .EQV. .TRUE.) .OR. (PARDISO .EQV. .TRUE.) ) THEN
+>>>>>>> fdbc334d64f548ac6f590e39028ccbb02bb0095e
     CALL SOLVERMODE(ID)
 END IF
 

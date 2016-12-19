@@ -22,19 +22,11 @@ SUBROUTINE TRUSS
   USE MEMALLOCATE
 
   IMPLICIT NONE
-  INTEGER :: NUME, NUMMAT, MM, N101, N102, N103, N104, N105, N106
+  INTEGER :: NUME, NUMMAT, MM, N(7)
 
   NUME = NPAR(2)
   NUMMAT = NPAR(3)
-
-! Allocate storage for element group data
-  IF (IND == 1) THEN
-      MM = 2*NUMMAT*ITWO + 7*NUME + 6*NUME*ITWO
-      CALL MEMALLOC(11,"ELEGP",MM,1)
-  END IF
-
-  NFIRST=NP(11)   ! Pointer to the first entry in the element group data array
-                  ! in the unit of single precision (corresponding to A)
+  NPAR(5) = 2
 
 ! Calculate the pointer to the arrays in the element group data
 ! N101: E(NUMMAT)
@@ -42,25 +34,32 @@ SUBROUTINE TRUSS
 ! N103: LM(6,NUME)
 ! N104: XYZ(6,NUME)
 ! N105: MTAP(NUME)
-  N101=NFIRST
-  N102=N101+NUMMAT*ITWO
-  N103=N102+NUMMAT*ITWO
-  N104=N103+6*NUME
-  N105=N104+6*NUME*ITWO
-  N106=N105+NUME
-  NLAST=N106
-
-  MIDEST=NLAST - NFIRST
+  N(1)=0
+  N(2)=N(1)+NUMMAT*ITWO
+  N(3)=N(2)+NUMMAT*ITWO
+  N(4)=N(3)+6*NUME
+  N(5)=N(4)+6*NUME*ITWO
+  N(6)=N(5)+NUME
+  N(7)=N(6)+NPAR(5)*NPAR(2)
+  
+  MIDEST=N(7)
+  if (IND .EQ. 1) then
+        ! Allocate storage for element group data
+        call MemAlloc(11,"ELEGP",MIDEST,1)
+  end if
+  NFIRST = NP(11)   ! Pointer to the first entry in the element group data array in the unit of single precision (corresponding to A)
+  N(:) = N(:) + NFIRST
+  NLAST=N(7)
 
   CALL RUSS (IA(NP(1)),DA(NP(2)),DA(NP(3)),DA(NP(4)),DA(NP(4)),IA(NP(5)),   &
-       A(N101),A(N102),A(N103),A(N104),A(N105))
+        A(N(1)),A(N(2)),A(N(3)),A(N(4)),A(N(5)),A(N(6)),A(N(7)))
 
   RETURN
 
 END SUBROUTINE TRUSS
 
 
-SUBROUTINE RUSS (ID,X,Y,Z,U,MHT,E,AREA,LM,XYZ,MATP)
+SUBROUTINE RUSS (ID,X,Y,Z,U,MHT,E,AREA,LM,XYZ,MATP,Node)
 ! . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 ! .                                                                   .
 ! .   TRUSS element subroutine                                        .
@@ -74,9 +73,9 @@ SUBROUTINE RUSS (ID,X,Y,Z,U,MHT,E,AREA,LM,XYZ,MATP)
   INTEGER :: ID(3,NUMNP),LM(6,NPAR(2)),MATP(NPAR(2)),MHT(NEQ)
   REAL(8) :: X(NUMNP),Y(NUMNP),Z(NUMNP),E(NPAR(3)),AREA(NPAR(3)),  &
              XYZ(6,NPAR(2)),U(NEQ)
-  REAL(8) :: S(6,6),ST(6),D(3)
+  REAL(8) :: S(6,6),ST(6),D(3), StressCollection(6,NPAR(2)), GaussianCollection(3,NPAR(2))
 
-  INTEGER :: NPAR1, NUME, NUMMAT, ND, I, J, L, N
+  INTEGER :: NPAR1, NUME, NUMMAT, ND, I, J, L, N, Node(NPAR(2),NPAR(5))
   INTEGER :: MTYPE, IPRINT
   REAL(8) :: XL2, XL, SQRT, XX, YY, STR, P
 
@@ -118,17 +117,12 @@ SUBROUTINE RUSS (ID,X,Y,Z,U,MHT,E,AREA,LM,XYZ,MATP)
 
      N=0
      DO WHILE (N .NE. NUME)
-        READ (IIN,'(5I5)') N,I,J,MTYPE  ! Read in element information
+        READ (IIN,'(5I5)') N,Node(N,1:2),MTYPE  ! Read in element information
 
 !       Save element information
-        XYZ(1,N)=X(I)  ! Coordinates of the element's left node
-        XYZ(2,N)=Y(I)
-        XYZ(3,N)=Z(I)
-
-        XYZ(4,N)=X(J)  ! Coordinates of the element's right node
-        XYZ(5,N)=Y(J)
-        XYZ(6,N)=Z(J)
-
+        XYZ(1:NPAR(5)*3-1:3,N)=X(Node(N,:))  ! Coordinates of the element's nodes
+        XYZ(2:NPAR(5)*3  :3,N)=Y(Node(N,:))
+        XYZ(3:NPAR(5)*3+1:3,N)=Z(Node(N,:))
         MATP(N)=MTYPE  ! Material type
 
         DO L=1,6
@@ -136,14 +130,15 @@ SUBROUTINE RUSS (ID,X,Y,Z,U,MHT,E,AREA,LM,XYZ,MATP)
         END DO
 
         DO L=1,3
-           LM(L,N)=ID(L,I)     ! Connectivity matrix
-           LM(L+3,N)=ID(L,J)
+           LM(L,N)=ID(L,Node(N,1))     ! Connectivity matrix
+           LM(L+3,N)=ID(L,Node(N,2))
         END DO
 
 !       Update column heights and bandwidth
         CALL COLHT (MHT,ND,LM(1,N))   
 
-        WRITE (IOUT,"(I5,6X,I5,4X,I5,7X,I5)") N,I,J,MTYPE
+        WRITE (IOUT,"(I5,6X,I5,4X,I5,7X,I5)") N,Node(N,1:2),MTYPE
+        write (VTKNodeTmp) NPAR(5), Node(N,:)-1
 
      END DO
 
@@ -217,8 +212,11 @@ SUBROUTINE RUSS (ID,X,Y,Z,U,MHT,E,AREA,LM,XYZ,MATP)
         P=STR*AREA(MTYPE)
 
         WRITE (IOUT,"(1X,I5,11X,E13.6,4X,E13.6)") N,P,STR
+        GaussianCollection(:,N) = 0.5*(XYZ(4:6,N)+XYZ(1:3,N))
+        StressCollection(1,N) = STR
      END DO
-
+     call PostProcessor(NPAR(1), 3, XYZ, &
+                        Node, 1, GaussianCollection, StressCollection, U)
   ELSE 
      STOP "*** ERROR *** Invalid IND value."
   END IF

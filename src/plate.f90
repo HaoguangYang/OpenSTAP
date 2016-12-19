@@ -74,6 +74,7 @@ SUBROUTINE PLATE4Q (ID,X,Y,Z,U,MHT,E,POSSION,LM,XYZ,MATP,THICK, Node)
 
   USE GLOBALS
   USE MEMALLOCATE
+  USE MathKernel
 
   IMPLICIT NONE
   INTEGER :: ID(6,NUMNP),LM(12,NPAR(2)),MATP(NPAR(2)),MHT(NEQ)
@@ -84,8 +85,8 @@ SUBROUTINE PLATE4Q (ID,X,Y,Z,U,MHT,E,POSSION,LM,XYZ,MATP,THICK, Node)
   INTEGER :: NPAR1, NUME, NUMMAT, ND, K, L, M, N
   INTEGER :: MTYPE, IPRINT, Node(NPAR(2),NPAR(5))
 
-  REAL(8) :: Cb(3, 3), Cs, Etemp, Ptemp, det, GaussianCollection(3,NPAR(2)*NPAR(5)), StressCollection(6,NPAR(2)*NPAR(5))
-  REAL(8) :: GAUSS(2) = (/-0.5773502692,0.5773502692/)
+  REAL(8) :: Cb(3, 3), Cs, Etemp, Ptemp, detJ, GaussianCollection(3,NPAR(2)*NPAR(5)), StressCollection(6,NPAR(2)*NPAR(5))
+  REAL(8) :: GAUSS(2), W(2)
   REAL(8) :: G1, G2, GN(2,4), Ja(2,2), Ja_inv(2,2), Bk(3,12),By(2,12), S(12,12), BB(2,4), NShape(1,4)
   REAL(8) :: X_Y(4, 2), XY_G(1,2), STR1(3,1), STR2(2,1), NN(1,4)
   NPAR1  = NPAR(1)
@@ -93,7 +94,7 @@ SUBROUTINE PLATE4Q (ID,X,Y,Z,U,MHT,E,POSSION,LM,XYZ,MATP,THICK, Node)
   NUMMAT = NPAR(3) 
 
   ND=12
-
+  call GaussianMask (GAUSS, W, 2)
 ! Read and generate element information
   IF (IND .EQ. 1) THEN
 
@@ -186,12 +187,12 @@ SUBROUTINE PLATE4Q (ID,X,Y,Z,U,MHT,E,POSSION,LM,XYZ,MATP,THICK, Node)
 ! 计算Jacobian
                 GN = reshape((/G2-1,G1-1, 1-G2,-G1-1, 1+G2,1+G1, -G2-1,1-G1/), shape(GN))/4
                 Ja = matmul(GN,X_Y)
-                det = Ja(1,1)*Ja(2,2) - Ja(1,2)*Ja(2,1)
+                detJ = Det(Ja,2)
                 Ja_inv(1,1) = Ja(2,2)
                 Ja_inv(2,1) = -Ja(2,1)
                 Ja_inv(1,2) = -Ja(1,2)
                 Ja_inv(2,2) = Ja(1,1)
-                Ja_inv = Ja_inv/det
+                Ja_inv = Ja_inv/detJ
                 BB = matmul(Ja_inv, GN)
                 
             NN(1,1)=(1-G1)*(1-G2)/4
@@ -215,7 +216,7 @@ SUBROUTINE PLATE4Q (ID,X,Y,Z,U,MHT,E,POSSION,LM,XYZ,MATP,THICK, Node)
                     By(2,3*K)   = -NN(1,K)
                 END DO
  ! 这里不要忘了还要乘上z方向积分
-                S = S + (matmul(matmul(transpose(Bk), Cb), Bk) + Cs*matmul(transpose(By), By))*abs(det)
+                S = S + W(L)*W(M)*(matmul(matmul(transpose(Bk), Cb), Bk) + Cs*matmul(transpose(By), By))*abs(detJ)
             END DO
         END DO
 
@@ -267,12 +268,12 @@ SUBROUTINE PLATE4Q (ID,X,Y,Z,U,MHT,E,POSSION,LM,XYZ,MATP,THICK, Node)
 ! 计算Jacobian
                 GN = reshape((/G2-1,G1-1, 1-G2,-G1-1, 1+G2,1+G1, -G2-1,1-G1/), shape(GN))/4
                 Ja = matmul(GN,X_Y)
-                det = Ja(1,1)*Ja(2,2) - Ja(1,2)*Ja(2,1)
+                detJ = Det(Ja,2)
                 Ja_inv(1,1) = Ja(2,2)
                 Ja_inv(2,1) = -Ja(2,1)
                 Ja_inv(1,2) = -Ja(1,2)
                 Ja_inv(2,2) = Ja(1,1)
-                Ja_inv = Ja_inv/det
+                Ja_inv = Ja_inv/detJ
                 BB = matmul(Ja_inv, GN)
                   
                 NN(1,1)=(1-G1)*(1-G2)/4
@@ -306,7 +307,7 @@ SUBROUTINE PLATE4Q (ID,X,Y,Z,U,MHT,E,POSSION,LM,XYZ,MATP,THICK, Node)
         END DO
      END DO
     
-     !call PostProcessor(NPAR(1), 2, XYZ, Node, 4, GaussianCollection, StressCollection, U)
+     call PostProcessor(NPAR(1), 2, XYZ, Node, 4, GaussianCollection, StressCollection, U)
     
   ELSE 
      STOP "*** ERROR *** Invalid IND value."

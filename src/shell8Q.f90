@@ -65,8 +65,9 @@ END SUBROUTINE SHELL8Q
 
 
 SUBROUTINE SHELL8 (ID,X,Y,Z,U,MHT,E,POSSION,LM,XYZ,MATP, THICK, Node)
- USE GLOBALS
+  USE GLOBALS
   USE MEMALLOCATE
+  USE MathKernel
 
   IMPLICIT NONE
   INTEGER :: ID(6,NUMNP),LM(40,NPAR(2)),MATP(NPAR(2)),MHT(NEQ)
@@ -77,9 +78,8 @@ SUBROUTINE SHELL8 (ID,X,Y,Z,U,MHT,E,POSSION,LM,XYZ,MATP, THICK, Node)
   INTEGER :: NPAR1, NUME, NUMMAT, ND, K, L, M, N
   INTEGER :: MTYPE, IPRINT, Node(NPAR(2),NPAR(5))
 
-  REAL(8) :: Cb(3, 3), Cs, Etemp, Ptemp, det, Cm(3, 3), StressCollection(6, NPAR(2)*9)
-  REAL(8) :: GAUSS(3) = (/-0.7745966692, 0.7745966692, 0.0/)
-  REAL(8) :: GAUSS_COF(3) = (/0.5555555556, 0.5555555556, 0.8888888889/)
+  REAL(8) :: Cb(3, 3), Cs, Etemp, Ptemp, detJ, Cm(3, 3), StressCollection(6, NPAR(2)*9)
+  REAL(8) :: GAUSS(3), GAUSS_COF(3)
   REAL(8) :: G1, G2, GN(2,4), GN8(2,8), Ja(2,2), Ja_inv(2,2), Bk(3,40),By(2,40), S(40,40), BB(2,8), NN0(1,8)
   REAL(8) :: X_Y(4, 2), STR1(3), STR2(2), Bm(3,40), GaussianCollection(3, NPAR(2)*9)
   NPAR1  = NPAR(1)
@@ -87,7 +87,7 @@ SUBROUTINE SHELL8 (ID,X,Y,Z,U,MHT,E,POSSION,LM,XYZ,MATP, THICK, Node)
   NUMMAT = NPAR(3) 
 
   ND=40
-
+  call GaussianMask(GAUSS, GAUSS_COF, 3)
 ! Read and generate element information
   IF (IND .EQ. 1) THEN
 
@@ -180,12 +180,12 @@ SUBROUTINE SHELL8 (ID,X,Y,Z,U,MHT,E,POSSION,LM,XYZ,MATP, THICK, Node)
 ! 计算Jacobian
                 GN = reshape((/G2-1,G1-1, 1-G2,-G1-1, 1+G2,1+G1, -G2-1,1-G1/), shape(GN))/4
                 Ja = matmul(GN,X_Y)
-                det = Ja(1,1)*Ja(2,2) - Ja(1,2)*Ja(2,1)
+                detJ = Det(Ja,2)
                 Ja_inv(1,1) = Ja(2,2)
                 Ja_inv(2,1) = -Ja(2,1)
                 Ja_inv(1,2) = -Ja(1,2)
                 Ja_inv(2,2) = Ja(1,1)
-                Ja_inv = Ja_inv/det
+                Ja_inv = Ja_inv/detJ
 ! 因为可能写不成一行了，所以直接依次赋值了~
                 NN0(1,1)=(1-G1)*(1-G2)*(-G1-G2-1)/4
                 NN0(1,2)=(1+G1)*(1-G2)*(G1-G2-1)/4
@@ -241,7 +241,7 @@ SUBROUTINE SHELL8 (ID,X,Y,Z,U,MHT,E,POSSION,LM,XYZ,MATP, THICK, Node)
                 END DO
  ! 这里不要忘了还要乘上z方向积分
                 S = S + (matmul(matmul(transpose(Bk), Cb), Bk) + Cs*matmul(transpose(By), By)+ &
-                    matmul(matmul(transpose(Bm), Cm), Bm))*abs(det)*GAUSS_COF(L)*GAUSS_COF(M)
+                    matmul(matmul(transpose(Bm), Cm), Bm))*abs(detJ)*GAUSS_COF(L)*GAUSS_COF(M)
             END DO
         END DO
         CALL ADDBAN (DA(NP(3)),IA(NP(2)),S,LM(1,N),ND)  ! 这里要输出的S就是制作好了的local stiffness matrix
@@ -292,12 +292,12 @@ SUBROUTINE SHELL8 (ID,X,Y,Z,U,MHT,E,POSSION,LM,XYZ,MATP, THICK, Node)
 ! 计算Jacobian
                 GN = reshape((/G2-1,G1-1, 1-G2,-G1-1, 1+G2,1+G1, -G2-1,1-G1/), shape(GN))/4
                 Ja = matmul(GN,X_Y)
-                det = Ja(1,1)*Ja(2,2) - Ja(1,2)*Ja(2,1)
+                detJ = Det(Ja,2)
                 Ja_inv(1,1) = Ja(2,2)
                 Ja_inv(2,1) = -Ja(2,1)
                 Ja_inv(1,2) = -Ja(1,2)
                 Ja_inv(2,2) = Ja(1,1)
-                Ja_inv = Ja_inv/det
+                Ja_inv = Ja_inv/detJ
                 BB = matmul(Ja_inv, GN8)
                 
                 NN0(1,1)=(1-G1)*(1-G2)*(-G1-G2-1)/4
@@ -360,8 +360,8 @@ SUBROUTINE SHELL8 (ID,X,Y,Z,U,MHT,E,POSSION,LM,XYZ,MATP, THICK, Node)
             END DO
         END DO
      END DO
-  !call Processor(NPAR(1), 2, XYZ((/((/3*k-2,3*k-1/),k=1,8)/),:), Node, 9, GaussianCollection(1:2,:), &
-  !                   StressCollection, U)
+  call PostProcessor(NPAR(1), 2, XYZ((/((/3*k-2,3*k-1/),k=1,8)/),:), Node, 9, GaussianCollection(1:2,:), &
+                     StressCollection, U)
   ELSE 
      STOP "*** ERROR *** Invalid IND value."
   END IF

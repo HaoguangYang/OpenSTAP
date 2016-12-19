@@ -20,6 +20,7 @@ subroutine hexahedral
     
     NPAR(5) = 8
     NPAR(6) = 8
+    NPAR(4) = 0
     
     NumberOfElements = NPAR(2)
     NumberOfMaterials = NPAR(3)
@@ -69,7 +70,7 @@ subroutine hexahedral
         HexEight (IA(NP(1)),DA(NP(2)),DA(NP(3)),DA(NP(4)),DA(NP(4)),IA(NP(5)),   &
                   A(N(1)),A(N(2)),A(N(3)),A(N(4)),A(N(5)),A(N(6)),A(N(7)),A(N(8)))
     
-    !Reuse DA(NP(4)) at Solution Phase 3 as displacement U    
+    !Reuse DA(NP(4)) at Solution Phase 3 as displacement U
     return
 end subroutine hexahedral
 
@@ -150,7 +151,7 @@ subroutine HexEight (ID,X,Y,Z,U,MHT,E, PoissonRatio, Density, Gravity, LM, Posit
             WRITE (IOUT,"(I7,5X,7(I7,1X),I7,4X,I5)") N,Node(N,1:ElementShapeNodes),MaterialType
             
             !write (IOUT,*) 'MHT',MHT
-            !write (VTKNodeTmp) NPAR(5), Node(N,:)-1
+            write (VTKNodeTmp) NPAR(5), Node(N,:)-1
             
         enddo
         return
@@ -256,8 +257,8 @@ subroutine HexEight (ID,X,Y,Z,U,MHT,E, PoissonRatio, Density, Gravity, LM, Posit
             StressCollection (:,ind1:ind2) = Stress
         END DO
 
-        !call PostProcessor(ElementType, 3, PositionData, &
-        !                   Node, QuadratureOrder**3, GaussianCollection, StressCollection, U)
+        call PostProcessor(ElementType, 3, PositionData, &
+                           Node, QuadratureOrder**3, GaussianCollection, StressCollection, U)
                            
                 
     END SELECT
@@ -292,7 +293,7 @@ end subroutine HexN
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !!       Calculate Gradiient of Shape Function Matrix       !!
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-!Still Problematic.
+
 subroutine HexB (BMatrix, DetJ, ElementShapeNodes, Transformed, Original)
     USE MathKernel
     implicit none

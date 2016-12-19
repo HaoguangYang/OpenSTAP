@@ -1,10 +1,25 @@
-stap : stap.o datain.o elcal.o assem.o globals.o truss.o memalloc.o 3T.o 4Q.o 9Q.o mathkernel.o hexahedral.o BEAM.o plate.o shell.o plate8Q.o shell8Q.o postprocessor.o
-	gfortran -o stap stap.o datain.o elcal.o assem.o globals.o truss.o memalloc.o 3T.o 4Q.o 9Q.o mathkernel.o hexahedral.o BEAM.o plate.o shell.o plate8Q.o shell8Q.o postprocessor.o
+stap : stap.o node.o list.o solver_mode.o datain.o elcal.o assem.o globals.o truss.o memalloc.o 3T.o 4Q.o 9Q.o mathkernel.o hexahedral.o BEAM.o plate.o shell.o plate8Q.o shell8Q.o postprocessor.o
+	gfortran -o stap stap.o node.o list.o solver_mode.o datain.o elcal.o assem.o globals.o truss.o memalloc.o 3T.o 4Q.o 9Q.o mathkernel.o hexahedral.o BEAM.o plate.o shell.o plate8Q.o shell8Q.o postprocessor.o
 
 stap.o : ../../src/stap.f90 ../../src/globals.f90 globals.mod memallocate.mod postprocessor.o
 	gfortran -c  ../../src/stap.f90
 
-datain.o : ../../src/datain.f90 ../../src/globals.f90 globals.mod memallocate.mod
+node.o : ../../src/module/node.f90
+	gfortran -c ../../src/module/node.f90
+    
+node.mod : ../../src/module/node.f90
+	gfortran -c ../../src/module/node.f90
+    
+list.o : ../../src/module/list.f90 ../../src/module/node.f90
+	gfortran -c ../../src/module/list.f90
+    
+list.mod : ../../src/module/list.f90 ../../src/module/node.f90
+	gfortran -c ../../src/module/list.f90
+	
+solver_mode.o : ../../src/solver_mode.f90 ../../src/globals.f90 list.mod node.mod
+	gfortran -c ../../src/solver_mode.f90
+    
+datain.o : ../../src/datain.f90 ../../src/globals.f90 globals.mod memallocate.mod node.mod solver_mode.o
 	gfortran -c  ../../src/datain.f90
 
 assem.o : ../../src/assem.f90 ../../src/globals.f90 globals.mod memallocate.mod
@@ -65,4 +80,4 @@ postprocessor.o : ../../src/postprocessor.f90 mathkernel.o memallocate.mod
 	gfortran -c  ../../src/postprocessor.f90
 
 clean : 
-	rm stap stap.o datain.o elcal.o assem.o globals.o globals.mod truss.o memalloc.o memallocate.mod 3T.o 4Q.o 9Q.o hexahedral.o BEAM.o plate.o shell.o plate8Q.o shell8Q.o mathkernel.o mathkernel.mod postprocessor.o
+	rm stap stap.o node.o node_class.mod list.o list_class.mod solver_mode.o datain.o elcal.o assem.o globals.o globals.mod truss.o memalloc.o memallocate.mod 3T.o 4Q.o 9Q.o hexahedral.o BEAM.o plate.o shell.o plate8Q.o shell8Q.o mathkernel.o mathkernel.mod postprocessor.o

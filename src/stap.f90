@@ -126,8 +126,13 @@ PROGRAM STAP90
   CALL MEMALLOC(5,"MHT  ",NEQ,1)
 
   IND=1    ! Read and generate element information
+<<<<<<< HEAD
   CALL ELCAL ! 到这里2,3,4才没用的
   !CALL VTKgenerate (IND)        !Prepare Post-Processing Files.
+=======
+  CALL ELCAL
+  CALL VTKgenerate (IND)        !Prepare Post-Processing Files.
+>>>>>>> fdbc334d64f548ac6f590e39028ccbb02bb0095e
 
   CALL SECOND (TIM(2))
 
@@ -163,7 +168,7 @@ else
 
   WRITE (IOUT,"(//,' TOTAL SYSTEM DATA',//,   &
                    '     NUMBER OF EQUATIONS',14(' .'),'(NEQ) = ',I5,/,   &
-                   '     NUMBER OF MATRIX ELEMENTS',11(' .'),'(NWK) = ',I5,/,   &
+                   '     NUMBER OF MATRIX ELEMENTS',11(' .'),'(NWK) = ',I11,/,   &
                    '     MAXIMUM HALF BANDWIDTH ',12(' .'),'(MK ) = ',I5,/,     &
                    '     MEAN HALF BANDWIDTH',14(' .'),'(MM ) = ',I5)") NEQ,NWK,MK,MM
 
@@ -201,7 +206,7 @@ end if
         CALL STRESS (A(NP(11)))
 
      END DO
-     !CALL VTKgenerate (IND)
+     CALL VTKgenerate (IND)
      CALL SECOND (TIM(5))
   END IF
 
@@ -265,7 +270,7 @@ SUBROUTINE WRITED (DISP,ID,NEQ,NUMNP)
   IC=4
 
   write(String, "('Displacement_Load_Case',I2.2)") CURLCASE
-  !write (VTKTmpFile) String, 3, NUMNP
+  write (VTKTmpFile) String, 3, NUMNP
   
   DO II=1,NUMNP
      IC=IC + 1
@@ -284,8 +289,8 @@ SUBROUTINE WRITED (DISP,ID,NEQ,NUMNP)
         IF (KK.NE.0) D(I)=DISP(KK)
      END DO
 
-     WRITE (IOUT,'(1X,I3,5X,6E14.6)') II,D
-     !write (VTKTmpFile) D(1:3)                                    !Displacements
+     WRITE (IOUT,'(1X,I5,5X,6E14.6)') II,D
+     write (VTKTmpFile) D(1:3)                                    !Displacements
 
   END DO
   
@@ -315,30 +320,30 @@ SUBROUTINE OPENFILES()
 !    call GETARG(1,FileInp)
 !  end if
 
-  !if(COMMAND_ARGUMENT_COUNT().ne.1) then
-  !   stop 'Usage: STAP90 InputFileName'
-  !else
-  !   call GET_COMMAND_ARGUMENT(1,FileInp)
-  !end if
+  if(COMMAND_ARGUMENT_COUNT().ne.1) then
+     stop 'Usage: STAP90 InputFileName'
+  else
+     call GET_COMMAND_ARGUMENT(1,FileInp)
+  end if
 
-  !INQUIRE(FILE = FileInp, EXIST = EX)
-  !IF (.NOT. EX) THEN
-  !   PRINT *, "*** STOP *** FILE STAP90.IN DOES NOT EXIST !"
-  !   STOP
-  !END IF
+  INQUIRE(FILE = FileInp, EXIST = EX)
+  IF (.NOT. EX) THEN
+     PRINT *, "*** STOP *** FILE STAP90.IN DOES NOT EXIST !"
+     STOP
+  END IF
   
-  !do i = 1, len_trim(FileInp)
-  !  if (FileInp(i:i) .EQ. '.') exit
-  !end do
+  do i = 1, len_trim(FileInp)
+    if (FileInp(i:i) .EQ. '.') exit
+  end do
   
-  OPEN(IIN   , FILE = "stap90_with_bo_shell_8H.in",  STATUS = "OLD")
-  OPEN(IOUT  , FILE = "stap90.OUT", STATUS = "REPLACE")
+  OPEN(IIN   , FILE = FileInp,  STATUS = "OLD")
+  OPEN(IOUT  , FILE = FileInp(1:i-1)//".OUT", STATUS = "REPLACE")
   OPEN(IELMNT, FILE = "ELMNT.TMP",  FORM = "UNFORMATTED")
   OPEN(ILOAD , FILE = "LOAD.TMP",   FORM = "UNFORMATTED")
-  !OPEN(VTKFile, FILE = FileInp(1:i-1)//".OUT.vtk", STATUS = "REPLACE")
-  !OPEN(VTKTmpFile, File = "VTK.tmp", FORM = "UNFORMATTED", STATUS = "REPLACE")
-  !OPEN(VTKNodeTmp, FILE = "VTKNode.tmp", FORM = "UNFORMATTED", STATUS = "REPLACE")
-  !OPEN(VTKElTypTmp, FILE = "VTKElTyp.tmp", FORM = "UNFORMATTED", STATUS = "REPLACE")
+  OPEN(VTKFile, FILE = FileInp(1:i-1)//".OUT.vtk", STATUS = "REPLACE")
+  OPEN(VTKTmpFile, File = "VTK.tmp", FORM = "UNFORMATTED", STATUS = "REPLACE")
+  OPEN(VTKNodeTmp, FILE = "VTKNode.tmp", FORM = "UNFORMATTED", STATUS = "REPLACE")
+  OPEN(VTKElTypTmp, FILE = "VTKElTyp.tmp", FORM = "UNFORMATTED", Access='Stream', STATUS = "REPLACE") !FORM = "UNFORMATTED",
   
 END SUBROUTINE OPENFILES
 
@@ -355,8 +360,8 @@ SUBROUTINE CLOSEFILES()
   CLOSE(IOUT)
   CLOSE(IELMNT, status='delete')
   CLOSE(ILOAD, status='delete')
-  !close(VTKFile)
-  !close(VTKTmpFile, status='delete')
-  !close(VTKNodeTmp, status='delete')
-  !close(VTKElTypTmp, status='delete')
+  close(VTKFile)
+  close(VTKTmpFile, status='delete')
+  close(VTKNodeTmp, status='delete')
+  close(VTKElTypTmp, status='delete')
 END SUBROUTINE CLOSEFILES
