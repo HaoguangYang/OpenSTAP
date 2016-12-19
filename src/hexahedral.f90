@@ -89,7 +89,7 @@ subroutine HexEight (ID,X,Y,Z,U,MHT,E, PoissonRatio, Density, Gravity, LM, Posit
                 DetJ(2,2,2), E(NPAR(3)), PoissonRatio(NPAR(3)), ElementDisp(24)
     real(8) ::  BMatrix(6, 3*NPAR(5)), PositionData(3*NPAR(5), NPAR(2)), DMatrix(6,6), &
                 Transformed(3), W(2), Weight(2,2,2), GaussianPts(2), GaussianCollection(3, NPAR(2)*2**3), &
-                StressCollection(6,NPAR(2)*2**3)
+                StressCollection(6,NPAR(2)*2**3), M(3*NPAR(5),3*NPAR(5)), Rho
     real(8) ::  Young, v, S(3*NPAR(5),3*NPAR(5)), GaussianPtsPosit(3,2**3), Strain(6,2**3), Stress(6,2**3), &
                 Density, Gravity, NMatrix(3,3*NPAR(5)), NormalVec(3), Point(3*NPAR(5),3*NPAR(5))
                 
@@ -137,7 +137,7 @@ subroutine HexEight (ID,X,Y,Z,U,MHT,E, PoissonRatio, Density, Gravity, LM, Posit
             PositionData(2:ElementShapeNodes*3  :3,N)=Y(Node(N,:))
             PositionData(3:ElementShapeNodes*3+1:3,N)=Z(Node(N,:))
             
-            MaterialData(N) = MaterialType                              ! Material type
+            MaterialData(N) = MaterialType                                ! Material type
 
             DO L=1,ND
                 LM(L,N)=0
@@ -174,36 +174,39 @@ subroutine HexEight (ID,X,Y,Z,U,MHT,E, PoissonRatio, Density, Gravity, LM, Posit
                 Young        = E(MaterialType)
                 v            = PoissonRatio(MaterialType)
                 call GetDMat(Young, v, DMatrix)
-                
+                IF (DYNANALYSIS .EQV. .TRUE.) Rho = Density(MaterialType)
                 MaterialComp = MaterialType
             end if
             
             !DetJ = reshape(Jacobian((n-1)*QuadratureOrder**3+1 : n*QuadratureOrder**3), &
             !               (/QuadratureOrder, QuadratureOrder, QuadratureOrder/))
             DetJ(:, :, :)=0
-            ind0  = 1
             do i = 1, QuadratureOrder
                 do j = 1, QuadratureOrder
                     do k = 1, QuadratureOrder
                         Transformed   = (/GaussianPts(i), GaussianPts(j), GaussianPts(k)/)
-                        CALL HexB(BMatrix, DetJ(i,j,k), ElementShapeNodes, Transformed, &
-                                  (/PositionData(1:ElementShapeNodes*3-1:3,N), &
-                                    PositionData(2:ElementShapeNodes*3  :3,N), &
-                                    PositionData(3:ElementShapeNodes*3+1:3,N)/))
-                        !write (*,*) ((n-1)*QuadratureOrder**3+ind0-2)*18*ElementShapeNodes+1,'----------------------',& 
-                        !            ((n-1)*QuadratureOrder**3+ind0-1)*18*ElementShapeNodes
-                        !write (*,*) BMatrix
-                        
-                        Point   = matmul(matmul(transpose(BMatrix),DMatrix),BMatrix)
-                        S = S + (Weight(i,j,k)*DetJ(i,j,k))*Point
-                        ind0 = ind0 + 1
+                        IF (LOADANALYSIS .EQV. .TRUE.) then
+                            CALL HexB(BMatrix, DetJ(i,j,k), ElementShapeNodes, Transformed, &
+                                      (/PositionData(1:ElementShapeNodes*3-1:3,N), &
+                                        PositionData(2:ElementShapeNodes*3  :3,N), &
+                                        PositionData(3:ElementShapeNodes*3+1:3,N)/))
+                            Point   = matmul(matmul(transpose(BMatrix),DMatrix),BMatrix)
+                            S = S + (Weight(i,j,k)*DetJ(i,j,k))*Point
+                        END IF
+                        IF (DYNANALYSIS .EQV. .TRUE.) then
+                            call HexN (NMatrix, ElementShapeNodes, Transformed)             !Initialize N Matrix for mass assembly
+                            Point = Rho*matmul(transpose(NMatrix),NMatrix)
+                            M = M + (Weight(i,j,k)*DetJ(i,j,k))*Point
+                        END IF
                     end do
                 end do
             end do
             
             !write(*,*) "S",S
             
-            CALL ADDBAN (DA(NP(3)),IA(NP(2)),S,LM(:,N),ND)
+            IF (LOADANALYSIS .EQV. .TRUE.) CALL ADDBAN (DA(NP(3)),IA(NP(2)),S,LM(:,N),ND)
+            IF (DYNANALYSIS .EQV. .TRUE.) CALL ADDBAN (DA(NP(5)),IA(NP(2)),M,LM(:,N),ND)
+            
         end do
         
     CASE (3)

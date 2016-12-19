@@ -155,6 +155,7 @@ PROGRAM STAP90
 
   CALL MEMALLOC(3,"STFF ",NWK,ITWO)
   CALL MEMALLOC(4,"R    ",NEQ,ITWO)
+  IF (DYNANALYSIS .EQV. .TRUE.) CALL MEMALLOC(5,"M    ",NWK,ITWO)
   CALL MEMALLOC(11,"ELEGP",MAXEST,1)
 
 ! Write total system data
@@ -174,7 +175,7 @@ PROGRAM STAP90
   ELSE
      IND=2    ! Assemble structure stiffness matrix
      CALL ASSEM (A(NP(11)))
-
+     
      CALL SECOND (TIM(3))
 
 !    Triangularize stiffness matrix
@@ -201,6 +202,7 @@ PROGRAM STAP90
 
      END DO
      CALL VTKgenerate (IND)
+     
      CALL SECOND (TIM(5))
   END IF
 
