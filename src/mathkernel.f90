@@ -350,6 +350,7 @@ subroutine LeastSquare (coeff, value, Ncoeff, Nval, sets)
     
     ATA = matmul(transpose(value(:,1:Ncoeff)),value(:,1:Ncoeff))        !May waste a lot of calcullatons here...
     call InvMat(ATA, ATA, Ncoeff)
+    
     do i = 1,sets
         ATY = matmul(transpose(value(:,1:Ncoeff)),value(:,Ncoeff+i))
         coeff(:,i) = matmul(ATA,ATY)

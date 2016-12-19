@@ -215,6 +215,7 @@ SUBROUTINE RUSS (ID,X,Y,Z,U,MHT,E,AREA,LM,XYZ,MATP,Node)
         GaussianCollection(:,N) = 0.5*(XYZ(4:6,N)+XYZ(1:3,N))
         StressCollection(1,N) = STR
      END DO
+!>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>WORKING PROGRESS
      call PostProcessor(NPAR(1), 3, XYZ, &
                         Node, 1, GaussianCollection, StressCollection, U)
   ELSE 

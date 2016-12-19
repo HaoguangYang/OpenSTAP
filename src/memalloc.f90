@@ -121,9 +121,10 @@ contains
 !     Compact the storage if neccessary
       if (npbase+nplen < nplast) then
 !        Move arrays behind the array num forward to reuse its storage
-         do i = npbase+nplen+1, nplast
-            A(i-nplen) = A(i)
-         end do
+         !do i = npbase+nplen+1, nplast
+         !   A(i-nplen) = A(i)
+         !end do
+         A(npbase+nplen+1-nplen : nplast-nplen) = A(npbase+nplen+1 : nplast)
 
 !        Update the pointer of arrays behind the array num
          do i = 1, amax
