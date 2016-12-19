@@ -141,9 +141,39 @@ SUBROUTINE ADDBAN (A,MAXA,S,LM,ND)
   END DO
 
   RETURN
-END SUBROUTINE ADDBAN
+    END SUBROUTINE ADDBAN
 
+subroutine pardiso_addban(A, rowIndex, columns, S, LM, ND)
+  USE GLOBALS, ONLY : NWK, NEQ
+  IMPLICIT NONE
+  REAL(8) :: A(NWK),S(ND,ND)
+  INTEGER :: rowIndex(NEQ+1),columns(nwk), LM(ND)
+  INTEGER :: ND, I, J, II, JJ, k, KK, temp
+  DO J=1,ND
+     JJ=LM(J)
+     IF (JJ .GT. 0) THEN
+        DO I=1,J
+           II=LM(I)
+           IF (II .GT. 0) THEN
+              IF (JJ .GT. II) THEN ! 如果JJ > II，交换，让JJ永远小于II
+                 temp = JJ
+                 JJ = II
+                 II = temp
+              END IF              
+              loop1: do k = rowIndex(JJ), rowIndex(JJ+1)-1
+                 if(columns(k) .EQ. II) then
+                     A(k) = A(k) + S(I,J)
+                     exit loop1
+                 end if
+             end do loop1
+           END IF
+        END DO
+     END IF
+  END DO
 
+  RETURN
+end subroutine
+  
 SUBROUTINE COLSOL (A,V,MAXA,NN,NWK,NNM,KKK)
 ! . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 ! .                                                                   .
@@ -272,4 +302,44 @@ SUBROUTINE COLSOL (A,V,MAXA,NN,NWK,NNM,KKK)
 
   END IF
 
-END SUBROUTINE COLSOL
+    END SUBROUTINE COLSOL
+
+subroutine pardiso_solver(A,V, rowIndex, columns)
+    use MKL_PARDISO
+    use GLOBALS, only : nwk, neq
+    implicit none
+    ! Internal solver memory pointer
+    TYPE(MKL_PARDISO_HANDLE)  pt(64)
+    INTEGER maxfct, mnum, mtype, phase, nrhs, error, msglvl, n
+    INTEGER iparm(64)
+    INTEGER rowIndex(neq) 
+    INTEGER columns(nwk)
+    INTEGER perm(neq)
+    REAL(8)  dparm(64) 
+    REAL(8)  A(nwk) 
+    REAL(8)  V(neq)
+    REAL(8)  x(neq)
+    
+    INTEGER i, j, idum, solver
+    REAL(8)  waltime1, waltime2, ddum, normb, normr
+    
+    mtype  = 2   ! unsymetric matrix symmetric, definite
+    maxfct = 1
+    mnum = 1
+    solver = 10  ! use sparse direct  method
+    nrhs = 1
+    call pardisoinit(pt, mtype, iparm)
+    msglvl = 0 !书否输入提示信息
+!.. Back substitution and iterative refinement
+      iparm(8)  = 1   ! max numbers of iterative refinement steps
+      phase     = 33  ! only solve
+
+      CALL pardiso_d(pt, maxfct, mnum, mtype, phase, neq, A, rowIndex, columns,perm, nrhs, iparm, msglvl, V, x, error) 
+
+      WRITE(*,*) 'Solve completed ...  '
+     
+      WRITE(*,*) 'The solution of the system is '
+      DO i = 1, neq
+        WRITE(*,*) ' x(',i,') = ', x(i)
+      END DO
+end subroutine pardiso_solver

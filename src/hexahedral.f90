@@ -67,7 +67,7 @@ subroutine hexahedral
     NLAST  = N(9)
     
     if ((NPAR(5) .EQ. 8) .AND. (NPAR(6) .EQ. 8)) call &
-        HexEight (IA(NP(1)),DA(NP(2)),DA(NP(3)),DA(NP(4)),DA(NP(4)),IA(NP(5)),   &
+        HexEight (IA(NP(1)),DA(NP(2)),DA(NP(3)),DA(NP(4)),DA(NP(4)),IA(NP(7)),   &
                   A(N(1)),A(N(2)),A(N(3)),A(N(4)),A(N(5)),A(N(6)),A(N(7)),A(N(8)))
     
     !Reuse DA(NP(4)) at Solution Phase 3 as displacement U
@@ -203,7 +203,11 @@ subroutine HexEight (ID,X,Y,Z,U,MHT,E, PoissonRatio, Density, Gravity, LM, Posit
             
             !write(*,*) "S",S
             
-            CALL ADDBAN (DA(NP(3)),IA(NP(2)),S,LM(:,N),ND)
+            if(pardisodoor) then
+                call pardiso_addban(DA(NP(8)),IA(NP(5)),IA(NP(6)),S,LM(:,N),ND)
+            else
+                CALL ADDBAN (DA(NP(8)),IA(NP(2)),S,LM(:,N),ND)
+            end if
         end do
         
     CASE (3)
@@ -257,8 +261,8 @@ subroutine HexEight (ID,X,Y,Z,U,MHT,E, PoissonRatio, Density, Gravity, LM, Posit
             StressCollection (:,ind1:ind2) = Stress
         END DO
 
-        call PostProcessor(ElementType, 3, PositionData, &
-                           Node, QuadratureOrder**3, GaussianCollection, StressCollection, U)
+        !call PostProcessor(ElementType, 3, PositionData, &
+        !                   Node, QuadratureOrder**3, GaussianCollection, StressCollection, U)
                            
                 
     END SELECT

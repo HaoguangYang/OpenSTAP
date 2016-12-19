@@ -1,14 +1,11 @@
 ! 这里认为没有必要同时具有半带宽优化与系数矩阵求解的功能
     SUBROUTINE SOLVERMODE(ID)
-    USE LIST_CLASS
-    USE NODE_CLASS
-    USE GLOBALS, ONLY : IIN, IOUT, NEQ, NUMNP, NWK, bandwidthopt, pardiso
-    USE MEMALLOCATE
+    USE GLOBALS, ONLY : IIN, IOUT, NEQ, NUMNP, NWK, bandwidthopt, pardisodoor
     
     INTEGER :: ID(6, NUMNP)
-    if(pardiso .eq. .true.) then
-         call pardiso_address(ID)
-    else if ( bandwidthopt .EQ. .true.) then
+    if(pardisodoor) then
+         call pardiso_input(ID)
+    else if ( bandwidthopt) then
         call bdopt(ID)
     end if
 
@@ -112,10 +109,10 @@ subroutine bdopt(ID)
      end do
 end subroutine bdopt
     
-subroutine pardiso_address(ID)
+subroutine pardiso_input(ID)
     USE LIST_CLASS
     USE NODE_CLASS
-    USE GLOBALS, ONLY : IIN, IOUT, NEQ, NUMNP, NWK, bandwidthopt, pardiso
+    USE GLOBALS, ONLY : IIN, IOUT, NEQ, NUMNP, NWK, bandwidthopt, pardisodoor
     USE MEMALLOCATE
     
     implicit none
@@ -129,15 +126,12 @@ subroutine pardiso_address(ID)
     INTEGER :: I, J, K ! 循环变量
     INTEGER :: temp_length, TEMP_INDEX
     INTEGER :: FREE_DOF ! 单元中自由的自由度
-    DO I = 1,NUMNP
-        DO J = 1,6
-            IF(ID(J,I) .NE. 0) THEN
-                CALL SET(lists(ID(J,I)), I, J)
-            END IF
-        END DO
-    END DO
     ! input phase
      READ (IIN,"(I5)") NUME ! 总element数
+     ! 为了节省空间，这里用sign_表示序号好了
+     DO i = 1,NEQ
+         lists(i)%sign_ = i
+     end do
      DO I = 1,NUME
          READ (IIN,"(I5)") N ! 这个element对应的节点数
          READ (IIN, "(<N>I5)") (TEMP_NODE(J), J = 1,N)
@@ -150,19 +144,61 @@ subroutine pardiso_address(ID)
                  END IF
              END DO
          END DO
-         DO J = 1, FREE_DOF
-             DO K = 1, FREE_DOF
+         DO K = 1, FREE_DOF
+             DO J = 1, FREE_DOF
                  CALL NEW(P_NODE, TEMP_ID(J))
                  call ADD_WITH_SORT(lists(TEMP_ID(K)), P_NODE)
              END DO
          END DO
      END DO
-     
+     ! 注意这里分配了rowIndex
+     CALL MEMALLOC(5,"rowIndex",NEQ,1)
+     call assign_rowIndex(lists, IA(NP(5)))
+     CALL MEMALLOC(6,"columns",NWK,1)
+     CALL assign_columns(lists, IA(NP(6)))
      do i = 1, neq
          call delete_all(lists(i))
      end do
-<<<<<<< HEAD
-end subroutine pardiso_address
-=======
-END SUBROUTINE SOLVERMODE
->>>>>>> fdbc334d64f548ac6f590e39028ccbb02bb0095e
+    end subroutine pardiso_input
+
+subroutine assign_rowIndex(lists, rowIndex)
+    use GLOBALS, only : neq, nwk
+    use list_class
+    use node_class
+    
+    implicit none
+    type(list) :: lists(neq)
+    integer :: rowIndex(neq+1)
+    type(node), pointer :: p_node
+    integer :: i, j
+    
+    nwk = 0
+    do i=1, neq
+        rowIndex(i) = 1 + nwk
+        nwk = nwk + length(lists(i))
+    end do
+    rowIndex(neq+1) = nwk+1
+    end subroutine assign_rowIndex
+    
+subroutine assign_columns(lists, columns)
+    use GLOBALS, only : neq, nwk
+    use list_class
+    use node_class
+    
+    implicit none
+    type(list) :: lists(neq)
+    integer :: columns(nwk)
+    type(node), pointer :: p_node
+    integer :: i, j
+    
+    j = 1
+    do i = 1, neq
+        p_node => lists(i)%head_
+        do while(associated(p_node))
+            columns(j) = p_node%index_
+            p_node => p_node%next_
+            j = j + 1
+        end do
+    end do
+    end subroutine assign_columns
+    

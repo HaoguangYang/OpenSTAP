@@ -58,7 +58,7 @@ NPAR(5) = 4
   N(:) = N(:) + NFIRST
   NLAST=N(7)
 
-  CALL ELEMENT_4Q_MAIN (IA(NP(1)),DA(NP(2)),DA(NP(3)),DA(NP(4)),DA(NP(4)),IA(NP(5)),   &
+  CALL ELEMENT_4Q_MAIN (IA(NP(1)),DA(NP(2)),DA(NP(3)),DA(NP(4)),DA(NP(4)),IA(NP(7)),   &
        A(N(1)),A(N(2)),A(N(3)),A(N(4)),A(N(5)),A(N(6)))
 
   RETURN
@@ -212,8 +212,11 @@ SUBROUTINE ELEMENT_4Q_MAIN (ID,X,Y,Z,U,MHT,E,POISSON,LM,XYZ,MATP,Node)
             END DO
          END DO       
 
-        CALL ADDBAN (DA(NP(3)),IA(NP(2)),KE,LM(1,N),ND)
-
+        if(pardisodoor) then
+            call pardiso_addban(DA(NP(8)),IA(NP(5)),IA(NP(6)),KE,LM(1,N),ND)
+        else
+            CALL ADDBAN (DA(NP(8)),IA(NP(2)),KE,LM(1,N),ND)
+        end if
      END DO
         !write (*,*) "--------------------K--------------------"
         !write (*,*) DA(NP(3): NP(3)+NumberOfMatrixElements-1)
@@ -280,8 +283,8 @@ SUBROUTINE ELEMENT_4Q_MAIN (ID,X,Y,Z,U,MHT,E,POISSON,LM,XYZ,MATP,Node)
         J = N*4
         GaussianCollection (:,I:J) = transpose(X_GUASS)
      END DO
-     call PostProcessor(NPAR(1), 2, XYZ((/1,2,4,5,7,8,10,11/),:), Node, 4, GaussianCollection, &
-         TRANSPOSE(reshape((/transpose(STRESS_XX),transpose(STRESS_YY),transpose(STRESS_XY)/),(/4*NPAR(2),3/))), U)
+     !call PostProcessor(NPAR(1), 2, XYZ((/1,2,4,5,7,8,10,11/),:), Node, 4, GaussianCollection, &
+     !    TRANSPOSE(reshape((/transpose(STRESS_XX),transpose(STRESS_YY),transpose(STRESS_XY)/),(/4*NPAR(2),3/))), U)
   ELSE 
      STOP "*** ERROR *** Invalid IND value."
   END IF
