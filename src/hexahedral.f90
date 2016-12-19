@@ -185,14 +185,12 @@ subroutine HexEight (ID,X,Y,Z,U,MHT,E, PoissonRatio, Density, Gravity, LM, Posit
                 do j = 1, QuadratureOrder
                     do k = 1, QuadratureOrder
                         Transformed   = (/GaussianPts(i), GaussianPts(j), GaussianPts(k)/)
-                        IF (LOADANALYSIS .EQV. .TRUE.) then
-                            CALL HexB(BMatrix, DetJ(i,j,k), ElementShapeNodes, Transformed, &
-                                      (/PositionData(1:ElementShapeNodes*3-1:3,N), &
-                                        PositionData(2:ElementShapeNodes*3  :3,N), &
-                                        PositionData(3:ElementShapeNodes*3+1:3,N)/))
-                            Point   = matmul(matmul(transpose(BMatrix),DMatrix),BMatrix)
-                            S = S + (Weight(i,j,k)*DetJ(i,j,k))*Point
-                        END IF
+                        CALL HexB(BMatrix, DetJ(i,j,k), ElementShapeNodes, Transformed, &
+                                  (/PositionData(1:ElementShapeNodes*3-1:3,N), &
+                                    PositionData(2:ElementShapeNodes*3  :3,N), &
+                                    PositionData(3:ElementShapeNodes*3+1:3,N)/))
+                        Point   = matmul(matmul(transpose(BMatrix),DMatrix),BMatrix)
+                        S = S + (Weight(i,j,k)*DetJ(i,j,k))*Point
                         IF (DYNANALYSIS .EQV. .TRUE.) then
                             call HexN (NMatrix, ElementShapeNodes, Transformed)             !Initialize N Matrix for mass assembly
                             Point = Rho*matmul(transpose(NMatrix),NMatrix)
@@ -204,7 +202,7 @@ subroutine HexEight (ID,X,Y,Z,U,MHT,E, PoissonRatio, Density, Gravity, LM, Posit
             
             !write(*,*) "S",S
             
-            IF (LOADANALYSIS .EQV. .TRUE.) CALL ADDBAN (DA(NP(3)),IA(NP(2)),S,LM(:,N),ND)
+            CALL ADDBAN (DA(NP(3)),IA(NP(2)),S,LM(:,N),ND)
             IF (DYNANALYSIS .EQV. .TRUE.) CALL ADDBAN (DA(NP(5)),IA(NP(2)),M,LM(:,N),ND)
             
         end do
