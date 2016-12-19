@@ -280,6 +280,10 @@ case (1)                                                            !Called in s
     write (VTKFile,*) HED
     write (VTKFile,"(A5)") 'ASCII'
     write (VTKFile,"(A25)") 'DATASET UNSTRUCTURED_GRID'
+    write (VTKFile,*) "POINTS",NUMNP,"double"
+    do i = 1, NUMNP
+        write (VTKFile,*) DA(NP(2)+i-1), DA(NP(3)+i-1), DA(NP(4)+i-1)           !X(i), Y(i), Z(i)
+    end do
     
 case (2)                                                            !Called in elcal.f90, subroutine ELCAL
     select case (NPAR(1))
@@ -306,10 +310,7 @@ case (2)                                                            !Called in e
      end select
      
 case (3)                                                            !Called in stap.f90, STAP at solution phase IND=3
-    write (VTKFile,*) "POINTS",NUMNP,"double"
-    do i = 1, NUMNP
-        write (VTKFile,*) DA(NP(2)+i-1), DA(NP(3)+i-1), DA(NP(4)+i-1)           !X(i), Y(i), Z(i)
-    end do
+!>>>>>>>>>>>>>>>>>>>>>>>>>>HOW TO RESOLVE CONNECTION POINTS BETWEEN TWO ELEMENT GROUPS??? THESE POINTS ARE REPEATED
     write (VTKFile,*) "CELLS ", NEL, NCONECT                        !Sum up all elements to generate a global picture
     rewind (VTKNodeTmp)
     do i = 1 , NEL
@@ -326,7 +327,7 @@ case (3)                                                            !Called in s
     rewind (VTKTmpFile)
     do i = 1 , NLCASE
         read (VTKTmpFile) string(1:25), Dat(1:2)                    !Fetch Displacements of Load Cases
-        write (VTKFile,*) string(1:25), Dat(1:2), "double"
+        write (VTKFile,*) string(1:25), Dat(1:2), "double"          !Displacements are written into temp files in subroutine writd, stap.f90
         do j = 1, NUMNP
             read (VTKTmpFile) Dat1(1:Dat(1))
             write (VTKFile,*) Dat1(1:Dat(1))
