@@ -18,7 +18,7 @@ PROGRAM STAP90
   IMPLICIT NONE
   INTEGER :: NEQ1, NLOAD, MM
   INTEGER :: LL, I
-  REAL :: TT
+  INTEGER :: TT
 
 ! OPEN INPUT DATA FILE, RESULTS OUTPUT FILE AND TEMPORARY FILES
   CALL OPENFILES()
@@ -247,11 +247,12 @@ end if
 
   WRITE (*,"(//,  &
      ' S O L U T I O N   T I M E   L O G   I N   S E C',//,   &
-     '     TIME FOR INPUT PHASE ',14(' .'),' =',F15.5,/,     &
-     '     TIME FOR CALCULATION OF STIFFNESS MATRIX  . . . . =',F15.5, /,   &
-     '     TIME FOR FACTORIZATION OF STIFFNESS MATRIX  . . . =',F15.5, /,   &
-     '     TIME FOR LOAD CASE SOLUTIONS ',10(' .'),' =',F15.5,//,   &
-     '      T O T A L   S O L U T I O N   T I M E  . . . . . =',F15.5)") (TIM(I),I=1,5),TT
+     '     TIME FOR INPUT PHASE ',14(' .'),' =',I5,/,     &
+     '     TIME FOR PREPARATION OF MATRIX FORMAT ... . . . . =',I5,/,     &
+     '     TIME FOR CALCULATION OF STIFFNESS MATRIX  . . . . =',I5, /,   &
+     '     TIME FOR FACTORIZATION OF STIFFNESS MATRIX  . . . =',I5, /,   &
+     '     TIME FOR LOAD CASE SOLUTIONS ',10(' .'),' =',I5,//,   &
+     '      T O T A L   S O L U T I O N   T I M E  . . . . . =',I5)") (TIM(I),I=1,5),TT
      
   CALL CLOSEFILES()
   write (*,*) "Press Any Key to Exit..."
@@ -264,12 +265,16 @@ END PROGRAM STAP90
 SUBROUTINE SECOND (TIM)
 ! USE DFPORT   ! Only for Compaq Fortran
   IMPLICIT NONE
-  REAL :: TIM
-
+  character*8 date
+  character*10 time
+  character*5 zone
+  integer*4 values(8)
+  integer :: TIM
+  call DATE_AND_TIME(date, time, zone, values)
+  TIM = values(7)*1000+values(8)
 ! This is a Fortran 95 intrinsic subroutine
 ! Returns the processor time in seconds
 
-  CALL CPU_TIME(TIM)
 
   RETURN
 END SUBROUTINE SECOND
@@ -371,7 +376,7 @@ SUBROUTINE OPENFILES()
   OPEN(VTKFile, FILE = FileInp(1:i-1)//".OUT.vtk", STATUS = "REPLACE")
   OPEN(VTKTmpFile, File = "VTK.tmp", FORM = "UNFORMATTED", STATUS = "REPLACE")
   OPEN(VTKNodeTmp, FILE = "VTKNode.tmp", FORM = "UNFORMATTED", STATUS = "REPLACE")
-  OPEN(VTKElTypTmp, FILE = "VTKElTyp.tmp", FORM = "UNFORMATTED", Access='Stream', STATUS = "REPLACE") !FORM = "UNFORMATTED",
+  OPEN(VTKElTypTmp, FILE = "VTKElTyp.tmp", FORM = "UNFORMATTED", Access='Stream', STATUS = "REPLACE") !FORM = "UNFORMAED",
   
 END SUBROUTINE OPENFILES
 
