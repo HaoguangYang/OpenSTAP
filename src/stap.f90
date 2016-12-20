@@ -10,7 +10,6 @@
 ! .     Tsinghua Univerity                                                .
 ! .                                                                       .
 ! . . . . . . . . . . . . . .  . . .  . . . . . . . . . . . . . . . . . . .
-
 PROGRAM STAP90
 
   USE GLOBALS
@@ -75,7 +74,7 @@ PROGRAM STAP90
   CALL MEMALLOC(3,"Y    ",NUMNP,ITWO)
   CALL MEMALLOC(4,"Z    ",NUMNP,ITWO)
 
-  CALL INPUT (IA(NP(1)),DA(NP(2)),DA(NP(3)),DA(NP(4)),NUMNP,NEQ)   !OTHER SITUATIONS EXCEPT BEAM(THE FORMER ONE)
+  CALL INPUT (IA(NP(1)),DA(NP(2)),DA(NP(3)),DA(NP(4)),NUMNP,NEQ)
 
 ! Calculate and store load vectors
 !   R(NEQ) : Load vector
@@ -116,32 +115,33 @@ PROGRAM STAP90
      CALL LOADS (DA(NP(5)),IA(NP(6)),IA(NP(7)),DA(NP(8)),IA(NP(1)),NLOAD,NEQ) !OTHER SITUATIONS EXCEPT BEAM(THE FORMER ONE)
 
   END DO
-
-! Read, generate and store element data
-
-! Clear storage
-!   MHT(NEQ) - Vector of column heights
-
-  CALL MEMFREEFROM(5)
-  CALL MEMALLOC(5,"MHT  ",NEQ,1)
-
-  IND=1    ! Read and generate element information
-  CALL ELCAL
-  CALL VTKgenerate (IND)        !Prepare Post-Processing Files.
-
-  CALL SECOND (TIM(2))
-
+  
 ! * * * * * * * * * * * * * * * * * * * * * *
 ! *               SOLUTION PHASE            *
-! * * * * * * * * * * * * * * * * * * * * * *
+! * * * * * * * * * * * * * * * * * * * * * *  
 
   WRITE(*,'("Solution phase ... ")')
+  
+pardisodoor = .true.
+! ********************************************************************8
+! Read, generate and store element data
+! 从这里开始，用不用pardiso会变得很不一样
+! Clear storage
+!   MHT(NEQ) - Vector of column heights
+if(.not. pardisodoor) then
+    
+  CALL MEMFREEFROMTO(5,8)
+  CALL MEMALLOC(5,"MHT  ",NEQ,1)
+  
+  IND=1    ! Read and generate element information
+  CALL ELCAL ! 到这里2,3,4才没用的
+  !CALL VTKgenerate (IND)        !Prepare Post-Processing Files.
 
-! Assemble stiffness matrix
-
+  CALL SECOND (TIM(2))
+  
 ! ALLOCATE STORAGE
 !    MAXA(NEQ+1)
-  CALL MEMFREEFROM(7)
+  CALL MEMFREEFROM(6)
   CALL MEMFREEFROMTO(2,4)
   CALL MEMALLOC(2,"MAXA ",NEQ+1,1)
 
@@ -150,9 +150,8 @@ PROGRAM STAP90
 ! ALLOCATE STORAGE
 !    A(NWK) - Global structure stiffness matrix K
 !    R(NEQ) - Load vector R and then displacement solution U
-
+ 
   MM=NWK/NEQ
-
   CALL MEMALLOC(3,"STFF ",NWK,ITWO)
   CALL MEMALLOC(4,"R    ",NEQ,ITWO)
   IF (DYNANALYSIS .EQV. .TRUE.) CALL MEMALLOC(5,"M    ",NWK,ITWO)
@@ -162,12 +161,33 @@ PROGRAM STAP90
 
   WRITE (IOUT,"(//,' TOTAL SYSTEM DATA',//,   &
                    '     NUMBER OF EQUATIONS',14(' .'),'(NEQ) = ',I5,/,   &
-                   '     NUMBER OF MATRIX ELEMENTS',11(' .'),'(NWK) = ',I11,/,   &
+                   '     NUMBER OF MATRIX ELEMENTS',11(' .'),'(NWK) = ',I9,/,   &
                    '     MAXIMUM HALF BANDWIDTH ',12(' .'),'(MK ) = ',I5,/,     &
                    '     MEAN HALF BANDWIDTH',14(' .'),'(MM ) = ',I5)") NEQ,NWK,MK,MM
+! ***************************************************************************************
+else !如果使用pardiso
+    
+  CALL MEMFREEFROMTO(5,8)
+  CALL MEMALLOC(5,"MHT  ",NEQ,1)
+  
+  IND=1    ! Read and generate element information
+  CALL ELCAL ! 到这里2,3,4才没用的
+  !CALL VTKgenerate (IND)        !Prepare Post-Processing Files.
 
+  CALL SECOND (TIM(2))
+    
+  CALL MEMFREEFROMTO(2,4)
+  ! NP(2,3,4,5)均在这里被分配
+  CALL SOLVERMODE(IA(NP(1)))
+  CALL MEMALLOC(11,"ELEGP",MAXEST,1)
+
+! Write total system data
+
+  WRITE (IOUT,"(//,' TOTAL SYSTEM DATA',//,   &
+                   '     NUMBER OF EQUATIONS',14(' .'),'(NEQ) = ',I5,/,   &
+                   '     NUMBER OF MATRIX ELEMENTS',11(' .'),'(NWK) = ',I9)") NEQ,NWK  
+end if
 ! In data check only mode we skip all further calculations
-
   IF (MODEX.LE.0) THEN
      CALL SECOND (TIM(3))
      CALL SECOND (TIM(4))
@@ -177,33 +197,34 @@ PROGRAM STAP90
      CALL ASSEM (A(NP(11)))
      
      CALL SECOND (TIM(3))
-
+     
 !    Triangularize stiffness matrix
      NEQ1=NEQ + 1
-     !IF (DYNANALYSIS .EQV. .TRUE.) CALL EIGENVAL (DA(NP(3)), DA(NP(5)), IA(NP(2)), NEQ, NWK, NEQ1)
-     IF (LOADANALYSIS .EQV. .TRUE.) CALL COLSOL (DA(NP(3)),DA(NP(4)),IA(NP(2)),NEQ,NWK,NEQ1,1)
 
-     CALL SECOND (TIM(4))
-
+     if(.not. pardisodoor) then
+        CALL COLSOL (DA(NP(3)),DA(NP(4)),IA(NP(2)),NEQ,NWK,NEQ1,1)
+     end if
+     CALL SECOND (TIM(4)) 
      IND=3    ! Stress calculations
-     IF (LOADANALYSIS .EQV. .TRUE.) THEN
-        REWIND ILOAD
-        DO CURLCASE=1,NLCASE
-            CALL LOADV (DA(NP(4)),NEQ)   ! Read in the load vector
-    
-!           Solve the equilibrium equations to calculate the displacements
-            CALL COLSOL (DA(NP(3)),DA(NP(4)),IA(NP(2)),NEQ,NWK,NEQ1,2)
-    
-            WRITE (IOUT,"(//,' LOAD CASE ',I3)") CURLCASE
+
+     REWIND ILOAD
+     DO CURLCASE=1,NLCASE
+        CALL LOADV (DA(NP(4)),NEQ)   ! Read in the load vector
+        if(pardisodoor) then
+            call pardiso_crop(DA(NP(3)), IA(NP(2)), IA(NP(5)))
+            call pardiso_solver(DA(NP(3)),DA(NP(4)),IA(NP(2)), IA(NP(5)))
+        else
+!       Solve the equilibrium equations to calculate the displacements
+            IF (LOADANALYSIS .EQV. .TRUE.) CALL COLSOL (DA(NP(3)),DA(NP(4)),IA(NP(2)),NEQ,NWK,NEQ1,2)
+        end if
+        WRITE (IOUT,"(//,' LOAD CASE ',I3)") CURLCASE
         
-            CALL WRITED (DA(NP(4)),IA(NP(1)),NEQ,NUMNP)  ! PRINT DISPLACEMENTS FOR OTHER SITUATIONS(THE FORMER ONE)
-            
+        CALL WRITED (DA(NP(4)),IA(NP(1)),NEQ,NUMNP)  ! PRINT DISPLACEMENTS FOR OTHER SITUATIONS(THE FORMER ONE)
 !           Calculation of stresses
             CALL STRESS (A(NP(11)))
 
-        END DO
-        CALL VTKgenerate (IND)
-     END IF
+     END DO
+     !CALL VTKgenerate (IND)
      CALL SECOND (TIM(5))
   END IF
 
@@ -267,7 +288,7 @@ SUBROUTINE WRITED (DISP,ID,NEQ,NUMNP)
   IC=4
 
   write(String, "('Displacement_Load_Case',I2.2)") CURLCASE
-  write (VTKTmpFile) String, 3, NUMNP
+  !write (VTKTmpFile) String, 3, NUMNP
   
   DO II=1,NUMNP
      IC=IC + 1
@@ -287,7 +308,7 @@ SUBROUTINE WRITED (DISP,ID,NEQ,NUMNP)
      END DO
 
      WRITE (IOUT,'(1X,I5,5X,6E14.6)') II,D
-     write (VTKTmpFile) D(1:3)                                    !Displacements
+     !write (VTKTmpFile) D(1:3)                                    !Displacements
 
   END DO
   
@@ -317,30 +338,30 @@ SUBROUTINE OPENFILES()
 !    call GETARG(1,FileInp)
 !  end if
 
-  if(COMMAND_ARGUMENT_COUNT().ne.1) then
-     stop 'Usage: STAP90 InputFileName'
-  else
-     call GET_COMMAND_ARGUMENT(1,FileInp)
-  end if
+  !if(COMMAND_ARGUMENT_COUNT().ne.1) then
+  !   stop 'Usage: STAP90 InputFileName'
+  !else
+  !   call GET_COMMAND_ARGUMENT(1,FileInp)
+  !end if
 
-  INQUIRE(FILE = FileInp, EXIST = EX)
-  IF (.NOT. EX) THEN
-     PRINT *, "*** STOP *** FILE STAP90.IN DOES NOT EXIST !"
-     STOP
-  END IF
+  !INQUIRE(FILE = FileInp, EXIST = EX)
+  !IF (.NOT. EX) THEN
+  !   PRINT *, "*** STOP *** FILE STAP90.IN DOES NOT EXIST !"
+  !   STOP
+  !END IF
   
-  do i = 1, len_trim(FileInp)
-    if (FileInp(i:i) .EQ. '.') exit
-  end do
+  !do i = 1, len_trim(FileInp)
+  !  if (FileInp(i:i) .EQ. '.') exit
+  !end do
   
-  OPEN(IIN   , FILE = FileInp,  STATUS = "OLD")
-  OPEN(IOUT  , FILE = FileInp(1:i-1)//".OUT", STATUS = "REPLACE")
+  OPEN(IIN   , FILE = "stap90_with_pd_shell.in",  STATUS = "OLD")
+  OPEN(IOUT  , FILE = "stap90.OUT", STATUS = "REPLACE")
   OPEN(IELMNT, FILE = "ELMNT.TMP",  FORM = "UNFORMATTED")
   OPEN(ILOAD , FILE = "LOAD.TMP",   FORM = "UNFORMATTED")
-  OPEN(VTKFile, FILE = FileInp(1:i-1)//".OUT.vtk", STATUS = "REPLACE")
-  OPEN(VTKTmpFile, File = "VTK.tmp", FORM = "UNFORMATTED", STATUS = "REPLACE")
-  OPEN(VTKNodeTmp, FILE = "VTKNode.tmp", FORM = "UNFORMATTED", STATUS = "REPLACE")
-  OPEN(VTKElTypTmp, FILE = "VTKElTyp.tmp", FORM = "UNFORMATTED", Access='Stream', STATUS = "REPLACE") !FORM = "UNFORMATTED",
+  !OPEN(VTKFile, FILE = FileInp(1:i-1)//".OUT.vtk", STATUS = "REPLACE")
+  !OPEN(VTKTmpFile, File = "VTK.tmp", FORM = "UNFORMATTED", STATUS = "REPLACE")
+  !OPEN(VTKNodeTmp, FILE = "VTKNode.tmp", FORM = "UNFORMATTED", STATUS = "REPLACE")
+  !OPEN(VTKElTypTmp, FILE = "VTKElTyp.tmp", FORM = "UNFORMATTED", Access='Stream', STATUS = "REPLACE") !FORM = "UNFORMATTED",
   
 END SUBROUTINE OPENFILES
 
@@ -358,7 +379,7 @@ SUBROUTINE CLOSEFILES()
   CLOSE(IELMNT, status='delete')
   CLOSE(ILOAD, status='delete')
   close(VTKFile)
-  close(VTKTmpFile, status='delete')
-  close(VTKNodeTmp, status='delete')
-  close(VTKElTypTmp, status='delete')
+  !close(VTKTmpFile, status='delete')
+  !close(VTKNodeTmp, status='delete')
+  !close(VTKElTypTmp, status='delete')
 END SUBROUTINE CLOSEFILES

@@ -88,6 +88,7 @@ SUBROUTINE SHELL4Q (ID,X,Y,Z,U,MHT,E,POSSION,LM,XYZ,MATP, THICK, Node)
   REAL(8) :: GAUSS(2), W(2)
   REAL(8) :: G1, G2, GN(2,4), Ja(2,2), Ja_inv(2,2), Bk(3,20),By(2,20),Bm(3,20), S(20,20), BB(2,4), NShape(1,4)
   REAL(8) :: X_Y(4, 2), XY_G(1,2), STR1(3), STR2(2), GaussianCollection(3,NPAR(2)*4), StressCollection(6,NPAR(2)*4)
+  real(8) :: x_test(20)
   NPAR1  = NPAR(1)
   NUME   = NPAR(2)
   NUMMAT = NPAR(3) 
@@ -234,9 +235,11 @@ SUBROUTINE SHELL4Q (ID,X,Y,Z,U,MHT,E,POSSION,LM,XYZ,MATP, THICK, Node)
                     matmul(transpose(By), By) + matmul(matmul(transpose(Bm), Cc), Bm))*abs(detJ)
             END DO
         END DO
-
-        CALL ADDBAN (DA(NP(3)),IA(NP(2)),S,LM(1,N),ND)  ! 这里要输出的S就是制作好了的local stiffness matrix
-        
+        if(pardisodoor) then
+            call pardiso_addban(DA(NP(3)),IA(NP(2)),IA(NP(5)),S,LM(1,N),ND)
+        else
+            CALL ADDBAN (DA(NP(3)),IA(NP(2)),S,LM(1,N),ND)
+        end if
      END DO
 
      RETURN
@@ -333,7 +336,7 @@ SUBROUTINE SHELL4Q (ID,X,Y,Z,U,MHT,E,POSSION,LM,XYZ,MATP, THICK, Node)
         END DO
     END DO
     
-    call PostProcessor(NPAR(1), 2, XYZ, Node, 4, GaussianCollection, StressCollection, U)
+    !call PostProcessor(NPAR(1), 2, XYZ, Node, 4, GaussianCollection, StressCollection, U)
   
   ELSE 
      STOP "*** ERROR *** Invalid IND value."

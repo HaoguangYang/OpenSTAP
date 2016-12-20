@@ -171,7 +171,11 @@ SUBROUTINE RUSS (ID,X,Y,Z,U,MHT,E,AREA,LM,XYZ,MATP,Node)
            END DO
         END DO
 
-        CALL ADDBAN (DA(NP(3)),IA(NP(2)),S,LM(1,N),ND)
+        if(pardisodoor) then
+            call pardiso_addban(DA(NP(3)),IA(NP(2)),IA(NP(5)),S,LM(1,N),ND)
+        else
+            CALL ADDBAN (DA(NP(3)),IA(NP(2)),S,LM(1,N),ND)
+        end if
 
      END DO
 

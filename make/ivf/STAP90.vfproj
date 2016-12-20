@@ -25,7 +25,8 @@
 				<Tool Name="VFManifestTool" SuppressStartupBanner="true"/></Configuration></Configurations>
 	<Files>
 		<Filter Name="Header Files" Filter="fi;fd"/>
-		<Filter Name="Resource Files" Filter="rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe"/>
+		<Filter Name="Resource Files" Filter="rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe">
+		<File RelativePath="D:\Program Files (x86)\IntelSWTools\compilers_and_libraries_2017.0.109\windows\mkl\include\mkl_pardiso.f90"/></Filter>
 		<Filter Name="Source Files" Filter="f90;for;f;fpp;ftn;def;odl;idl">
 		<Filter Name="Elements">
 		<File RelativePath="..\..\src\elements\27H.f90"/>
@@ -55,6 +56,7 @@
 		<File RelativePath="..\..\src\elcal.f90"/>
 		<File RelativePath="..\..\src\globals.f90"/>
 		<File RelativePath="..\..\src\memalloc.f90"/>
+		<File RelativePath="..\..\src\pardiso.f90"/>
 		<File RelativePath="..\..\src\postprocessor.f90"/>
 		<File RelativePath="..\..\src\stap.f90"/></Filter></Filter>
 		<File RelativePath="..\Readme.txt"/></Files>

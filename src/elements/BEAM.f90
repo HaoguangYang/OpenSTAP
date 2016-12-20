@@ -258,7 +258,11 @@ SUBROUTINE BEAMELE (ID,X,Y,Z,U,MHT,E,G,AREA,I_X,I_Y,I_Z,J_X,J_Y,J_Z,LM,XYZ,MATP,
 
         S=MATMUL(TRANSPOSE(T),MATMUL(S,T))
         
-        CALL ADDBAN (DA(NP(3)),IA(NP(2)),S,LM(1,N),ND)
+        if(pardisodoor) then
+            call pardiso_addban(DA(NP(3)),IA(NP(2)),IA(NP(5)),S,LM(1,N),ND)
+        else
+            CALL ADDBAN (DA(NP(3)),IA(NP(2)),S,LM(1,N),ND)
+        end if
 
      END DO
 
@@ -395,8 +399,8 @@ SUBROUTINE BEAMELE (ID,X,Y,Z,U,MHT,E,G,AREA,I_X,I_Y,I_Z,J_X,J_Y,J_Z,LM,XYZ,MATP,
        GaussianCollection(:,N) = 0.5*(XYZ(4:6,N)+XYZ(1:3,N))
        StressCollection((/1,2,3,5,6,4/),N) = 0.5*(FORCE(7:12)-FORCE(1:6))
      END DO
-     call PostProcessor(NPAR(1), 3, XYZ, &
-                        Node, 1, GaussianCollection, StressCollection, U)
+     !call PostProcessor(NPAR(1), 3, XYZ, &
+     !                   Node, 1, GaussianCollection, StressCollection, U)
   ELSE 
      STOP "*** ERROR *** Invalid IND value."
   END IF

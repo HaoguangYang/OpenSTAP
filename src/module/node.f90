@@ -15,8 +15,12 @@ private
     interface operator( .EQ. )
         module procedure equal_this
     end interface
+
+    interface operator( .LT. )
+        module procedure less_this
+    end interface
     
-public node, new, operator(.EQ.)
+public node, new, operator(.EQ.), operator(.LT.)
     contains
     ! 新建指针
     subroutine new_this(this, index)
@@ -32,4 +36,10 @@ public node, new, operator(.EQ.)
     type(node), intent(in) :: p_node1, p_node2
         equal_this = p_node1%index_ .EQ. p_node2%index_
     end function equal_this
+    
+    ! 用于新建operator .LT.
+    logical function less_this(p_node1, p_node2)
+    type(node), pointer, intent(in) :: p_node1, p_node2
+        less_this = p_node1%index_ .LT. p_node2%index_
+    end function less_this
 end module node_class

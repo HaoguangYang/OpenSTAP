@@ -211,7 +211,11 @@ SUBROUTINE ELEMENT_3T_MAIN (ID,X,Y,Z,U,MHT,E,POISSON,LM,XYZ,MATP,Node)
         BMAT = BmatElast3T(C(:,1),C(:,2))
         KE = 1.0/2*MATMUL(MATMUL(TRANSPOSE(BMAT),D),BMAT)*DETJ
         
-        CALL ADDBAN (DA(NP(3)),IA(NP(2)),KE,LM(1,N),ND)   
+        if(pardisodoor) then
+            call pardiso_addban(DA(NP(3)),IA(NP(2)),IA(NP(5)),KE,LM(1,N),ND)
+        else
+            CALL ADDBAN (DA(NP(3)),IA(NP(2)),KE,LM(1,N),ND)
+        end if
         
      END DO
 
@@ -268,8 +272,8 @@ SUBROUTINE ELEMENT_3T_MAIN (ID,X,Y,Z,U,MHT,E,POISSON,LM,XYZ,MATP,Node)
         GaussianCollection (:,I:J) = transpose(XY)
         StressCollection (:,I:J) = Stress
      END DO
-     call PostProcessor(NPAR(1), 2, XYZ((/1,2,4,5,7,8/),:), &
-                           Node, 3, GaussianCollection, StressCollection, U)
+     !call PostProcessor(NPAR(1), 2, XYZ((/1,2,4,5,7,8/),:), &
+     !                      Node, 3, GaussianCollection, StressCollection, U)
 
   ELSE 
      STOP "*** ERROR *** Invalid IND value."

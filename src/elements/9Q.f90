@@ -249,8 +249,11 @@ SUBROUTINE ELEMENT_9Q_MAIN (ID,X,Y,Z,U,MHT,E,POISSON,LM,XY,MATP)
             END DO
          END DO       
 
-        CALL ADDBAN (DA(NP(3)),IA(NP(2)),KE,LM(1,N),ND)
-
+        if(pardisodoor) then
+            call pardiso_addban(DA(NP(3)),IA(NP(2)),IA(NP(5)),KE,LM(1,N),ND)
+        else
+            CALL ADDBAN (DA(NP(3)),IA(NP(2)),KE,LM(1,N),ND)
+        end if
      END DO
 
      RETURN

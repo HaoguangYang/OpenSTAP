@@ -200,9 +200,13 @@ subroutine HexEight (ID,X,Y,Z,U,MHT,E, PoissonRatio, Density, Gravity, LM, Posit
             
             !write(*,*) "S",S
             
-            CALL ADDBAN (DA(NP(3)),IA(NP(2)),S,LM(:,N),ND)
-            IF (DYNANALYSIS .EQV. .TRUE.) CALL ADDBAN (DA(NP(5)),IA(NP(2)),M,LM(:,N),ND)
-            
+            if(pardisodoor) then
+                call pardiso_addban(DA(NP(3)),IA(NP(2)),IA(NP(5)),S,LM(:,N),ND)
+            else
+                CALL ADDBAN (DA(NP(3)),IA(NP(2)),S,LM(:,N),ND)
+            end if
+
+            !IF (DYNANALYSIS .EQV. .TRUE.) CALL ADDBAN (DA(NP(5)),IA(NP(2)),M,LM(:,N),ND)
         end do
         
     CASE (3)
@@ -256,8 +260,8 @@ subroutine HexEight (ID,X,Y,Z,U,MHT,E, PoissonRatio, Density, Gravity, LM, Posit
             StressCollection (:,ind1:ind2) = Stress
         END DO
 
-        call PostProcessor(ElementType, 3, PositionData, &
-                           Node, QuadratureOrder**3, GaussianCollection, StressCollection, U)
+        !call PostProcessor(ElementType, 3, PositionData, &
+        !                   Node, QuadratureOrder**3, GaussianCollection, StressCollection, U)
                            
                 
     END SELECT

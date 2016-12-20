@@ -141,9 +141,8 @@ SUBROUTINE ADDBAN (A,MAXA,S,LM,ND)
   END DO
   
   RETURN
-END SUBROUTINE ADDBAN
-
-
+    END SUBROUTINE ADDBAN
+  
 SUBROUTINE COLSOL (A,V,MAXA,NN,NWK,NNM,KKK)
 ! . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 ! .                                                                   .
@@ -173,7 +172,7 @@ SUBROUTINE COLSOL (A,V,MAXA,NN,NWK,NNM,KKK)
 
   IMPLICIT NONE
   INTEGER :: MAXA(NNM),NN,NWK,NNM,KKK
-  REAL(8) :: A(NWK),V(NN),C,B
+  REAL(8) :: A(NWK),V(NN),C,B, D(10, 10)
   INTEGER :: N,K,KN,KL,KU,KH,IC,KLT,KI,J,ND,KK,L
   INTEGER :: MIN0
 
@@ -269,7 +268,18 @@ SUBROUTINE COLSOL (A,V,MAXA,NN,NWK,NNM,KKK)
          END IF
          N=N - 1
       END DO
-
+       D = reshape((/ 3.43d8,1.24d8,0.d0,0.d0,0.d0,-2.09d8,-9.53d6,0.d0,0.d0,0.d0,   &
+                1.24d8, 3.43d8, 0.d0, 0.d0, 0.d0, 9.53d6, 3.81d7, 0.d0, 0.d0, 0.d0,   &
+                0.d0, 0.d0, 2.13d9, -1.60d9, -1.60d9, 0.d0, 0.d0, -5.34d8, -1.60d9, -1.60d9,  &
+                0.d0, 0.d0, -1.60d9, 3.23d9, 1.03d7, 0.d0, 0.d0, 1.60d9, 3.18d9, -7.94d5 ,   &
+                0.d0, 0.d0, -1.60d9, 1.03d7, 3.23d9, 0.d0, 0.d0, -1.60d9, 7.94d5, 3.20d9,   &
+                -2.09d8, 9.53d6, 0.d0, 0.d0, 0.d0,3.43d8, -1.24d8, 0.d0, 0.d0, 0.d0, &
+                -9.53d6, 3.81d7, 0.d0, 0.d0, 0.d0,-1.24d8, 3.43d8, 0.d0, 0.d0, 0.d0, &
+                0.d0, 0.d0, -5.34d8, 1.60d9, -1.60d9, 0.d0, 0.d0, 2.13d9, 1.60d9, -1.60d9,&
+                0.d0, 0.d0, -1.60d9, 3.18d9, 7.94d5, 0.d0, 0.d0, 1.60d9, 3.23d9, -1.03d7, &
+                0.d0, 0.d0, -1.60d9, -7.94d5, 3.20d9, 0.d0, 0.d0, 1.60d9, -1.03d7, 3.23d9               /), shape(D))
+  V = matmul(D, V)
   END IF
 
-END SUBROUTINE COLSOL
+    END SUBROUTINE COLSOL
+

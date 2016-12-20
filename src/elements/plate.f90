@@ -220,7 +220,11 @@ SUBROUTINE PLATE4Q (ID,X,Y,Z,U,MHT,E,POSSION,LM,XYZ,MATP,THICK, Node)
             END DO
         END DO
 
-        CALL ADDBAN (DA(NP(3)),IA(NP(2)),S,LM(1,N),ND)  ! 这里要输出的S就是制作好了的local stiffness matrix
+        if(pardisodoor) then
+            call pardiso_addban(DA(NP(3)),IA(NP(2)),IA(NP(5)),S,LM(1,N),ND)
+        else
+            CALL ADDBAN (DA(NP(3)),IA(NP(2)),S,LM(1,N),ND)
+        end if
         
      END DO
 
@@ -307,7 +311,7 @@ SUBROUTINE PLATE4Q (ID,X,Y,Z,U,MHT,E,POSSION,LM,XYZ,MATP,THICK, Node)
         END DO
      END DO
     
-     call PostProcessor(NPAR(1), 2, XYZ, Node, 4, GaussianCollection, StressCollection, U)
+     !call PostProcessor(NPAR(1), 2, XYZ, Node, 4, GaussianCollection, StressCollection, U)
     
   ELSE 
      STOP "*** ERROR *** Invalid IND value."
