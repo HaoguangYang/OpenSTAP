@@ -88,9 +88,11 @@ SUBROUTINE ELEMNT
      CALL ELEMENT_3T
   case (11)
      CALL HexTriQuad
+  case (12)
+     CALL TIMOSHENKO
 !    Other element types would be called here, identifying each
 !    element type by a different NPAR(1) parameter
-  case (12:)
+  case (13:)
      stop "ELEMENT TYPE STILL UNDER DEVELOPMENT..."
   END SELECT
 
