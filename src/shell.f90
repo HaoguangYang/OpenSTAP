@@ -81,12 +81,12 @@ SUBROUTINE SHELL4Q (ID,X,Y,Z,U,MHT,E,POSSION,LM,XYZ,MATP, THICK, Node)
              XYZ(12,NPAR(2)),THICK(NPAR(2)),U(NEQ)
   
   REAL(8) :: DE(20,1)
-  INTEGER :: NPAR1, NUME, NUMMAT, ND, K, L, M, N
+  INTEGER :: NPAR1, NUME, NUMMAT, ND, K, L, M, N, J
   INTEGER :: MTYPE, IPRINT, Node(NPAR(2),NPAR(5))
 
   REAL(8) :: Cb(3, 3),Cc(3, 3), Cs, Etemp, Ptemp, detJ, N1, N2, N3, N4
   REAL(8) :: GAUSS(2), W(2)
-  REAL(8) :: G1, G2, GN(2,4), Ja(2,2), Ja_inv(2,2), Bk(3,20),By(2,20),Bm(3,20), S(20,20), BB(2,4), NShape(1,4)
+  REAL(8) :: G1, G2, GN(2,4), Ja(2,2), Ja_inv(2,2), Bk(3,20),By(2,20),Bm(3,20), S(20,20), BB(2,4), NShape(1,4), NN0(1,4)
   REAL(8) :: X_Y(4, 2), XY_G(1,2), STR1(3), STR2(2), GaussianCollection(3,NPAR(2)*4), StressCollection(6,NPAR(2)*4)
   NPAR1  = NPAR(1)
   NUME   = NPAR(2)
@@ -141,11 +141,23 @@ SUBROUTINE SHELL4Q (ID,X,Y,Z,U,MHT,E,POSSION,LM,XYZ,MATP, THICK, Node)
         !   LM(L+15,N)=ID(L,L)
         !END DO
         ! 这里是为了让顺序
-        DO L=1,3
+        DO L=1,1
            LM(L   ,N)=ID(L+2,Node(N,1))     ! Connectivity matrix
            LM(L+5 ,N)=ID(L+2,Node(N,2))
            LM(L+10,N)=ID(L+2,Node(N,3))
            LM(L+15,N)=ID(L+2,Node(N,4))
+        END DO
+        DO L=2,2
+           LM(L   ,N)=ID(L+3,Node(N,1))     ! Connectivity matrix
+           LM(L+5 ,N)=ID(L+3,Node(N,2))
+           LM(L+10,N)=ID(L+3,Node(N,3))
+           LM(L+15,N)=ID(L+3,Node(N,4))
+        END DO
+        DO L=3,3
+           LM(L   ,N)=ID(L+1,Node(N,1))     ! Connectivity matrix
+           LM(L+5 ,N)=ID(L+1,Node(N,2))
+           LM(L+10,N)=ID(L+1,Node(N,3))
+           LM(L+15,N)=ID(L+1,Node(N,4))
         END DO
         DO L=4,5
            LM(L   ,N)=ID(L-3,Node(N,1))
@@ -185,10 +197,10 @@ SUBROUTINE SHELL4Q (ID,X,Y,Z,U,MHT,E,POSSION,LM,XYZ,MATP, THICK, Node)
         Cb(3,2) = 0
         Cb(3,3) = (1-Ptemp)/2
         
-        Cc = Cb*Etemp/12.0/(1-Ptemp*Ptemp)*5.0/6.0
-        Cb = Cb*Etemp/12.0/(1-Ptemp*Ptemp)*5.0/6.0
-
-        Cs = Etemp/(2*(1+Ptemp))
+        Cc = Cb*THICK(N)*Etemp/(1-Ptemp*Ptemp)
+        Cb = Cb*Etemp/12.0/(1-Ptemp*Ptemp)*THICK(N)*THICK(N)*THICK(N)
+        
+        Cs = Etemp/(2*(1+Ptemp))*THICK(N)*5/6
 ! Gauss 积分常数
         S = 0
         DO L=1,2
@@ -196,6 +208,12 @@ SUBROUTINE SHELL4Q (ID,X,Y,Z,U,MHT,E,POSSION,LM,XYZ,MATP, THICK, Node)
                 G1 = GAUSS(L)
                 G2 = GAUSS(M)
 ! 计算Jacobian
+                NN0(1,1)=(1-G1)*(1-G2)/4
+                NN0(1,2)=(1+G1)*(1-G2)/4
+                NN0(1,3)=(1+G1)*(1+G2)/4
+                NN0(1,4)=(1-G1)*(1+G2)/4
+                
+                
                 GN = reshape((/G2-1,G1-1, 1-G2,-G1-1, 1+G2,1+G1, -G2-1,1-G1/), shape(GN))/4
                 Ja = matmul(GN,X_Y)
                 detJ = Det(Ja,2)
@@ -208,19 +226,20 @@ SUBROUTINE SHELL4Q (ID,X,Y,Z,U,MHT,E,POSSION,LM,XYZ,MATP, THICK, Node)
 ! 为弯曲部分的Bk赋值，改成循环
                 Bk = 0
                 DO K = 1,4
-                    Bk(1,5*K-3) = BB(1,K)
+                    Bk(1,5*K-3) = -BB(1,K)
                     Bk(2,5*K-2)   = BB(2,K)
-                    Bk(3,5*K-3) = BB(2,K)
+                    Bk(3,5*K-3) = -BB(2,K)
                     Bk(3,5*K-2)   = BB(1,K)
                 END DO
 ! 为剪切部分的By赋值。改成循环
                 By = 0
                 DO K = 1,4
                     By(1,5*K-4) = BB(1,K)
-                    By(1,5*K-3) = -1
+                    By(1,5*K-3) = NN0(1, K)
                     By(2,5*K-4) = BB(2,K)
-                    By(2,5*K-2)   = -1
+                    By(2,5*K-2)   = -NN0(1, K)
                 END DO
+            
 ! 为平面部分的Bm赋值。改成循环
                 Bm = 0
                 DO K = 1,4
@@ -230,8 +249,13 @@ SUBROUTINE SHELL4Q (ID,X,Y,Z,U,MHT,E,POSSION,LM,XYZ,MATP, THICK, Node)
                     Bm(3,5*K)   = BB(1,K)
                 END DO
 ! 这里不要忘了还要乘上z方向积分
-                S = S + W(L)*W(M)*(matmul(matmul(transpose(Bk), Cb), Bk)/12.0 + 5.0/6.0*Cs* &
-                    matmul(transpose(By), By) + matmul(matmul(transpose(Bm), Cc), Bm))*abs(detJ)
+               S = S + (matmul(matmul(transpose(Bk), Cb), Bk) + Cs*matmul(transpose(By), By)+ &
+                    matmul(matmul(transpose(Bm), Cc), Bm))*abs(detJ)
+         
+                              
+                   
+        
+                
             END DO
         END DO
 

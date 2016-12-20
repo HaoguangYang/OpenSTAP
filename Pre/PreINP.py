@@ -285,15 +285,21 @@ print(material_e)
 
 #-----------输出LOAD信息 扩充ID到6维-------------
 load_floor = 58e6/(material_e[0][2][1]-material_e[0][2][0]+1)
+#load_floor = 0.0/(material_e[0][2][1]-material_e[0][2][0]+1)
 load_pier = 348e6/(material_e[1][2][1]-material_e[1][2][0]+1)
+#load_pier = 0.0/(material_e[1][2][1]-material_e[1][2][0]+1)
 load_supportbeam = 27.868e6/(material_e[2][2][1]-material_e[2][2][0]+1)
+#load_supportbeam = 0.0/(material_e[2][2][1]-material_e[2][2][0]+1)
 load_riverbank = 346.25e6/(material_e[3][2][1]-material_e[3][2][0]+1)
-load_cables = 0
+#load_riverbank = 0.0/(material_e[3][2][1]-material_e[3][2][0]+1)
+load_cables = 0.0
 load_e = [load_floor,load_pier,load_supportbeam,load_riverbank,load_cables]
+
 ID_6 = [[0,0,1],[1,1,1],[0,0,0],[1,1,1],[1,1,1]]
 #print(load)
 
 load = [0 for x in range(len(node[0])+1)]    #从load[1]开始对于node[0]
+
 for i in range(len(keyloc[2])):
     for j in range(len(element[i][1][0])):
         e_num = element[i][1][0][j]
@@ -303,13 +309,24 @@ for i in range(len(keyloc[2])):
                 for k in e_node:
                     load[k] = load[k] + load_e[s]
                     for p in range(3):
-                        node_b[k-1][p+3]=node_b[k-1][p+3]+ID_6[s][p]
-                        if node_b[k-1][p+3]==2:
+                        node_b[k-1][p+3]=node_b[k-1][p+3] + ID_6[s][p]
+                        if node_b[k-1][p+3] == 2:
                             node_b[k-1][p+3] = 1
-                     
-
-
-                    
+                    #node_b[k-1][5] = 1
+                    #if s==0:
+                        #node_b[k-1] = [1,1,1,1,1,1]
+        #for s in range(len(material_e)):
+        #    if material_e[s][2][0] <= e_num <= material_e[s][2][1]:
+        #        for k in e_node:
+        #            #load[k] = load[k] + load_e[s]
+        #            #for p in range(3):
+        #                #node_b[k-1][p+3]=node_b[k-1][p+3]*ID_6[s][p]
+        #            if s!=2:
+        #                node_b[k-1] = [1,1,1,1,1,1]
+                        
+#for i in range(len(load)):
+#    if i == 3428 or i == 3758 or i == 3430 or i == 3760:
+#        load[i] = 5e6
 #print(load)                    
                 
               
@@ -353,6 +370,7 @@ for i in range(len(keyloc[4])):
     print(material[i][2])
     print('\n')
     
+    
 print('·····························')
 print('\n'*5)
 
@@ -374,7 +392,10 @@ for i in range(len(node[0])):
     inp.write('%5d'%0 + '\n')
     
 #输出稀疏存储信息
-
+#max_e
+#for i in range(len(material_e)):
+#    if 
+#inp.write('%5d'%())
 
 #输入荷载信息
 inp.write('%5d'*2%(1,len(node[0]))+'\n')
@@ -384,6 +405,7 @@ for i in range(len(node[0])):
 
 #输入单元信息
 for i in range(len(keyloc[2])):
+
     if element[i][0] == 'C3D8R':
         inp.write('%5d'*3%(4,len(element[i][1][0]),2) + '\n')
         inp.write('%5d'%1 + '%10.3e'%(material_e[1][1][2][0]) + '%10.3f'%(material_e[1][1][2][1]) + '\n')
