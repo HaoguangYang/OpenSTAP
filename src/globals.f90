@@ -67,7 +67,7 @@ module GLOBALS
    integer :: NG
    
    logical :: BANDWIDTHOPT = .FALSE.
-   logical :: pardisodoor = .false.
+   logical :: PARDISODOOR = .FALSE.
    logical :: LOADANALYSIS = .TRUE.
    logical :: DYNANALYSIS = .FALSE.
 end module GLOBALS
