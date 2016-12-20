@@ -123,11 +123,6 @@ PROGRAM STAP90
 ! * * * * * * * * * * * * * * * * * * * * * *  
 
   WRITE(*,'("Solution phase ... ")')
-<<<<<<< HEAD
-  
-=======
-
->>>>>>> 7ffb281d4a8407596245ac3e5ba7918c0d286fe8
 ! ********************************************************************8
 ! Read, generate and store element data
 ! 从这里开始，用不用pardiso会变得很不一样
@@ -135,7 +130,7 @@ PROGRAM STAP90
 !   MHT(NEQ) - Vector of column heights
 if(.not. pardisodoor) then
     
-  CALL MEMFREEFROMTO(5,8)
+  CALL MEMFREEFROM(5)
   CALL MEMALLOC(5,"MHT  ",NEQ,1)
   
   IND=1    ! Read and generate element information
@@ -146,7 +141,7 @@ if(.not. pardisodoor) then
   
 ! ALLOCATE STORAGE
 !    MAXA(NEQ+1)
-  CALL MEMFREEFROM(6)
+  CALL MEMFREEFROM(7)
   CALL MEMFREEFROMTO(2,4)
   CALL MEMALLOC(2,"MAXA ",NEQ+1,1)
 
@@ -198,7 +193,6 @@ end if
      
      CALL SECOND (TIM(3))
      
-
      if(.not. pardisodoor) then
          !    Triangularize stiffness matrix
         NEQ1=NEQ + 1
@@ -367,13 +361,8 @@ SUBROUTINE OPENFILES()
     if (FileInp(i:i) .EQ. '.') exit
   end do
   
-<<<<<<< HEAD
-  OPEN(IIN   , FILE = "stap90_with_pd_shell_8H.in",  STATUS = "OLD")
-  OPEN(IOUT  , FILE = "stap90.OUT", STATUS = "REPLACE")
-=======
   OPEN(IIN   , FILE = FileInp,  STATUS = "OLD")
   OPEN(IOUT  , FILE = FileInp(1:i-1)//".OUT", STATUS = "REPLACE")
->>>>>>> 7ffb281d4a8407596245ac3e5ba7918c0d286fe8
   OPEN(IELMNT, FILE = "ELMNT.TMP",  FORM = "UNFORMATTED")
   OPEN(ILOAD , FILE = "LOAD.TMP",   FORM = "UNFORMATTED")
   OPEN(VTKFile, FILE = FileInp(1:i-1)//".OUT.vtk", STATUS = "REPLACE")
