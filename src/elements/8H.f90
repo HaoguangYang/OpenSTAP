@@ -81,7 +81,7 @@ subroutine HexEight (ID,X,Y,Z,U,MHT,E, PoissonRatio, Density, Gravity, LM, Posit
     integer ::  QuadratureOrder     = 2                     ! NPAR(6) -- Element Load Nodes
     INTEGER ::  ID(6,NUMNP), MHT(NEQ), MaterialData(NPAR(2))
     integer ::  MaterialType, MaterialComp, ND, L, N, i, j, LM(24,NPAR(2)), ElementType, ind0, iprint, k, &
-                ind1, ind2, Node(NPAR(2),NPAR(5)), tempNode(1,8)
+                ind1, ind2, Node(NPAR(2),NPAR(5))
     real(8) ::  X(NUMNP), Y(NUMNP), Z(NUMNP), U(NEQ), &
                 DetJ(2,2,2), E(NPAR(3)), PoissonRatio(NPAR(3)), ElementDisp(24)
     real(8) ::  BMatrix(6, 3*NPAR(5)), PositionData(3*NPAR(5), NPAR(2)), DMatrix(6,6), &
@@ -128,15 +128,6 @@ subroutine HexEight (ID,X,Y,Z,U,MHT,E, PoissonRatio, Density, Gravity, LM, Posit
         
         DO WHILE (N .NE. NumberOfElements)
             READ (IIN,'(11I5)') N,Node(N,1:NPAR(5)),MaterialType          ! Read in element information
-            tempNode = Node
-            Node(1,1) = tempNode(1,8)
-            Node(1,2) = tempNode(1,7)
-            Node(1,3) = tempNode(1,6)
-            Node(1,4) = tempNode(1,5)
-            Node(1,5) = tempNode(1,4)
-            Node(1,6) = tempNode(1,3)
-            Node(1,7) = tempNode(1,2)
-            Node(1,8) = tempNode(1,1)
     !       Save element information
             PositionData(1:ElementShapeNodes*3-1:3,N)=X(Node(N,:))        ! Coordinates of the element's nodes
             PositionData(2:ElementShapeNodes*3  :3,N)=Y(Node(N,:))

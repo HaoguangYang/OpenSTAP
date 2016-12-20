@@ -173,8 +173,6 @@ else !如果使用pardiso
   IND=1    ! Read and generate element information
   CALL ELCAL ! 到这里2,3,4才没用的
   CALL VTKgenerate (IND)        !Prepare Post-Processing Files.
-
-  CALL SECOND (TIM(2))
     
   CALL MEMFREEFROMTO(2,4)
   ! NP(2,3,4,5)均在这里被分配
@@ -208,42 +206,46 @@ end if
      DO CURLCASE=1,NLCASE
         CALL LOADV (DA(NP(4)),NEQ)   ! Read in the load vector
         if(pardisodoor) then
-            call pardiso_crop(DA(NP(3)), IA(NP(2)), IA(NP(5)))
             CALL SECOND (TIM(5))
+            call pardiso_crop(DA(NP(3)), IA(NP(2)), IA(NP(5)))
               WRITE (IOUT,"(//,' TOTAL SYSTEM DATA',//,   &
                    '     NUMBER OF EQUATIONS',14(' .'),'(NEQ) = ',I5,/,   &
                    '     NUMBER OF MATRIX ELEMENTS',11(' .'),'(NWK) = ',I9)") NEQ,NWK  
             call pardiso_solver(DA(NP(3)),DA(NP(4)),IA(NP(2)), IA(NP(5)))
+            CALL SECOND (TIM(6))
         else
 !       Solve the equilibrium equations to calculate the displacements
             IF (LOADANALYSIS .EQV. .TRUE.) CALL COLSOL (DA(NP(3)),DA(NP(4)),IA(NP(2)),NEQ,NWK,NEQ1,2)
+            CALL SECOND (TIM(6))
         end if
         WRITE (IOUT,"(//,' LOAD CASE ',I3)") CURLCASE
         
         CALL WRITED (DA(NP(4)),IA(NP(1)),NEQ,NUMNP)  ! PRINT DISPLACEMENTS FOR OTHER SITUATIONS(THE FORMER ONE)
 !           Calculation of stresses
             CALL STRESS (A(NP(11)))
-
+            CALL SECOND (TIM(7))
      END DO
      CALL VTKgenerate (IND)
-     CALL SECOND (TIM(6))
+     
   END IF
 
 ! Print solution times
 
-  TT=0.
-  DO I=1,5
+  TT=0
+  DO I=1,6
      TIM(I)=TIM(I+1) - TIM(I)
      TT=TT + TIM(I)
   END DO
-  
+  TT = TT - TIM(1)
   WRITE (IOUT,"(//,  &
      ' S O L U T I O N   T I M E   L O G   I N   S E C',//,   &
-     '     TIME FOR INPUT PHASE ',14(' .'),' =',F15.5,/,     &
-     '     TIME FOR CALCULATION OF STIFFNESS MATRIX  . . . . =',F15.5, /,   &
-     '     TIME FOR FACTORIZATION OF STIFFNESS MATRIX  . . . =',F15.5, /,   &
-     '     TIME FOR LOAD CASE SOLUTIONS ',10(' .'),' =',F15.5,//,   &
-     '      T O T A L   S O L U T I O N   T I M E  . . . . . =',F15.5)") (TIM(I),I=1,5),TT
+     '     TIME FOR INPUT PHASE ',14(' .'),' =',I5,/,     &
+     '     TIME FOR PREPARATION OF MATRIX FORMAT ... . . . . =',I5,/,     &
+     '     TIME FOR CALCULATION OF STIFFNESS MATRIX  . . . . =',I5, /,   &
+     '     TIME FOR FACTORIZATION OF STIFFNESS MATRIX  . . . =',I5, /,   &
+     '     TIME FOR LOAD CASE SOLUTIONS ',10(' .'),' =',I5,//,   &
+     '     TIME FOR CALCLUATE STRESS ',10(' .'),' =',I5,//,   &
+     '      T O T A L   S O L U T I O N   T I M E  . . . . . =',I5)") (TIM(I),I=1,6),TT
 
   WRITE (*,"(//,  &
      ' S O L U T I O N   T I M E   L O G   I N   S E C',//,   &
@@ -251,8 +253,9 @@ end if
      '     TIME FOR PREPARATION OF MATRIX FORMAT ... . . . . =',I5,/,     &
      '     TIME FOR CALCULATION OF STIFFNESS MATRIX  . . . . =',I5, /,   &
      '     TIME FOR FACTORIZATION OF STIFFNESS MATRIX  . . . =',I5, /,   &
-     '     TIME FOR LOAD CASE SOLUTIONS ',10(' .'),' =',I5,//,   &
-     '      T O T A L   S O L U T I O N   T I M E  . . . . . =',I5)") (TIM(I),I=1,5),TT
+     '     TIME FOR LOAD CASE SOLUTIONS ',10(' .'),' =',I5,/,   &
+     '     TIME FOR CALCLUATE STRESS ',10(' .'),' =',I5,//,   &
+     '      T O T A L   S O L U T I O N   T I M E  . . . . . =',I5)") (TIM(I),I=1,6),TT
      
   CALL CLOSEFILES()
   write (*,*) "Press Any Key to Exit..."
