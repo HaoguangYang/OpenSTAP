@@ -47,8 +47,6 @@ PROGRAM STAP90
   READ (IIN,'(A80,/, 4I1,/,4I5)') HED, &
                                   BANDWIDTHOPT,PARDISODOOR,LOADANALYSIS,DYNANALYSIS, &
                                   NUMNP,NUMEG,NLCASE,MODEX
-!PARDISODOOR = .true.
-!BANDWIDTHOPT = .false.
 ! input node
   IF (NUMNP.EQ.0) STOP   ! Data check mode
 
