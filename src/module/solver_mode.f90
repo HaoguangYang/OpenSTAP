@@ -47,11 +47,11 @@ subroutine bdopt(ID)
         ! CM algorithm
         ! 先找到最小的节点
         ID_NEW = 1
-        temp_length = LENGTH(LISTS(1))
+        temp_length = LISTS(1)%length_
         TEMP_INDEX = 1
         DO I = 1,NEQ
-             IF(temp_length > length(lists(I))) THEN
-                temp_length = length(lists(I))
+             IF(temp_length > lists(I)%length_) THEN
+                temp_length = lists(I)%length_
                 TEMP_INDEX = I
             END IF
         END DO
@@ -69,8 +69,8 @@ subroutine bdopt(ID)
             temp_length = 100000 ! 应该要放最大整数，但是忘了是多少了
             do i = 1, neq
               if(lists(i)%sign_ .eq. 1) then
-                  if(temp_length > length(lists(i))) then
-                    temp_length = length(lists(i))
+                  if(temp_length > lists(i)%length_) then
+                    temp_length = lists(i)%length_
                     temp_index  = i
                   end if
              end if
@@ -99,7 +99,7 @@ end subroutine bdopt
 subroutine pardiso_input(ID)
     USE LIST_CLASS
     USE NODE_CLASS
-    USE GLOBALS, ONLY : IIN, IOUT, NEQ, NUMNP, NWK, bandwidthopt, pardisodoor
+    USE GLOBALS, ONLY : IIN, IOUT, NEQ, NUMNP, NWK, pardisodoor, TIM
     USE MEMALLOCATE
     
     implicit none
@@ -141,6 +141,7 @@ subroutine pardiso_input(ID)
              END DO
          END DO
      END DO
+     CALL SECOND (TIM(2))
      ! 注意这里分配了rowIndex
      CALL MEMALLOC(2,"rowIndex",NEQ+1,1)
      CALL assign_rowIndex(lists, IA(NP(2)))
@@ -167,7 +168,7 @@ subroutine assign_rowIndex(lists, rowIndex)
     nwk = 0
     do i=1, neq
         rowIndex(i) = 1 + nwk
-        nwk = nwk + length(lists(i))
+        nwk = nwk + lists(i)%length_
     end do
     rowIndex(neq+1) = nwk+1
     end subroutine assign_rowIndex

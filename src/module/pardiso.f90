@@ -62,7 +62,7 @@ end subroutine
 
 subroutine pardiso_solver(K,V, rowIndex, columns)
 USE mkl_pardiso
-USE GLOBALS, only : neq, nwk
+USE GLOBALS, only : neq, nwk, tim
 IMPLICIT NONE
 !.. Internal solver memory pointer 
 TYPE(MKL_PARDISO_HANDLE)  :: pt(64)
@@ -110,16 +110,16 @@ END DO
 !.. Reordering and Symbolic Factorization, This step also allocates
 ! all memory that is necessary for the factorization
 
-phase = 11 ! only reordering and symbolic factorization
+!phase = 11 ! only reordering and symbolic factorization
 
-CALL pardiso (pt, maxfct, mnum, mtype, phase, neq, K, rowIndex, columns, &
-              idum, nrhs, iparm, msglvl, ddum, ddum, error)
+!CALL pardiso (pt, maxfct, mnum, mtype, phase, neq, K, rowIndex, columns, &
+!              idum, nrhs, iparm, msglvl, ddum, ddum, error)
     
-WRITE(*,*) 'Reordering completed ... '
-IF (error /= 0) THEN
-   WRITE(*,*) 'The following ERROR was detected: ', error
-   GOTO 1000
-END IF
+!WRITE(*,*) 'Reordering completed ... '
+!IF (error /= 0) THEN
+!   WRITE(*,*) 'The following ERROR was detected: ', error
+!   GOTO 1000
+!END IF
 !WRITE(*,*) 'Number of nonzeros in factors = ',iparm(18)
 !WRITE(*,*) 'Number of factorization MFLOPS = ',iparm(19)
 
@@ -143,9 +143,8 @@ END IF
 !   WRITE(*,*) 'The following ERROR was detected: ', error
 !   GOTO 1000
 !ENDIF
-
 iparm(8) = 2 ! max numbers of iterative refinement steps
-phase = 23 ! only solving
+phase = 13 ! only solving
 CALL pardiso (pt, maxfct, mnum, mtype, phase, neq, K, rowIndex, columns, &
               idum, nrhs, iparm, msglvl, V, x, error)
 

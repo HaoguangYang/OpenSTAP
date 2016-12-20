@@ -16,10 +16,6 @@ private
         module procedure set_this
     end interface
     
-    interface length
-        module procedure length_this
-    end interface
-    
     interface search
         module procedure search_this
     end interface
@@ -36,7 +32,7 @@ private
         module procedure delete_all_this
     end interface
     
-    public node, list, length, add, search, add_with_search, delete, set, delete_all, add_with_sort
+    public node, list, add, search, add_with_search, delete, set, delete_all, add_with_sort
 
     contains
     !new a node
@@ -56,12 +52,6 @@ private
         this%row_ = row
         this%column_ = column
     end subroutine set_this
-    
-    ! return length of the list
-    integer function length_this(this)
-        type(list) :: this
-        length_this = this%length_
-    end function length_this
 
     ! search for p_node0
     logical function search_this(this, p_node0)
