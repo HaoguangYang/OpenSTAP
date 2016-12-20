@@ -65,26 +65,20 @@ USE mkl_pardiso
 USE GLOBALS, only : neq, nwk
 IMPLICIT NONE
 !.. Internal solver memory pointer 
-TYPE(MKL_PARDISO_HANDLE), ALLOCATABLE  :: pt(:)
+TYPE(MKL_PARDISO_HANDLE)  :: pt(64)
 !.. All other variables
 INTEGER maxfct, mnum, mtype, phase, nrhs, error, msglvl
 INTEGER error1
-INTEGER, ALLOCATABLE :: iparm( : )
-REAL(8), ALLOCATABLE :: x( : )
+INTEGER :: iparm(64)
+REAL(8) x(neq)
 INTEGER i, idum(1)
 REAL(8) ddum(1)
 REAL(8) K(nwk), V(neq)
 INTEGER columns(nwk), rowIndex(neq+1)
-
-ALLOCATE(x(neq))
 !..
 !.. Set up PARDISO control parameter
 !..
-ALLOCATE(iparm(64))
-
-DO i = 1, 64
-   iparm(i) = 0
-END DO
+iparm = 0
 
 iparm(1) = 1 ! no solver default
 iparm(2) = 3 ! fill-in reordering from METIS
@@ -109,7 +103,6 @@ mnum = 1
 !.. Initialize the internal solver memory pointer. This is only
 ! necessary for the FIRST call of the PARDISO solver.
 
-ALLOCATE (pt(64))
 DO i = 1, 64
    pt(i)%DUMMY =  0 
 END DO
@@ -127,38 +120,41 @@ IF (error /= 0) THEN
    WRITE(*,*) 'The following ERROR was detected: ', error
    GOTO 1000
 END IF
-WRITE(*,*) 'Number of nonzeros in factors = ',iparm(18)
-WRITE(*,*) 'Number of factorization MFLOPS = ',iparm(19)
+!WRITE(*,*) 'Number of nonzeros in factors = ',iparm(18)
+!WRITE(*,*) 'Number of factorization MFLOPS = ',iparm(19)
 
 !.. Factorization.
-phase = 22 ! only factorization
-CALL pardiso (pt, maxfct, mnum, mtype, phase, neq, K, rowIndex, columns, &
-              idum, nrhs, iparm, msglvl, ddum, ddum, error)
-WRITE(*,*) 'Factorization completed ... '
-IF (error /= 0) THEN
-   WRITE(*,*) 'The following ERROR was detected: ', error
-   GOTO 1000
-ENDIF
+!phase = 22 ! only factorization
+!CALL pardiso (pt, maxfct, mnum, mtype, phase, neq, K, rowIndex, columns, &
+!              idum, nrhs, iparm, msglvl, ddum, ddum, error)
+!WRITE(*,*) 'Factorization completed ... '
+!IF (error /= 0) THEN
+!   WRITE(*,*) 'The following ERROR was detected: ', error
+!   GOTO 1000
+!ENDIF
 
 !.. Back substitution and iterative refinement
+!iparm(8) = 2 ! max numbers of iterative refinement steps
+!phase = 33 ! only solving
+!CALL pardiso (pt, maxfct, mnum, mtype, phase, neq, K, rowIndex, columns, &
+!              idum, nrhs, iparm, msglvl, V, x, error)
+!WRITE(*,*) 'Solve completed ... '
+!IF (error /= 0) THEN
+!   WRITE(*,*) 'The following ERROR was detected: ', error
+!   GOTO 1000
+!ENDIF
+
 iparm(8) = 2 ! max numbers of iterative refinement steps
-phase = 33 ! only solving
+phase = 23 ! only solving
 CALL pardiso (pt, maxfct, mnum, mtype, phase, neq, K, rowIndex, columns, &
               idum, nrhs, iparm, msglvl, V, x, error)
-WRITE(*,*) 'Solve completed ... '
-IF (error /= 0) THEN
-   WRITE(*,*) 'The following ERROR was detected: ', error
-   GOTO 1000
-ENDIF
+
 V = x
 1000 CONTINUE
 !.. Termination and release of memory
 phase = -1 ! release internal memory
 CALL pardiso (pt, maxfct, mnum, mtype, phase, neq, ddum, idum, idum, &
               idum, nrhs, iparm, msglvl, ddum, ddum, error1)
-
-IF (ALLOCATED(x))       DEALLOCATE(x)
-IF (ALLOCATED(iparm))   DEALLOCATE(iparm)
 
 IF (error1 /= 0) THEN
    WRITE(*,*) 'The following ERROR on release stage was detected: ', error1
