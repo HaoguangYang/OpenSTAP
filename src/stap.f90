@@ -122,7 +122,6 @@ PROGRAM STAP90
 
   WRITE(*,'("Solution phase ... ")')
   
-pardisodoor = .true.
 ! ********************************************************************8
 ! Read, generate and store element data
 ! 从这里开始，用不用pardiso会变得很不一样
@@ -178,14 +177,9 @@ else !如果使用pardiso
     
   CALL MEMFREEFROMTO(2,4)
   ! NP(2,3,4,5)均在这里被分配
-  CALL SOLVERMODE(IA(NP(1)))
+  CALL pardiso_input(IA(NP(1)))
   CALL MEMALLOC(11,"ELEGP",MAXEST,1)
-
 ! Write total system data
-
-  WRITE (IOUT,"(//,' TOTAL SYSTEM DATA',//,   &
-                   '     NUMBER OF EQUATIONS',14(' .'),'(NEQ) = ',I5,/,   &
-                   '     NUMBER OF MATRIX ELEMENTS',11(' .'),'(NWK) = ',I9)") NEQ,NWK  
 end if
 ! In data check only mode we skip all further calculations
   IF (MODEX.LE.0) THEN
@@ -198,12 +192,13 @@ end if
      
      CALL SECOND (TIM(3))
      
-!    Triangularize stiffness matrix
-     NEQ1=NEQ + 1
 
      if(.not. pardisodoor) then
+         !    Triangularize stiffness matrix
+        NEQ1=NEQ + 1
         CALL COLSOL (DA(NP(3)),DA(NP(4)),IA(NP(2)),NEQ,NWK,NEQ1,1)
      end if
+     
      CALL SECOND (TIM(4)) 
      IND=3    ! Stress calculations
 
@@ -212,6 +207,9 @@ end if
         CALL LOADV (DA(NP(4)),NEQ)   ! Read in the load vector
         if(pardisodoor) then
             call pardiso_crop(DA(NP(3)), IA(NP(2)), IA(NP(5)))
+              WRITE (IOUT,"(//,' TOTAL SYSTEM DATA',//,   &
+                   '     NUMBER OF EQUATIONS',14(' .'),'(NEQ) = ',I5,/,   &
+                   '     NUMBER OF MATRIX ELEMENTS',11(' .'),'(NWK) = ',I9)") NEQ,NWK  
             call pardiso_solver(DA(NP(3)),DA(NP(4)),IA(NP(2)), IA(NP(5)))
         else
 !       Solve the equilibrium equations to calculate the displacements
@@ -354,7 +352,7 @@ SUBROUTINE OPENFILES()
   !  if (FileInp(i:i) .EQ. '.') exit
   !end do
   
-  OPEN(IIN   , FILE = "stap90_with_pd_shell.in",  STATUS = "OLD")
+  OPEN(IIN   , FILE = "stap90_with_pd_shell_8H.in",  STATUS = "OLD")
   OPEN(IOUT  , FILE = "stap90.OUT", STATUS = "REPLACE")
   OPEN(IELMNT, FILE = "ELMNT.TMP",  FORM = "UNFORMATTED")
   OPEN(ILOAD , FILE = "LOAD.TMP",   FORM = "UNFORMATTED")
