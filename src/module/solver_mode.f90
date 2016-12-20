@@ -187,6 +187,10 @@ subroutine assign_columns(lists, columns)
             columns(j) = p_node%index_
             p_node => p_node%next_
             j = j + 1
+            if( j == nwk+1) then
+                j = j-1
+                exit
+            end if
         end do
     end do
     end subroutine assign_columns

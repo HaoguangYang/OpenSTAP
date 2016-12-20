@@ -87,7 +87,7 @@ DO i = 1, 64
 END DO
 
 iparm(1) = 1 ! no solver default
-iparm(2) = 2 ! fill-in reordering from METIS
+iparm(2) = 3 ! fill-in reordering from METIS
 iparm(4) = 0 ! no iterative-direct algorithm
 iparm(5) = 0 ! no user fill-in reducing permutation
 iparm(6) = 0 ! =0 solution on the first n components of x
@@ -102,7 +102,7 @@ iparm(20) = 0 ! Output: Numbers of CG Iterations
 
 error  = 0 ! initialize error flag
 msglvl = 1 ! print statistical information
-mtype  = -2 ! symmetric, indefinite
+mtype  = 2 ! symmetric, indefinite
 nrhs = 1 
 maxfct = 1 
 mnum = 1

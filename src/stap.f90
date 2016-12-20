@@ -47,7 +47,8 @@ PROGRAM STAP90
   READ (IIN,'(A80,/, 4I1,/,4I5)') HED, &
                                   BANDWIDTHOPT,PARDISODOOR,LOADANALYSIS,DYNANALYSIS, &
                                   NUMNP,NUMEG,NLCASE,MODEX
-
+PARDISODOOR = .true.
+BANDWIDTHOPT = .false.
 ! input node
   IF (NUMNP.EQ.0) STOP   ! Data check mode
 
@@ -123,11 +124,6 @@ PROGRAM STAP90
 ! * * * * * * * * * * * * * * * * * * * * * *  
 
   WRITE(*,'("Solution phase ... ")')
-<<<<<<< HEAD
-  
-=======
-
->>>>>>> 7ffb281d4a8407596245ac3e5ba7918c0d286fe8
 ! ********************************************************************8
 ! Read, generate and store element data
 ! 从这里开始，用不用pardiso会变得很不一样
@@ -149,9 +145,8 @@ if(.not. pardisodoor) then
   CALL MEMFREEFROM(6)
   CALL MEMFREEFROMTO(2,4)
   CALL MEMALLOC(2,"MAXA ",NEQ+1,1)
-
   CALL ADDRES (IA(NP(2)),IA(NP(5)))
-
+  CALL SECOND (TIM(3))
 ! ALLOCATE STORAGE
 !    A(NWK) - Global structure stiffness matrix K
 !    R(NEQ) - Load vector R and then displacement solution U
@@ -184,19 +179,20 @@ else !如果使用pardiso
   CALL MEMFREEFROMTO(2,4)
   ! NP(2,3,4,5)均在这里被分配
   CALL pardiso_input(IA(NP(1)))
+  CALL SECOND (TIM(3))
   CALL MEMALLOC(11,"ELEGP",MAXEST,1)
 ! Write total system data
 end if
 ! In data check only mode we skip all further calculations
   IF (MODEX.LE.0) THEN
-     CALL SECOND (TIM(3))
      CALL SECOND (TIM(4))
      CALL SECOND (TIM(5))
+     CALL SECOND (TIM(6))
   ELSE
      IND=2    ! Assemble structure stiffness matrix
      CALL ASSEM (A(NP(11)))
      
-     CALL SECOND (TIM(3))
+     CALL SECOND (TIM(4))
      
 
      if(.not. pardisodoor) then
@@ -205,7 +201,7 @@ end if
         CALL COLSOL (DA(NP(3)),DA(NP(4)),IA(NP(2)),NEQ,NWK,NEQ1,1)
      end if
      
-     CALL SECOND (TIM(4)) 
+      
      IND=3    ! Stress calculations
 
      REWIND ILOAD
@@ -213,6 +209,7 @@ end if
         CALL LOADV (DA(NP(4)),NEQ)   ! Read in the load vector
         if(pardisodoor) then
             call pardiso_crop(DA(NP(3)), IA(NP(2)), IA(NP(5)))
+            CALL SECOND (TIM(5))
               WRITE (IOUT,"(//,' TOTAL SYSTEM DATA',//,   &
                    '     NUMBER OF EQUATIONS',14(' .'),'(NEQ) = ',I5,/,   &
                    '     NUMBER OF MATRIX ELEMENTS',11(' .'),'(NWK) = ',I9)") NEQ,NWK  
@@ -229,13 +226,13 @@ end if
 
      END DO
      CALL VTKgenerate (IND)
-     CALL SECOND (TIM(5))
+     CALL SECOND (TIM(6))
   END IF
 
 ! Print solution times
 
   TT=0.
-  DO I=1,4
+  DO I=1,5
      TIM(I)=TIM(I+1) - TIM(I)
      TT=TT + TIM(I)
   END DO
@@ -246,7 +243,7 @@ end if
      '     TIME FOR CALCULATION OF STIFFNESS MATRIX  . . . . =',F15.5, /,   &
      '     TIME FOR FACTORIZATION OF STIFFNESS MATRIX  . . . =',F15.5, /,   &
      '     TIME FOR LOAD CASE SOLUTIONS ',10(' .'),' =',F15.5,//,   &
-     '      T O T A L   S O L U T I O N   T I M E  . . . . . =',F15.5)") (TIM(I),I=1,4),TT
+     '      T O T A L   S O L U T I O N   T I M E  . . . . . =',F15.5)") (TIM(I),I=1,5),TT
 
   WRITE (*,"(//,  &
      ' S O L U T I O N   T I M E   L O G   I N   S E C',//,   &
@@ -254,7 +251,7 @@ end if
      '     TIME FOR CALCULATION OF STIFFNESS MATRIX  . . . . =',F15.5, /,   &
      '     TIME FOR FACTORIZATION OF STIFFNESS MATRIX  . . . =',F15.5, /,   &
      '     TIME FOR LOAD CASE SOLUTIONS ',10(' .'),' =',F15.5,//,   &
-     '      T O T A L   S O L U T I O N   T I M E  . . . . . =',F15.5)") (TIM(I),I=1,4),TT
+     '      T O T A L   S O L U T I O N   T I M E  . . . . . =',F15.5)") (TIM(I),I=1,5),TT
      
   CALL CLOSEFILES()
   write (*,*) "Press Any Key to Exit..."
@@ -367,13 +364,8 @@ SUBROUTINE OPENFILES()
     if (FileInp(i:i) .EQ. '.') exit
   end do
   
-<<<<<<< HEAD
-  OPEN(IIN   , FILE = "stap90_with_pd_shell_8H.in",  STATUS = "OLD")
-  OPEN(IOUT  , FILE = "stap90.OUT", STATUS = "REPLACE")
-=======
   OPEN(IIN   , FILE = FileInp,  STATUS = "OLD")
   OPEN(IOUT  , FILE = FileInp(1:i-1)//".OUT", STATUS = "REPLACE")
->>>>>>> 7ffb281d4a8407596245ac3e5ba7918c0d286fe8
   OPEN(IELMNT, FILE = "ELMNT.TMP",  FORM = "UNFORMATTED")
   OPEN(ILOAD , FILE = "LOAD.TMP",   FORM = "UNFORMATTED")
   OPEN(VTKFile, FILE = FileInp(1:i-1)//".OUT.vtk", STATUS = "REPLACE")
