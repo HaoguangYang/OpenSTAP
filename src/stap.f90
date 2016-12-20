@@ -209,12 +209,13 @@ end if
         if(pardisodoor) then
             call pardiso_crop(DA(NP(3)), IA(NP(2)), IA(NP(5)))
             CALL SECOND (TIM(5))
-              WRITE (IOUT,"(//,' TOTAL SYSTEM DATA',//,   &
+            WRITE (IOUT,"(//,' TOTAL SYSTEM DATA',//,   &
                    '     NUMBER OF EQUATIONS',14(' .'),'(NEQ) = ',I5,/,   &
                    '     NUMBER OF MATRIX ELEMENTS',11(' .'),'(NWK) = ',I9)") NEQ,NWK  
             call pardiso_solver(DA(NP(3)),DA(NP(4)),IA(NP(2)), IA(NP(5)))
         else
 !       Solve the equilibrium equations to calculate the displacements
+            CALL SECOND (TIM(5))
             IF (LOADANALYSIS .EQV. .TRUE.) CALL COLSOL (DA(NP(3)),DA(NP(4)),IA(NP(2)),NEQ,NWK,NEQ1,2)
         end if
         WRITE (IOUT,"(//,' LOAD CASE ',I3)") CURLCASE
@@ -237,21 +238,22 @@ end if
   END DO
   
   WRITE (IOUT,"(//,  &
-     ' S O L U T I O N   T I M E   L O G   I N   S E C',//,   &
-     '     TIME FOR INPUT PHASE ',14(' .'),' =',F15.5,/,     &
-     '     TIME FOR CALCULATION OF STIFFNESS MATRIX  . . . . =',F15.5, /,   &
-     '     TIME FOR FACTORIZATION OF STIFFNESS MATRIX  . . . =',F15.5, /,   &
-     '     TIME FOR LOAD CASE SOLUTIONS ',10(' .'),' =',F15.5,//,   &
-     ' T O T A L   S O L U T I O N   T I M E  . . . . . =',F15.5)") (TIM(I),I=1,5),TT
+     ' S O L U T I O N   T I M E   L O G   I N   M I L L I S E C',//,   &
+     '     TIME FOR INPUT PHASE ',14(' .'),' =',I15,/,     &
+     '     TIME FOR PREPARATION OF MATRIX FORMAT . . . . . . =',I15,/,     &
+     '     TIME FOR CALCULATION OF STIFFNESS MATRIX  . . . . =',I15, /,   &
+     '     TIME FOR FACTORIZATION OF STIFFNESS MATRIX  . . . =',I15, /,   &
+     '     TIME FOR LOAD CASE SOLUTIONS ',10(' .'),' =',I15,//,   &
+     ' T O T A L   S O L U T I O N   T I M E . . . . . . . . =',I15)") (TIM(I),I=1,5),TT
 
   WRITE (*,"(//,  &
-     ' S O L U T I O N   T I M E   L O G   I N   S E C',//,   &
-     '     TIME FOR INPUT PHASE ',14(' .'),' =',F15.5,/,     &
-     '     TIME FOR PREPARATION OF MATRIX FORMAT . . . . . . =',F15.5,/,     &
-     '     TIME FOR CALCULATION OF STIFFNESS MATRIX  . . . . =',F15.5, /,   &
-     '     TIME FOR FACTORIZATION OF STIFFNESS MATRIX  . . . =',F15.5, /,   &
-     '     TIME FOR LOAD CASE SOLUTIONS ',10(' .'),' =',F15.5,//,   &
-     ' T O T A L   S O L U T I O N   T I M E . . . . . . . . =',F15.5)") (TIM(I),I=1,5),TT
+     ' S O L U T I O N   T I M E   L O G   I N   M I L L I S E C',//,   &
+     '     TIME FOR INPUT PHASE ',14(' .'),' =',I15,/,     &
+     '     TIME FOR PREPARATION OF MATRIX FORMAT . . . . . . =',I15,/,     &
+     '     TIME FOR CALCULATION OF STIFFNESS MATRIX  . . . . =',I15, /,   &
+     '     TIME FOR FACTORIZATION OF STIFFNESS MATRIX  . . . =',I15, /,   &
+     '     TIME FOR LOAD CASE SOLUTIONS ',10(' .'),' =',I15,//,   &
+     ' T O T A L   S O L U T I O N   T I M E . . . . . . . . =',I15)") (TIM(I),I=1,5),TT
      
   CALL CLOSEFILES()
   write (*,*) "Press Any Key to Exit..."
