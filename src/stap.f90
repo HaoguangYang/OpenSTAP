@@ -122,7 +122,7 @@ PROGRAM STAP90
 
   WRITE(*,'("Solution phase ... ")')
   
-pardisodoor = .false.
+pardisodoor = .true.
 ! ********************************************************************8
 ! Read, generate and store element data
 ! 从这里开始，用不用pardiso会变得很不一样
@@ -211,6 +211,7 @@ end if
      DO CURLCASE=1,NLCASE
         CALL LOADV (DA(NP(4)),NEQ)   ! Read in the load vector
         if(pardisodoor) then
+            call pardiso_crop(DA(NP(3)), IA(NP(2)), IA(NP(5)))
             call pardiso_solver(DA(NP(3)),DA(NP(4)),IA(NP(2)), IA(NP(5)))
         else
 !       Solve the equilibrium equations to calculate the displacements
@@ -353,7 +354,7 @@ SUBROUTINE OPENFILES()
   !  if (FileInp(i:i) .EQ. '.') exit
   !end do
   
-  OPEN(IIN   , FILE = "stap90_with_pd_shell_8H.in",  STATUS = "OLD")
+  OPEN(IIN   , FILE = "stap90_with_pd_shell.in",  STATUS = "OLD")
   OPEN(IOUT  , FILE = "stap90.OUT", STATUS = "REPLACE")
   OPEN(IELMNT, FILE = "ELMNT.TMP",  FORM = "UNFORMATTED")
   OPEN(ILOAD , FILE = "LOAD.TMP",   FORM = "UNFORMATTED")
