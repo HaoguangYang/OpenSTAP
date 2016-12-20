@@ -221,7 +221,7 @@ SUBROUTINE RUSS (ID,X,Y,Z,U,MHT,E,AREA,LM,XYZ,MATP,Node)
      END DO
 !>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>WORKING PROGRESS
      StressCollection(2,:) = 0D0
-     call PostProcessor(NPAR(1), 3, XYZ, &
+     call PostProcessor(NPAR(1), 1, XYZ, &
                         Node, 1, GaussianCollection, StressCollection, U)
 !>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>AT POINT 513 & 1370 WHERE TRUSSES MERGE, DO NOT USE LEAST SQUARE!
 !>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>WOULD BE BETTER IF USE DIM==1.
