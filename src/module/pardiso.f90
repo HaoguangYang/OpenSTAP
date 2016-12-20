@@ -124,25 +124,31 @@ END IF
 !WRITE(*,*) 'Number of factorization MFLOPS = ',iparm(19)
 
 !.. Factorization.
-phase = 22 ! only factorization
-CALL pardiso (pt, maxfct, mnum, mtype, phase, neq, K, rowIndex, columns, &
-              idum, nrhs, iparm, msglvl, ddum, ddum, error)
-WRITE(*,*) 'Factorization completed ... '
-IF (error /= 0) THEN
-   WRITE(*,*) 'The following ERROR was detected: ', error
-   GOTO 1000
-ENDIF
+!phase = 22 ! only factorization
+!CALL pardiso (pt, maxfct, mnum, mtype, phase, neq, K, rowIndex, columns, &
+!              idum, nrhs, iparm, msglvl, ddum, ddum, error)
+!WRITE(*,*) 'Factorization completed ... '
+!IF (error /= 0) THEN
+!   WRITE(*,*) 'The following ERROR was detected: ', error
+!   GOTO 1000
+!ENDIF
 
 !.. Back substitution and iterative refinement
+!iparm(8) = 2 ! max numbers of iterative refinement steps
+!phase = 33 ! only solving
+!CALL pardiso (pt, maxfct, mnum, mtype, phase, neq, K, rowIndex, columns, &
+!              idum, nrhs, iparm, msglvl, V, x, error)
+!WRITE(*,*) 'Solve completed ... '
+!IF (error /= 0) THEN
+!   WRITE(*,*) 'The following ERROR was detected: ', error
+!   GOTO 1000
+!ENDIF
+
 iparm(8) = 2 ! max numbers of iterative refinement steps
-phase = 33 ! only solving
+phase = 23 ! only solving
 CALL pardiso (pt, maxfct, mnum, mtype, phase, neq, K, rowIndex, columns, &
               idum, nrhs, iparm, msglvl, V, x, error)
-WRITE(*,*) 'Solve completed ... '
-IF (error /= 0) THEN
-   WRITE(*,*) 'The following ERROR was detected: ', error
-   GOTO 1000
-ENDIF
+
 V = x
 1000 CONTINUE
 !.. Termination and release of memory
