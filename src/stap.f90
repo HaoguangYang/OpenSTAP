@@ -47,8 +47,8 @@ PROGRAM STAP90
   READ (IIN,'(A80,/, 4I1,/,4I5)') HED, &
                                   BANDWIDTHOPT,PARDISODOOR,LOADANALYSIS,DYNANALYSIS, &
                                   NUMNP,NUMEG,NLCASE,MODEX
-PARDISODOOR = .true.
-BANDWIDTHOPT = .false.
+!PARDISODOOR = .true.
+!BANDWIDTHOPT = .false.
 ! input node
   IF (NUMNP.EQ.0) STOP   ! Data check mode
 
@@ -193,7 +193,7 @@ end if
      CALL ASSEM (A(NP(11)))
      
      CALL SECOND (TIM(4))
-     
+     !IF (DYNANALYSIS .EQV. .TRUE.) CALL EIGENVAL (DA(NP(3)), DA(NP(5)), IA(NP(2)), NEQ, NWK, NEQ1)
      if(.not. pardisodoor) then
          !    Triangularize stiffness matrix
         NEQ1=NEQ + 1
