@@ -141,7 +141,16 @@ private
             this%length_ = 2
         end if
     else ! 多于1一个节点
+        if(p_node0 .LT. this%head_) then !如果是最小的
+            this%head_%prev_ => p_node0
+            p_node0%next_ => this%head_
+            this%head_ => p_node0
+            this%length_ = this%length_ + 1
+            nullify(p_node0%prev_)
+            return
+        end if
         p_node => this%head_
+        
         do while(associated(p_node))
             if(p_node0 .EQ. p_node) then
                 return
