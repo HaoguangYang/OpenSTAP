@@ -1,18 +1,3 @@
-! 这里认为没有必要同时具有半带宽优化与系数矩阵求解的功能
-    SUBROUTINE SOLVERMODE(ID)
-    USE GLOBALS, ONLY : IIN, IOUT, NEQ, NUMNP, NWK, bandwidthopt, pardisodoor
-    
-    INTEGER :: ID(6, NUMNP)
-    
-    if ( bandwidthopt) then
-        call bdopt(ID)
-        bandwidthopt = .false.  ! 只做一次
-    else if(pardisodoor) then
-         call pardiso_input(ID)
-    end if
-
-    END SUBROUTINE SOLVERMODE
-
 subroutine bdopt(ID)
     USE LIST_CLASS
     USE NODE_CLASS

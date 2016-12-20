@@ -49,6 +49,7 @@
 		<File RelativePath="..\..\src\module\mathkernel.f90"/>
 		<File RelativePath="..\..\src\module\mkl_pardiso.f90"/>
 		<File RelativePath="..\..\src\module\node.f90"/>
+		<File RelativePath="..\..\src\module\pardiso.f90"/>
 		<File RelativePath="..\..\src\module\solver_mode.f90"/></Filter>
 		<Filter Name="Utils">
 		<File RelativePath="..\..\src\assem.f90"/>
@@ -56,7 +57,6 @@
 		<File RelativePath="..\..\src\elcal.f90"/>
 		<File RelativePath="..\..\src\globals.f90"/>
 		<File RelativePath="..\..\src\memalloc.f90"/>
-		<File RelativePath="..\..\src\pardiso.f90"/>
 		<File RelativePath="..\..\src\postprocessor.f90"/>
 		<File RelativePath="..\..\src\stap.f90"/></Filter></Filter>
 		<File RelativePath="..\Readme.txt"/></Files>

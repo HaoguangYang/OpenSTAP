@@ -1,5 +1,5 @@
 subroutine pardiso_crop(A, rowIndex, columns)
-    use GLOBALS, only : NWK, NEQ, NWK_final
+    use GLOBALS, only : NWK, NEQ
     real(8) :: A(nwk)
     integer :: rowIndex(neq+1)
     integer :: columns(nwk)
@@ -37,17 +37,21 @@ subroutine pardiso_crop(A, rowIndex, columns)
         DO I=J,ND
            II=LM(I)
            IF (II .GT. 0) THEN
-              IF (JJ .GT. II) THEN ! 如果JJ > II，交换，让JJ永远小于II
-                 tempJ = II
-              else
-                 tempJ = JJ                  
+              IF (JJ .GT. II) THEN ! 如果JJ > II
+                 loop1: do k = rowIndex(II), rowIndex(II+1)-1
+                    if(columns(k) .EQ. JJ) then
+                        A(k) = A(k) + S(I,J)
+                        exit loop1
+                    end if
+                end do loop1
+              else ! 如果II < JJ
+                  loop2: do k = rowIndex(JJ), rowIndex(JJ+1)-1
+                    if(columns(k) .EQ. II) then
+                        A(k) = A(k) + S(I,J)
+                        exit loop2
+                    end if
+                end do loop2                  
               END IF              
-              loop1: do k = rowIndex(tempJ), rowIndex(tempJ+1)-1
-                 if(columns(k) .EQ. II) then
-                     A(k) = A(k) + S(I,J)
-                     exit loop1
-                 end if
-             end do loop1
            END IF
         END DO
      END IF
@@ -69,7 +73,6 @@ INTEGER, ALLOCATABLE :: iparm( : )
 REAL(8), ALLOCATABLE :: x( : )
 INTEGER i, idum(1)
 REAL(8) ddum(1)
-REAL(8) C(10,10)
 REAL(8) K(nwk), V(neq)
 INTEGER columns(nwk), rowIndex(neq+1)
 
