@@ -79,7 +79,7 @@ PROGRAM STAP90
 ! Calculate and store load vectors
 !   R(NEQ) : Load vector
 
-  CALL MEMALLOC(7,"R    ",NEQ,ITWO)
+  CALL MEMALLOC(5,"R    ",NEQ,ITWO)
 
   WRITE (IOUT,"(//,' L O A D   C A S E   D A T A')")
 
@@ -108,64 +108,83 @@ PROGRAM STAP90
 !                      3 : Z-direction
 !       FLOAD(NLOAD) : Magnitude of load
 
-     CALL MEMALLOC(8,"NOD  ",NLOAD,1)
-     CALL MEMALLOC(9,"IDIRN",NLOAD,1)
-     CALL MEMALLOC(10,"FLOAD",NLOAD,ITWO)
+     CALL MEMALLOC(6,"NOD  ",NLOAD,1)
+     CALL MEMALLOC(7,"IDIRN",NLOAD,1)
+     CALL MEMALLOC(8,"FLOAD",NLOAD,ITWO)
      
-     CALL LOADS (DA(NP(7)),IA(NP(8)),IA(NP(9)),DA(NP(10)),IA(NP(1)),NLOAD,NEQ) !OTHER SITUATIONS EXCEPT BEAM(THE FORMER ONE)
+     CALL LOADS (DA(NP(5)),IA(NP(6)),IA(NP(7)),DA(NP(8)),IA(NP(1)),NLOAD,NEQ) !OTHER SITUATIONS EXCEPT BEAM(THE FORMER ONE)
 
   END DO
+  
+! * * * * * * * * * * * * * * * * * * * * * *
+! *               SOLUTION PHASE            *
+! * * * * * * * * * * * * * * * * * * * * * *  
 
+  WRITE(*,'("Solution phase ... ")')
+  
+pardisodoor = .false.
+! ********************************************************************8
 ! Read, generate and store element data
-
+! 从这里开始，用不用pardiso会变得很不一样
 ! Clear storage
 !   MHT(NEQ) - Vector of column heights
-
-  CALL MEMFREEFROMTO(7,10)
-  CALL MEMALLOC(7,"MHT  ",NEQ,1)
-
+if(.not. pardisodoor) then
+    
+  CALL MEMFREEFROMTO(5,8)
+  CALL MEMALLOC(5,"MHT  ",NEQ,1)
+  
   IND=1    ! Read and generate element information
   CALL ELCAL ! 到这里2,3,4才没用的
   !CALL VTKgenerate (IND)        !Prepare Post-Processing Files.
 
   CALL SECOND (TIM(2))
-
-! * * * * * * * * * * * * * * * * * * * * * *
-! *               SOLUTION PHASE            *
-! * * * * * * * * * * * * * * * * * * * * * *
-
-  WRITE(*,'("Solution phase ... ")')
-    
-if(.not. pardisodoor) then
+  
 ! ALLOCATE STORAGE
 !    MAXA(NEQ+1)
-  CALL MEMFREEFROM(8)
+  CALL MEMFREEFROM(6)
   CALL MEMFREEFROMTO(2,4)
   CALL MEMALLOC(2,"MAXA ",NEQ+1,1)
 
-  CALL ADDRES (IA(NP(2)),IA(NP(7)))
+  CALL ADDRES (IA(NP(2)),IA(NP(5)))
 
 ! ALLOCATE STORAGE
 !    A(NWK) - Global structure stiffness matrix K
 !    R(NEQ) - Load vector R and then displacement solution U
-
+ 
   MM=NWK/NEQ
-
+  CALL MEMALLOC(3,"STFF ",NWK,ITWO)
   CALL MEMALLOC(4,"R    ",NEQ,ITWO)
-  CALL MEMALLOC(8,"STFF ",NWK,ITWO)
   CALL MEMALLOC(11,"ELEGP",MAXEST,1)
 
 ! Write total system data
 
   WRITE (IOUT,"(//,' TOTAL SYSTEM DATA',//,   &
                    '     NUMBER OF EQUATIONS',14(' .'),'(NEQ) = ',I5,/,   &
-                   '     NUMBER OF MATRIX ELEMENTS',11(' .'),'(NWK) = ',I11,/,   &
+                   '     NUMBER OF MATRIX ELEMENTS',11(' .'),'(NWK) = ',I9,/,   &
                    '     MAXIMUM HALF BANDWIDTH ',12(' .'),'(MK ) = ',I5,/,     &
                    '     MEAN HALF BANDWIDTH',14(' .'),'(MM ) = ',I5)") NEQ,NWK,MK,MM
-else
-  CALL MEMALLOC(4,"R    ",NEQ,ITWO)
-  CALL MEMALLOC(8,"STFF ",NWK,ITWO)
-  CALL MEMALLOC(11,"ELEGP",MAXEST,1)   
+! ***************************************************************************************
+else !如果使用pardiso
+    
+  CALL MEMFREEFROMTO(5,8)
+  CALL MEMALLOC(5,"MHT  ",NEQ,1)
+  
+  IND=1    ! Read and generate element information
+  CALL ELCAL ! 到这里2,3,4才没用的
+  !CALL VTKgenerate (IND)        !Prepare Post-Processing Files.
+
+  CALL SECOND (TIM(2))
+    
+  CALL MEMFREEFROMTO(2,4)
+  ! NP(2,3,4,5)均在这里被分配
+  CALL SOLVERMODE(IA(NP(1)))
+  CALL MEMALLOC(11,"ELEGP",MAXEST,1)
+
+! Write total system data
+
+  WRITE (IOUT,"(//,' TOTAL SYSTEM DATA',//,   &
+                   '     NUMBER OF EQUATIONS',14(' .'),'(NEQ) = ',I5,/,   &
+                   '     NUMBER OF MATRIX ELEMENTS',11(' .'),'(NWK) = ',I9)") NEQ,NWK  
 end if
 ! In data check only mode we skip all further calculations
   IF (MODEX.LE.0) THEN
@@ -181,7 +200,7 @@ end if
 !    Triangularize stiffness matrix
      NEQ1=NEQ + 1
      if(.not. pardisodoor) then
-        CALL COLSOL (DA(NP(8)),DA(NP(4)),IA(NP(2)),NEQ,NWK,NEQ1,1)
+        CALL COLSOL (DA(NP(3)),DA(NP(4)),IA(NP(2)),NEQ,NWK,NEQ1,1)
      end if
      CALL SECOND (TIM(4)) 
      IND=3    ! Stress calculations
@@ -190,10 +209,10 @@ end if
      DO CURLCASE=1,NLCASE
         CALL LOADV (DA(NP(4)),NEQ)   ! Read in the load vector
         if(pardisodoor) then
-            call pardiso_solver(DA(NP(8)),DA(NP(4)),IA(NP(5)), IA(NP(6)))
+            call pardiso_solver(DA(NP(3)),DA(NP(4)),IA(NP(2)), IA(NP(5)))
         else
 !       Solve the equilibrium equations to calculate the displacements
-            CALL COLSOL (DA(NP(8)),DA(NP(4)),IA(NP(2)),NEQ,NWK,NEQ1,2)
+            CALL COLSOL (DA(NP(3)),DA(NP(4)),IA(NP(2)),NEQ,NWK,NEQ1,2)
         end if
         WRITE (IOUT,"(//,' LOAD CASE ',I3)") CURLCASE
         
@@ -333,7 +352,7 @@ SUBROUTINE OPENFILES()
   !  if (FileInp(i:i) .EQ. '.') exit
   !end do
   
-  OPEN(IIN   , FILE = "stap90_shell_8H.in",  STATUS = "OLD")
+  OPEN(IIN   , FILE = "stap90_with_pd_shell.in",  STATUS = "OLD")
   OPEN(IOUT  , FILE = "stap90.OUT", STATUS = "REPLACE")
   OPEN(IELMNT, FILE = "ELMNT.TMP",  FORM = "UNFORMATTED")
   OPEN(ILOAD , FILE = "LOAD.TMP",   FORM = "UNFORMATTED")

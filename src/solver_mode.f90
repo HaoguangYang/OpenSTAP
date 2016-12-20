@@ -3,10 +3,12 @@
     USE GLOBALS, ONLY : IIN, IOUT, NEQ, NUMNP, NWK, bandwidthopt, pardisodoor
     
     INTEGER :: ID(6, NUMNP)
-    if(pardisodoor) then
-         call pardiso_input(ID)
-    else if ( bandwidthopt) then
+    
+    if ( bandwidthopt) then
         call bdopt(ID)
+        bandwidthopt = .false.  ! 只做一次
+    else if(pardisodoor) then
+         call pardiso_input(ID)
     end if
 
     END SUBROUTINE SOLVERMODE
@@ -152,10 +154,12 @@ subroutine pardiso_input(ID)
          END DO
      END DO
      ! 注意这里分配了rowIndex
-     CALL MEMALLOC(5,"rowIndex",NEQ,1)
-     call assign_rowIndex(lists, IA(NP(5)))
-     CALL MEMALLOC(6,"columns",NWK,1)
-     CALL assign_columns(lists, IA(NP(6)))
+     CALL MEMALLOC(2,"rowIndex",NEQ+1,1)
+     CALL assign_rowIndex(lists, IA(NP(2)))
+     CALL MEMALLOC(3,"STFF ",NWK,ITWO)
+     CALL MEMALLOC(4,"R    ",NEQ,ITWO)
+     CALL MEMALLOC(5,"columns",NWK,1)
+     CALL assign_columns(lists, IA(NP(5)))
      do i = 1, neq
          call delete_all(lists(i))
      end do

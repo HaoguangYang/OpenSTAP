@@ -57,7 +57,7 @@ SUBROUTINE PLATE
   N(:) = N(:) + NFIRST
   NLAST=N(8)
 
-  CALL PLATE4Q (IA(NP(1)),DA(NP(2)),DA(NP(3)),DA(NP(4)),DA(NP(4)),IA(NP(7)),   &
+  CALL PLATE4Q (IA(NP(1)),DA(NP(2)),DA(NP(3)),DA(NP(4)),DA(NP(4)),IA(NP(5)),   &
        A(N(1)),A(N(2)),A(N(3)),A(N(4)),A(N(5)),A(N(6)),A(N(7)))
 
   RETURN
@@ -221,9 +221,9 @@ SUBROUTINE PLATE4Q (ID,X,Y,Z,U,MHT,E,POSSION,LM,XYZ,MATP,THICK, Node)
         END DO
 
         if(pardisodoor) then
-            call pardiso_addban(DA(NP(8)),IA(NP(5)),IA(NP(6)),S,LM(1,N),ND)
+            call pardiso_addban(DA(NP(3)),IA(NP(2)),IA(NP(5)),S,LM(1,N),ND)
         else
-            CALL ADDBAN (DA(NP(8)),IA(NP(2)),S,LM(1,N),ND)
+            CALL ADDBAN (DA(NP(3)),IA(NP(2)),S,LM(1,N),ND)
         end if
         
      END DO
