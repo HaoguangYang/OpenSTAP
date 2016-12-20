@@ -284,10 +284,10 @@ print(material_e)
 
 
 #-----------输出LOAD信息 扩充ID到6维-------------
-load_floor = 58e6/(material_e[0][2][1]-material_e[0][2][0])
-load_pier = 348e6/(material_e[1][2][1]-material_e[1][2][0])
-load_supportbeam = 17.134e6/(material_e[2][2][1]-material_e[2][2][0])
-load_riverbank = 346.25e6/(material_e[3][2][1]-material_e[3][2][0])
+load_floor = 58e6/(material_e[0][2][1]-material_e[0][2][0]+1)
+load_pier = 348e6/(material_e[1][2][1]-material_e[1][2][0]+1)
+load_supportbeam = 27.868e6/(material_e[2][2][1]-material_e[2][2][0]+1)
+load_riverbank = 346.25e6/(material_e[3][2][1]-material_e[3][2][0]+1)
 load_cables = 0
 load_e = [load_floor,load_pier,load_supportbeam,load_riverbank,load_cables]
 ID_6 = [[0,0,1],[1,1,1],[0,0,0],[1,1,1],[1,1,1]]
@@ -372,6 +372,9 @@ for i in range(len(node[0])):
     inp.write('%5d'*7%(node[0][i],node_b[i][0],node_b[i][1],node_b[i][2],node_b[i][3],node_b[i][4],node_b[i][5]))
     inp.write('%10.3f'*3%(node[1][i][0],node[1][i][1],node[1][i][2]))
     inp.write('%5d'%0 + '\n')
+    
+#输出稀疏存储信息
+
 
 #输入荷载信息
 inp.write('%5d'*2%(1,len(node[0]))+'\n')
@@ -403,7 +406,7 @@ for i in range(len(keyloc[2])):
             inp.write('%5d'%(1) + '%10.1e'%(1.0) + '%5d'%(0) + '\n')
     elif element[i][0] == 'B31':
         inp.write('%5d'*3%(5,len(element[i][1][0]),1) + '\n')
-        inp.write('%5d'%1 + '%10.3e'%(material_e[2][1][2][0]) + '%10.3e'%(4.62085e10) + '%10.3f'%(0.76))
+        inp.write('%5d'%1 + '%10.3e'%(material_e[2][1][2][0]) + '%10.3e'%(2.60030e10) + '%10.3f'%(0.76))
         inp.write('%10.3e'%(0.4853333) + '%10.3e'%(0.4853333) + '%10.3e'%(0.4853333))
         inp.write('%10.3e'%(0.9170666) + '%10.3e'%(0.9170666) + '%10.3e'%(0.9170666) + '\n')
         for j in range(len(element[i][1][0])):
