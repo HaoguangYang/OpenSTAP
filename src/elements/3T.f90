@@ -94,7 +94,7 @@ SUBROUTINE ELEMENT_3T_MAIN (ID,X,Y,Z,U,MHT,E,POISSON,LM,XYZ,MATP,Node)
     END FUNCTION
   END INTERFACE
   
-  INTEGER :: ID(3,NUMNP),LM(12,NPAR(2)),MATP(NPAR(2)),MHT(NEQ)
+  INTEGER :: ID(6,NUMNP),LM(12,NPAR(2)),MATP(NPAR(2)),MHT(NEQ)
   REAL(8) :: X(NUMNP),Y(NUMNP),Z(NUMNP),E(NPAR(3)),POISSON(NPAR(3)),  &
              XYZ(9,NPAR(2)),U(NEQ),DST(6,1)
   REAL(8) :: ETA,EPSILON
@@ -272,8 +272,8 @@ SUBROUTINE ELEMENT_3T_MAIN (ID,X,Y,Z,U,MHT,E,POISSON,LM,XYZ,MATP,Node)
         GaussianCollection (:,I:J) = transpose(XY)
         StressCollection (:,I:J) = Stress
      END DO
-     !call PostProcessor(NPAR(1), 2, XYZ((/1,2,4,5,7,8/),:), &
-     !                      Node, 3, GaussianCollection, StressCollection, U)
+     call PostProcessor(NPAR(1), 2, XYZ((/1,2,4,5,7,8/),:), &
+                           Node, 3, GaussianCollection, StressCollection, U)
 
   ELSE 
      STOP "*** ERROR *** Invalid IND value."

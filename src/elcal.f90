@@ -86,9 +86,11 @@ SUBROUTINE ELEMNT
      CALL SHELL8Q
   case (10)
      CALL ELEMENT_3T
+  case (11)
+     CALL HexTriQuad
 !    Other element types would be called here, identifying each
 !    element type by a different NPAR(1) parameter
-  case (11:)
+  case (12:)
      stop "ELEMENT TYPE STILL UNDER DEVELOPMENT..."
   END SELECT
 

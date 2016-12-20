@@ -70,7 +70,7 @@ SUBROUTINE RUSS (ID,X,Y,Z,U,MHT,E,AREA,LM,XYZ,MATP,Node)
   USE MEMALLOCATE
 
   IMPLICIT NONE
-  INTEGER :: ID(3,NUMNP),LM(6,NPAR(2)),MATP(NPAR(2)),MHT(NEQ)
+  INTEGER :: ID(6,NUMNP),LM(6,NPAR(2)),MATP(NPAR(2)),MHT(NEQ)
   REAL(8) :: X(NUMNP),Y(NUMNP),Z(NUMNP),E(NPAR(3)),AREA(NPAR(3)),  &
              XYZ(6,NPAR(2)),U(NEQ)
   REAL(8) :: S(6,6),ST(6),D(3), StressCollection(6,NPAR(2)), GaussianCollection(3,NPAR(2))
@@ -220,8 +220,11 @@ SUBROUTINE RUSS (ID,X,Y,Z,U,MHT,E,AREA,LM,XYZ,MATP,Node)
         StressCollection(1,N) = STR
      END DO
 !>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>WORKING PROGRESS
+     StressCollection(2,:) = 0D0
      call PostProcessor(NPAR(1), 3, XYZ, &
                         Node, 1, GaussianCollection, StressCollection, U)
+!>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>AT POINT 513 & 1370 WHERE TRUSSES MERGE, DO NOT USE LEAST SQUARE!
+!>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>WOULD BE BETTER IF USE DIM==1.
   ELSE 
      STOP "*** ERROR *** Invalid IND value."
   END IF

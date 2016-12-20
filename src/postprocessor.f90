@@ -221,19 +221,9 @@ subroutine PostProcessor (ElementType, Dimen, PositionData, &
                         !Error for element number 5 and 6
                     end do
                 end do
-                !sets = 3
-                if (Ncoeff .GT. 0) then
-                    call LeastSquare (coeff(1:Ncoeff,:), value(1:Nval,1:Ncoeff+NStress), Ncoeff, Nval, NStress)
-                    !write (*,*) coeff
-                    !write (*,*) value
-                    ind2 = NodeRelationFlag(L,ref2)
-                    x = PositionData(2*(ind2-1)+1,NodeRelationFlag(L,1))    !(L,1) relative to Hint 1
-                    y = PositionData(2*(ind2-1)+2,NodeRelationFlag(L,1))
-                    if (Ncoeff .EQ. 6) Stress(1:NStress,L) = matmul(transpose(coeff(1:6,1:NStress)),(/1D0, x, y, x*y, x**2, y**2/))
-                    if (Ncoeff .EQ. 3) Stress(1:NStress,L) = matmul(transpose(coeff(1:3,1:NStress)),(/1D0, x, y/))
-                else
-                    Stress(:,L) = 1/Nval*(sum(value(1:Nval, 1:NStress),1))
-                end if
+                !sets = 1
+                Stress(:,L) = 1/Nval*(sum(value(1:Nval, 1:NStress),1))
+                
                 if (NStress == 3) then
                     write (IOUT,"(I6, 3X, E13.6, 2X, E13.6, A13, 2X, E13.6, 2(2X, A13))") &
                                                                     L, Stress(1:2,L), "---", Stress(3,L), "---", "---"

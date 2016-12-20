@@ -44,7 +44,9 @@ PROGRAM STAP90
 !            0 : data check only;
 !            1 : execution
 
-  READ (IIN,'(A80,/,4I5)') HED,NUMNP,NUMEG,NLCASE,MODEX
+  READ (IIN,'(A80,/, 4I1,/,4I5)') HED, &
+                                  BANDWIDTHOPT,PARDISODOOR,LOADANALYSIS,DYNANALYSIS, &
+                                  NUMNP,NUMEG,NLCASE,MODEX
 
 ! input node
   IF (NUMNP.EQ.0) STOP   ! Data check mode
@@ -121,7 +123,11 @@ PROGRAM STAP90
 ! * * * * * * * * * * * * * * * * * * * * * *  
 
   WRITE(*,'("Solution phase ... ")')
+<<<<<<< HEAD
   
+=======
+
+>>>>>>> 7ffb281d4a8407596245ac3e5ba7918c0d286fe8
 ! ********************************************************************8
 ! Read, generate and store element data
 ! 从这里开始，用不用pardiso会变得很不一样
@@ -134,7 +140,7 @@ if(.not. pardisodoor) then
   
   IND=1    ! Read and generate element information
   CALL ELCAL ! 到这里2,3,4才没用的
-  !CALL VTKgenerate (IND)        !Prepare Post-Processing Files.
+  CALL VTKgenerate (IND)        !Prepare Post-Processing Files.
 
   CALL SECOND (TIM(2))
   
@@ -171,7 +177,7 @@ else !如果使用pardiso
   
   IND=1    ! Read and generate element information
   CALL ELCAL ! 到这里2,3,4才没用的
-  !CALL VTKgenerate (IND)        !Prepare Post-Processing Files.
+  CALL VTKgenerate (IND)        !Prepare Post-Processing Files.
 
   CALL SECOND (TIM(2))
     
@@ -222,7 +228,7 @@ end if
             CALL STRESS (A(NP(11)))
 
      END DO
-     !CALL VTKgenerate (IND)
+     CALL VTKgenerate (IND)
      CALL SECOND (TIM(5))
   END IF
 
@@ -241,9 +247,18 @@ end if
      '     TIME FOR FACTORIZATION OF STIFFNESS MATRIX  . . . =',F15.5, /,   &
      '     TIME FOR LOAD CASE SOLUTIONS ',10(' .'),' =',F15.5,//,   &
      '      T O T A L   S O L U T I O N   T I M E  . . . . . =',F15.5)") (TIM(I),I=1,4),TT
-     
+
+  WRITE (*,"(//,  &
+     ' S O L U T I O N   T I M E   L O G   I N   S E C',//,   &
+     '     TIME FOR INPUT PHASE ',14(' .'),' =',F15.5,/,     &
+     '     TIME FOR CALCULATION OF STIFFNESS MATRIX  . . . . =',F15.5, /,   &
+     '     TIME FOR FACTORIZATION OF STIFFNESS MATRIX  . . . =',F15.5, /,   &
+     '     TIME FOR LOAD CASE SOLUTIONS ',10(' .'),' =',F15.5,//,   &
+     '      T O T A L   S O L U T I O N   T I M E  . . . . . =',F15.5)") (TIM(I),I=1,4),TT
      
   CALL CLOSEFILES()
+  write (*,*) "Press Any Key to Exit..."
+  read (*,*)
   STOP
 
 END PROGRAM STAP90
@@ -286,7 +301,7 @@ SUBROUTINE WRITED (DISP,ID,NEQ,NUMNP)
   IC=4
 
   write(String, "('Displacement_Load_Case',I2.2)") CURLCASE
-  !write (VTKTmpFile) String, 3, NUMNP
+  write (VTKTmpFile) String, 3, NUMNP
   
   DO II=1,NUMNP
      IC=IC + 1
@@ -306,7 +321,7 @@ SUBROUTINE WRITED (DISP,ID,NEQ,NUMNP)
      END DO
 
      WRITE (IOUT,'(1X,I5,5X,6E14.6)') II,D
-     !write (VTKTmpFile) D(1:3)                                    !Displacements
+     write (VTKTmpFile) D(1:3)                                    !Displacements
 
   END DO
   
@@ -336,30 +351,35 @@ SUBROUTINE OPENFILES()
 !    call GETARG(1,FileInp)
 !  end if
 
-  !if(COMMAND_ARGUMENT_COUNT().ne.1) then
-  !   stop 'Usage: STAP90 InputFileName'
-  !else
-  !   call GET_COMMAND_ARGUMENT(1,FileInp)
-  !end if
+  if(COMMAND_ARGUMENT_COUNT().ne.1) then
+     stop 'Usage: STAP90 InputFileName'
+  else
+     call GET_COMMAND_ARGUMENT(1,FileInp)
+  end if
 
-  !INQUIRE(FILE = FileInp, EXIST = EX)
-  !IF (.NOT. EX) THEN
-  !   PRINT *, "*** STOP *** FILE STAP90.IN DOES NOT EXIST !"
-  !   STOP
-  !END IF
+  INQUIRE(FILE = FileInp, EXIST = EX)
+  IF (.NOT. EX) THEN
+     PRINT *, "*** STOP *** FILE STAP90.IN DOES NOT EXIST !"
+     STOP
+  END IF
   
-  !do i = 1, len_trim(FileInp)
-  !  if (FileInp(i:i) .EQ. '.') exit
-  !end do
+  do i = 1, len_trim(FileInp)
+    if (FileInp(i:i) .EQ. '.') exit
+  end do
   
+<<<<<<< HEAD
   OPEN(IIN   , FILE = "stap90_with_pd_shell_8H.in",  STATUS = "OLD")
   OPEN(IOUT  , FILE = "stap90.OUT", STATUS = "REPLACE")
+=======
+  OPEN(IIN   , FILE = FileInp,  STATUS = "OLD")
+  OPEN(IOUT  , FILE = FileInp(1:i-1)//".OUT", STATUS = "REPLACE")
+>>>>>>> 7ffb281d4a8407596245ac3e5ba7918c0d286fe8
   OPEN(IELMNT, FILE = "ELMNT.TMP",  FORM = "UNFORMATTED")
   OPEN(ILOAD , FILE = "LOAD.TMP",   FORM = "UNFORMATTED")
-  !OPEN(VTKFile, FILE = FileInp(1:i-1)//".OUT.vtk", STATUS = "REPLACE")
-  !OPEN(VTKTmpFile, File = "VTK.tmp", FORM = "UNFORMATTED", STATUS = "REPLACE")
-  !OPEN(VTKNodeTmp, FILE = "VTKNode.tmp", FORM = "UNFORMATTED", STATUS = "REPLACE")
-  !OPEN(VTKElTypTmp, FILE = "VTKElTyp.tmp", FORM = "UNFORMATTED", Access='Stream', STATUS = "REPLACE") !FORM = "UNFORMATTED",
+  OPEN(VTKFile, FILE = FileInp(1:i-1)//".OUT.vtk", STATUS = "REPLACE")
+  OPEN(VTKTmpFile, File = "VTK.tmp", FORM = "UNFORMATTED", STATUS = "REPLACE")
+  OPEN(VTKNodeTmp, FILE = "VTKNode.tmp", FORM = "UNFORMATTED", STATUS = "REPLACE")
+  OPEN(VTKElTypTmp, FILE = "VTKElTyp.tmp", FORM = "UNFORMATTED", Access='Stream', STATUS = "REPLACE") !FORM = "UNFORMATTED",
   
 END SUBROUTINE OPENFILES
 
@@ -377,7 +397,7 @@ SUBROUTINE CLOSEFILES()
   CLOSE(IELMNT, status='delete')
   CLOSE(ILOAD, status='delete')
   close(VTKFile)
-  !close(VTKTmpFile, status='delete')
-  !close(VTKNodeTmp, status='delete')
-  !close(VTKElTypTmp, status='delete')
+  close(VTKTmpFile, status='delete')
+  close(VTKNodeTmp, status='delete')
+  close(VTKElTypTmp, status='delete')
 END SUBROUTINE CLOSEFILES

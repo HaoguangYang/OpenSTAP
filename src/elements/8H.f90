@@ -59,7 +59,6 @@ subroutine EightHex
     
     if (IND .EQ. 1) then
         call MemAlloc(11,"ELEGP",MIDEST,1)
-        !call MemAlloc(6,"NODE ",NPAR(5)*NPAR(2),1)
     end if
     NFIRST = NP(11)
     N(:) = N(:) + NFIRST
@@ -206,7 +205,7 @@ subroutine HexEight (ID,X,Y,Z,U,MHT,E, PoissonRatio, Density, Gravity, LM, Posit
                 CALL ADDBAN (DA(NP(3)),IA(NP(2)),S,LM(:,N),ND)
             end if
 
-            !IF (DYNANALYSIS .EQV. .TRUE.) CALL ADDBAN (DA(NP(5)),IA(NP(2)),M,LM(:,N),ND)
+            IF (DYNANALYSIS .EQV. .TRUE.) CALL ADDBAN (DA(NP(5)),IA(NP(2)),M,LM(:,N),ND)
         end do
         
     CASE (3)
@@ -260,8 +259,8 @@ subroutine HexEight (ID,X,Y,Z,U,MHT,E, PoissonRatio, Density, Gravity, LM, Posit
             StressCollection (:,ind1:ind2) = Stress
         END DO
 
-        !call PostProcessor(ElementType, 3, PositionData, &
-        !                   Node, QuadratureOrder**3, GaussianCollection, StressCollection, U)
+        call PostProcessor(ElementType, 3, PositionData, &
+                           Node, QuadratureOrder**3, GaussianCollection, StressCollection, U)
                            
                 
     END SELECT
