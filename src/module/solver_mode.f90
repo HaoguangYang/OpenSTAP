@@ -26,7 +26,6 @@ subroutine bdopt(ID)
      READ (IIN,"(I5)") NUME ! 总element数
      DO I = 1,NUME
          READ (IIN,"(I5)") N ! 这个element对应的节点数
-         WRITE (IOUT, "('(',I5,'I5)')") N
          READ (IIN, "(8I5)") (TEMP_NODE(J), J = 1,N)
          FREE_DOF = 0
          DO J = 1,N
