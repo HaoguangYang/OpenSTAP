@@ -68,4 +68,5 @@ module GLOBALS
    logical :: PARDISODOOR
    logical :: LOADANALYSIS
    logical :: DYNANALYSIS
+
 end module GLOBALS

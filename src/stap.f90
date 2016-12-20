@@ -47,8 +47,8 @@ PROGRAM STAP90
   READ (IIN,'(A80,/, 4I1,/,4I5)') HED, &
                                   BANDWIDTHOPT,PARDISODOOR,LOADANALYSIS,DYNANALYSIS, &
                                   NUMNP,NUMEG,NLCASE,MODEX
-PARDISODOOR = .true.
-BANDWIDTHOPT = .false.
+!PARDISODOOR = .true.
+!BANDWIDTHOPT = .false.
 ! input node
   IF (NUMNP.EQ.0) STOP   ! Data check mode
 
@@ -131,7 +131,7 @@ BANDWIDTHOPT = .false.
 !   MHT(NEQ) - Vector of column heights
 if(.not. pardisodoor) then
     
-  CALL MEMFREEFROMTO(5,8)
+  CALL MEMFREEFROM(5)
   CALL MEMALLOC(5,"MHT  ",NEQ,1)
   
   IND=1    ! Read and generate element information
@@ -142,7 +142,7 @@ if(.not. pardisodoor) then
   
 ! ALLOCATE STORAGE
 !    MAXA(NEQ+1)
-  CALL MEMFREEFROM(6)
+  CALL MEMFREEFROM(7)
   CALL MEMFREEFROMTO(2,4)
   CALL MEMALLOC(2,"MAXA ",NEQ+1,1)
   CALL ADDRES (IA(NP(2)),IA(NP(5)))
@@ -191,8 +191,7 @@ end if
      CALL ASSEM (A(NP(11)))
      
      CALL SECOND (TIM(4))
-     
-
+     !IF (DYNANALYSIS .EQV. .TRUE.) CALL EIGENVAL (DA(NP(3)), DA(NP(5)), IA(NP(2)), NEQ, NWK, NEQ1,2)
      if(.not. pardisodoor) then
          !    Triangularize stiffness matrix
         NEQ1=NEQ + 1
@@ -215,6 +214,7 @@ end if
             CALL SECOND (TIM(6))
         else
 !       Solve the equilibrium equations to calculate the displacements
+            CALL SECOND (TIM(5))
             IF (LOADANALYSIS .EQV. .TRUE.) CALL COLSOL (DA(NP(3)),DA(NP(4)),IA(NP(2)),NEQ,NWK,NEQ1,2)
             CALL SECOND (TIM(6))
         end if
