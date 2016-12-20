@@ -194,9 +194,9 @@ node = readnode(keyloc[1][0]+1,keyloc[2][0]-1)
 node_b = []         #Node_Boundary
 for i in range(len(node[0])):
     if node[0][i] in boundary:
-        node_b.append([1,1,1,0,0,0])
+        node_b.append([1,1,1,1,1,1])
     else:
-        node_b.append([0,0,0,0,0,0])
+        node_b.append([0,0,0,1,1,1])
         
 element = [[] for x in range(len(keyloc[2]))]
 for i in range(0,len(keyloc[2])):
@@ -309,9 +309,9 @@ for i in range(len(keyloc[2])):
                 for k in e_node:
                     load[k] = load[k] + load_e[s]
                     for p in range(3):
-                        node_b[k-1][p+3]=node_b[k-1][p+3] + ID_6[s][p]
-                        if node_b[k-1][p+3] == 2:
-                            node_b[k-1][p+3] = 1
+                        node_b[k-1][p+3]=node_b[k-1][p+3]*ID_6[s][p]
+                        #if node_b[k-1][p+3] == 2:
+                        #   node_b[k-1][p+3] = 1
                     #node_b[k-1][5] = 1
                     #if s==0:
                         #node_b[k-1] = [1,1,1,1,1,1]

@@ -134,6 +134,9 @@ subroutine pardiso_input(ID)
          DO K = 1, FREE_DOF
              DO J = 1, FREE_DOF
                  CALL NEW(P_NODE, TEMP_ID(J))
+                 if( (K.eq.1) .and. (I.eq.55) ) then
+                     ID_new = K
+                 end if
                  call ADD_WITH_SORT(lists(TEMP_ID(K)), P_NODE)
              END DO
          END DO
