@@ -1,5 +1,5 @@
 stap : stap.o node.o list.o solver_mode.o datain.o elcal.o assem.o globals.o truss.o memalloc.o 3T.o 4Q.o 9Q.o mathkernel.o hexahedral.o BEAM.o plate.o shell.o plate8Q.o shell8Q.o postprocessor.o
-	gfortran -o stap stap.o node.o list.o solver_mode.o datain.o elcal.o assem.o globals.o truss.o memalloc.o 3T.o 4Q.o 9Q.o mathkernel.o hexahedral.o BEAM.o plate.o shell.o plate8Q.o shell8Q.o postprocessor.o
+	gfortran -o stap  stap.o node.o list.o solver_mode.o datain.o elcal.o assem.o globals.o truss.o memalloc.o 3T.o 4Q.o 9Q.o mathkernel.o hexahedral.o BEAM.o plate.o shell.o plate8Q.o shell8Q.o postprocessor.o
 
 stap.o : ../../src/stap.f90 ../../src/globals.f90 globals.mod memallocate.mod postprocessor.o
 	gfortran -c  ../../src/stap.f90

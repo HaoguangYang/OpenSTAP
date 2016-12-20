@@ -154,6 +154,7 @@ if(.not. pardisodoor) then
   MM=NWK/NEQ
   CALL MEMALLOC(3,"STFF ",NWK,ITWO)
   CALL MEMALLOC(4,"R    ",NEQ,ITWO)
+  IF (DYNANALYSIS .EQV. .TRUE.) CALL MEMALLOC(5,"M    ",NWK,ITWO)
   CALL MEMALLOC(11,"ELEGP",MAXEST,1)
 
 ! Write total system data
@@ -194,11 +195,12 @@ end if
   ELSE
      IND=2    ! Assemble structure stiffness matrix
      CALL ASSEM (A(NP(11)))
-
+     
      CALL SECOND (TIM(3))
      
 !    Triangularize stiffness matrix
      NEQ1=NEQ + 1
+<<<<<<< HEAD
      if(.not. pardisodoor) then
         CALL COLSOL (DA(NP(3)),DA(NP(4)),IA(NP(2)),NEQ,NWK,NEQ1,1)
      end if
@@ -217,12 +219,37 @@ end if
         WRITE (IOUT,"(//,' LOAD CASE ',I3)") CURLCASE
         
         CALL WRITED (DA(NP(4)),IA(NP(1)),NEQ,NUMNP)  ! PRINT DISPLACEMENTS FOR OTHER SITUATIONS(THE FORMER ONE)
-        
-!       Calculation of stresses
-        CALL STRESS (A(NP(11)))
+=======
+     !IF (DYNANALYSIS .EQV. .TRUE.) CALL EIGENVAL (DA(NP(3)), DA(NP(5)), IA(NP(2)), NEQ, NWK, NEQ1)
+     IF (LOADANALYSIS .EQV. .TRUE.) CALL COLSOL (DA(NP(3)),DA(NP(4)),IA(NP(2)),NEQ,NWK,NEQ1,1)
 
+     CALL SECOND (TIM(4))
+
+     IND=3    ! Stress calculations
+     IF (LOADANALYSIS .EQV. .TRUE.) THEN
+        REWIND ILOAD
+        DO CURLCASE=1,NLCASE
+            CALL LOADV (DA(NP(4)),NEQ)   ! Read in the load vector
+    
+!           Solve the equilibrium equations to calculate the displacements
+            CALL COLSOL (DA(NP(3)),DA(NP(4)),IA(NP(2)),NEQ,NWK,NEQ1,2)
+    
+            WRITE (IOUT,"(//,' LOAD CASE ',I3)") CURLCASE
+>>>>>>> f301bab224fca2981b7dd051c01663e0f13411dc
+        
+            CALL WRITED (DA(NP(4)),IA(NP(1)),NEQ,NUMNP)  ! PRINT DISPLACEMENTS FOR OTHER SITUATIONS(THE FORMER ONE)
+            
+!           Calculation of stresses
+            CALL STRESS (A(NP(11)))
+
+<<<<<<< HEAD
      END DO
      !CALL VTKgenerate (IND)
+=======
+        END DO
+        CALL VTKgenerate (IND)
+     END IF
+>>>>>>> f301bab224fca2981b7dd051c01663e0f13411dc
      CALL SECOND (TIM(5))
   END IF
 

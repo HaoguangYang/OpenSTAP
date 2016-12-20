@@ -139,7 +139,7 @@ SUBROUTINE ADDBAN (A,MAXA,S,LM,ND)
         END DO
      END IF
   END DO
-
+  
   RETURN
     END SUBROUTINE ADDBAN
 
@@ -276,7 +276,7 @@ SUBROUTINE COLSOL (A,V,MAXA,NN,NWK,NNM,KKK)
             V(N)=V(N) - C
          END IF
       END DO
-
+      
 ! BACK-SUBSTITUTE
 
       DO N=1,NN

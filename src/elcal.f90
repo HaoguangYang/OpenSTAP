@@ -73,7 +73,7 @@ SUBROUTINE ELEMNT
   case (3)
      CALL ELEMENT_9Q
   case (4)
-     CALL HEXAHEDRAL
+     CALL EightHex
   case (5)
      CALL BEAM
   case (6)
@@ -123,3 +123,4 @@ SUBROUTINE STRESS (AA)
 
   RETURN
 END subroutine STRESS
+

@@ -151,7 +151,7 @@ REAL(8) :: AA,CC
 !
 IF (NWM.LE.NN) THEN
 DO I=1,NN
-TT(I)=B(I)*RR(I)
+    TT(I)=B(I)*RR(I)
 END DO
 RETURN
 END IF
@@ -161,14 +161,14 @@ TT(I)=0.
 END DO
 !
 DO I=1,NN
-KL=MAXA(I)
-KU=MAXA(I+1) - 1
-II=I + 1
-CC=RR(I)
-DO KK=KL,KU
-II=II - 1
-TT(II)=TT(II) + B(KK)*CC
-END DO
+    KL=MAXA(I)
+    KU=MAXA(I+1) - 1
+    II=I + 1
+    CC=RR(I)
+    DO KK=KL,KU
+        II=II - 1
+        TT(II)=TT(II) + B(KK)*CC
+    END DO
 END DO
 !
 IF (NN.EQ.1) RETURN
