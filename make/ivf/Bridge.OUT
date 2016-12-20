@@ -42821,12 +42821,12 @@ ELEMENT400
 
  S O L U T I O N   T I M E   L O G   I N   S E C
 
-     TIME FOR INPUT PHASE  . . . . . . . . . . . . . . =        0.15625
+     TIME FOR INPUT PHASE  . . . . . . . . . . . . . . =        0.00000
      TIME FOR CALCULATION OF STIFFNESS MATRIX  . . . . =        0.00000
-     TIME FOR FACTORIZATION OF STIFFNESS MATRIX  . . . =        1.67188
-     TIME FOR LOAD CASE SOLUTIONS  . . . . . . . . . . =       -1.84375
+     TIME FOR FACTORIZATION OF STIFFNESS MATRIX  . . . =            NaN
+     TIME FOR LOAD CASE SOLUTIONS  . . . . . . . . . . =            NaN
 
-      T O T A L   S O L U T I O N   T I M E  . . . . . =       49.31250
- . . . . . . . . . . =       49.29688
+      T O T A L   S O L U T I O N   T I M E  . . . . . =        0.00000
+ . . . . . . . . . . =        0.00000
 
       T O T A L   S O L U T I O N   T I M E  . . . . . =

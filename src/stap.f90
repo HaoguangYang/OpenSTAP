@@ -242,16 +242,16 @@ end if
      '     TIME FOR CALCULATION OF STIFFNESS MATRIX  . . . . =',F15.5, /,   &
      '     TIME FOR FACTORIZATION OF STIFFNESS MATRIX  . . . =',F15.5, /,   &
      '     TIME FOR LOAD CASE SOLUTIONS ',10(' .'),' =',F15.5,//,   &
-     '      T O T A L   S O L U T I O N   T I M E  . . . . . =',F15.5)") (TIM(I),I=1,5),TT
+     ' T O T A L   S O L U T I O N   T I M E  . . . . . =',F15.5)") (TIM(I),I=1,5),TT
 
   WRITE (*,"(//,  &
      ' S O L U T I O N   T I M E   L O G   I N   S E C',//,   &
-     '     TIME FOR INPUT PHASE ',14(' .'),' =',I5,/,     &
-     '     TIME FOR PREPARATION OF MATRIX FORMAT ... . . . . =',I5,/,     &
-     '     TIME FOR CALCULATION OF STIFFNESS MATRIX  . . . . =',I5, /,   &
-     '     TIME FOR FACTORIZATION OF STIFFNESS MATRIX  . . . =',I5, /,   &
-     '     TIME FOR LOAD CASE SOLUTIONS ',10(' .'),' =',I5,//,   &
-     '      T O T A L   S O L U T I O N   T I M E  . . . . . =',I5)") (TIM(I),I=1,5),TT
+     '     TIME FOR INPUT PHASE ',14(' .'),' =',F15.5,/,     &
+     '     TIME FOR PREPARATION OF MATRIX FORMAT . . . . . . =',F15.5,/,     &
+     '     TIME FOR CALCULATION OF STIFFNESS MATRIX  . . . . =',F15.5, /,   &
+     '     TIME FOR FACTORIZATION OF STIFFNESS MATRIX  . . . =',F15.5, /,   &
+     '     TIME FOR LOAD CASE SOLUTIONS ',10(' .'),' =',F15.5,//,   &
+     ' T O T A L   S O L U T I O N   T I M E . . . . . . . . =',F15.5)") (TIM(I),I=1,5),TT
      
   CALL CLOSEFILES()
   write (*,*) "Press Any Key to Exit..."
