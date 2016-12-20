@@ -200,7 +200,7 @@ end if
      
 !    Triangularize stiffness matrix
      NEQ1=NEQ + 1
-<<<<<<< HEAD
+
      if(.not. pardisodoor) then
         CALL COLSOL (DA(NP(3)),DA(NP(4)),IA(NP(2)),NEQ,NWK,NEQ1,1)
      end if
@@ -214,42 +214,16 @@ end if
             call pardiso_solver(DA(NP(3)),DA(NP(4)),IA(NP(2)), IA(NP(5)))
         else
 !       Solve the equilibrium equations to calculate the displacements
-            CALL COLSOL (DA(NP(3)),DA(NP(4)),IA(NP(2)),NEQ,NWK,NEQ1,2)
+            IF (LOADANALYSIS .EQV. .TRUE.) CALL COLSOL (DA(NP(3)),DA(NP(4)),IA(NP(2)),NEQ,NWK,NEQ1,2)
         end if
         WRITE (IOUT,"(//,' LOAD CASE ',I3)") CURLCASE
         
         CALL WRITED (DA(NP(4)),IA(NP(1)),NEQ,NUMNP)  ! PRINT DISPLACEMENTS FOR OTHER SITUATIONS(THE FORMER ONE)
-=======
-     !IF (DYNANALYSIS .EQV. .TRUE.) CALL EIGENVAL (DA(NP(3)), DA(NP(5)), IA(NP(2)), NEQ, NWK, NEQ1)
-     IF (LOADANALYSIS .EQV. .TRUE.) CALL COLSOL (DA(NP(3)),DA(NP(4)),IA(NP(2)),NEQ,NWK,NEQ1,1)
-
-     CALL SECOND (TIM(4))
-
-     IND=3    ! Stress calculations
-     IF (LOADANALYSIS .EQV. .TRUE.) THEN
-        REWIND ILOAD
-        DO CURLCASE=1,NLCASE
-            CALL LOADV (DA(NP(4)),NEQ)   ! Read in the load vector
-    
-!           Solve the equilibrium equations to calculate the displacements
-            CALL COLSOL (DA(NP(3)),DA(NP(4)),IA(NP(2)),NEQ,NWK,NEQ1,2)
-    
-            WRITE (IOUT,"(//,' LOAD CASE ',I3)") CURLCASE
->>>>>>> f301bab224fca2981b7dd051c01663e0f13411dc
-        
-            CALL WRITED (DA(NP(4)),IA(NP(1)),NEQ,NUMNP)  ! PRINT DISPLACEMENTS FOR OTHER SITUATIONS(THE FORMER ONE)
-            
 !           Calculation of stresses
             CALL STRESS (A(NP(11)))
 
-<<<<<<< HEAD
      END DO
      !CALL VTKgenerate (IND)
-=======
-        END DO
-        CALL VTKgenerate (IND)
-     END IF
->>>>>>> f301bab224fca2981b7dd051c01663e0f13411dc
      CALL SECOND (TIM(5))
   END IF
 
@@ -379,7 +353,7 @@ SUBROUTINE OPENFILES()
   !  if (FileInp(i:i) .EQ. '.') exit
   !end do
   
-  OPEN(IIN   , FILE = "stap90_with_pd_shell.in",  STATUS = "OLD")
+  OPEN(IIN   , FILE = "stap90_with_pd_shell_8H.in",  STATUS = "OLD")
   OPEN(IOUT  , FILE = "stap90.OUT", STATUS = "REPLACE")
   OPEN(IELMNT, FILE = "ELMNT.TMP",  FORM = "UNFORMATTED")
   OPEN(ILOAD , FILE = "LOAD.TMP",   FORM = "UNFORMATTED")
