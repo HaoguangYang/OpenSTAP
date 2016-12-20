@@ -139,11 +139,41 @@ SUBROUTINE ADDBAN (A,MAXA,S,LM,ND)
         END DO
      END IF
   END DO
+  
+  RETURN
+    END SUBROUTINE ADDBAN
+
+subroutine pardiso_addban(A, rowIndex, columns, S, LM, ND)
+  USE GLOBALS, ONLY : NWK, NEQ
+  IMPLICIT NONE
+  REAL(8) :: A(NWK),S(ND,ND)
+  INTEGER :: rowIndex(NEQ+1),columns(nwk), LM(ND)
+  INTEGER :: ND, I, J, II, JJ, k, KK, tempJ
+  DO J=1,ND
+     JJ=LM(J)
+     IF (JJ .GT. 0) THEN
+        DO I=J,ND
+           II=LM(I)
+           IF (II .GT. 0) THEN
+              IF (JJ .GT. II) THEN ! 如果JJ > II，交换，让JJ永远小于II
+                 tempJ = II
+              else
+                 tempJ = JJ                  
+              END IF              
+              loop1: do k = rowIndex(tempJ), rowIndex(tempJ+1)-1
+                 if(columns(k) .EQ. II) then
+                     A(k) = A(k) + S(I,J)
+                     exit loop1
+                 end if
+             end do loop1
+           END IF
+        END DO
+     END IF
+  END DO
 
   RETURN
-END SUBROUTINE ADDBAN
-
-
+end subroutine
+  
 SUBROUTINE COLSOL (A,V,MAXA,NN,NWK,NNM,KKK)
 ! . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 ! .                                                                   .
@@ -173,7 +203,7 @@ SUBROUTINE COLSOL (A,V,MAXA,NN,NWK,NNM,KKK)
 
   IMPLICIT NONE
   INTEGER :: MAXA(NNM),NN,NWK,NNM,KKK
-  REAL(8) :: A(NWK),V(NN),C,B
+  REAL(8) :: A(NWK),V(NN),C,B, D(10, 10)
   INTEGER :: N,K,KN,KL,KU,KH,IC,KLT,KI,J,ND,KK,L
   INTEGER :: MIN0
 
@@ -246,7 +276,7 @@ SUBROUTINE COLSOL (A,V,MAXA,NN,NWK,NNM,KKK)
             V(N)=V(N) - C
          END IF
       END DO
-
+      
 ! BACK-SUBSTITUTE
 
       DO N=1,NN
@@ -269,7 +299,180 @@ SUBROUTINE COLSOL (A,V,MAXA,NN,NWK,NNM,KKK)
          END IF
          N=N - 1
       END DO
-
+       D = reshape((/ 3.43d8,1.24d8,0.d0,0.d0,0.d0,-2.09d8,-9.53d6,0.d0,0.d0,0.d0,   &
+                1.24d8, 3.43d8, 0.d0, 0.d0, 0.d0, 9.53d6, 3.81d7, 0.d0, 0.d0, 0.d0,   &
+                0.d0, 0.d0, 2.13d9, -1.60d9, -1.60d9, 0.d0, 0.d0, -5.34d8, -1.60d9, -1.60d9,  &
+                0.d0, 0.d0, -1.60d9, 3.23d9, 1.03d7, 0.d0, 0.d0, 1.60d9, 3.18d9, -7.94d5 ,   &
+                0.d0, 0.d0, -1.60d9, 1.03d7, 3.23d9, 0.d0, 0.d0, -1.60d9, 7.94d5, 3.20d9,   &
+                -2.09d8, 9.53d6, 0.d0, 0.d0, 0.d0,3.43d8, -1.24d8, 0.d0, 0.d0, 0.d0, &
+                -9.53d6, 3.81d7, 0.d0, 0.d0, 0.d0,-1.24d8, 3.43d8, 0.d0, 0.d0, 0.d0, &
+                0.d0, 0.d0, -5.34d8, 1.60d9, -1.60d9, 0.d0, 0.d0, 2.13d9, 1.60d9, -1.60d9,&
+                0.d0, 0.d0, -1.60d9, 3.18d9, 7.94d5, 0.d0, 0.d0, 1.60d9, 3.23d9, -1.03d7, &
+                0.d0, 0.d0, -1.60d9, -7.94d5, 3.20d9, 0.d0, 0.d0, 1.60d9, -1.03d7, 3.23d9               /), shape(D))
+  V = matmul(D, V)
   END IF
 
-END SUBROUTINE COLSOL
+    END SUBROUTINE COLSOL
+
+subroutine pardiso_solver(D,V, rowIndex, columns)
+USE mkl_pardiso
+USE GLOBALS, only : neq, nwk
+IMPLICIT NONE
+!.. Internal solver memory pointer 
+TYPE(MKL_PARDISO_HANDLE), ALLOCATABLE  :: pt(:)
+!.. All other variables
+INTEGER maxfct, mnum, mtype, phase, n, nrhs, error, msglvl, nnz
+INTEGER error1
+INTEGER, ALLOCATABLE :: iparm( : )
+INTEGER, ALLOCATABLE :: ia( : )
+INTEGER, ALLOCATABLE :: ja( : )
+REAL(8), ALLOCATABLE :: a( : )
+REAL(8), ALLOCATABLE :: b( : )
+REAL(8), ALLOCATABLE :: x( : )
+INTEGER i, idum(1)
+REAL(8) ddum(1)
+REAL(8) C(10,10)
+REAL(8) D(nwk), V(neq)
+INTEGER columns(nwk), rowIndex(neq+1)
+!.. Fill all arrays containing matrix data.
+n = 8 
+nnz = 36
+
+ALLOCATE(ia(n + 1))
+ia = (/ 1, 9, 16, 22, 27, 31, 34, 36, 37 /)
+ALLOCATE(ja(nnz))
+ja = (/ 1, 2, 3, 4, 5, 6, 7, 8, &
+           2, 3, 4, 5, 6, 7, 8, &
+              3, 4, 5, 6, 7, 8, &
+                 4, 5, 6, 7, 8, &
+                    5, 6, 7, 8, &
+                       6, 7, 8, &
+                          7, 8, &
+                             8 /)
+ALLOCATE(a(nnz))
+ C = reshape((/ 3.43d8,1.24d8,0.d0,0.d0,0.d0,-2.09d8,-9.53d6,0.d0,0.d0,0.d0,   &
+                1.24d8, 3.43d8, 0.d0, 0.d0, 0.d0, 9.53d6, 3.81d7, 0.d0, 0.d0, 0.d0,   &
+                0.d0, 0.d0, 2.13d9, -1.60d9, -1.60d9, 0.d0, 0.d0, -5.34d8, -1.60d9, -1.60d9,  &
+                0.d0, 0.d0, -1.60d9, 3.23d9, 1.03d7, 0.d0, 0.d0, 1.60d9, 3.18d9, -7.94d5 ,   &
+                0.d0, 0.d0, -1.60d9, 1.03d7, 3.23d9, 0.d0, 0.d0, -1.60d9, 7.94d5, 3.20d9,   &
+                -2.09d8, 9.53d6, 0.d0, 0.d0, 0.d0,3.43d8, -1.24d8, 0.d0, 0.d0, 0.d0, &
+                -9.53d6, 3.81d7, 0.d0, 0.d0, 0.d0,-1.24d8, 3.43d8, 0.d0, 0.d0, 0.d0, &
+                0.d0, 0.d0, -5.34d8, 1.60d9, -1.60d9, 0.d0, 0.d0, 2.13d9, 1.60d9, -1.60d9,&
+                0.d0, 0.d0, -1.60d9, 3.18d9, 7.94d5, 0.d0, 0.d0, 1.60d9, 3.23d9, -1.03d7, &
+                0.d0, 0.d0, -1.60d9, -7.94d5, 3.20d9, 0.d0, 0.d0, 1.60d9, -1.03d7, 3.23d9               /), shape(C))
+
+
+a = (/ 7.d0, 0.d0,  1.d0, 0.d0, 0.d0, 2.d0, 7.d0, 0.d0,  &
+             -4.d0, 8.d0, 0.d0, 2.d0, 0.d0, 0.d0, 0.d0,  &
+                    1.d0, 0.d0, 0.d0, 0.d0, 0.d0, 5.d0,  &
+                          7.d0, 0.d0, 0.d0, 9.d0, 0.d0,  &
+                                5.d0, 1.d0, 5.d0, 0.d0,  &
+                                     -1.d0, 0.d0, 5.d0,  &
+                                           11.d0, 0.d0,  &
+                                                  5.d0 /)
+ALLOCATE(b(n))
+ALLOCATE(x(neq))
+!..
+!.. Set up PARDISO control parameter
+!..
+ALLOCATE(iparm(64))
+
+DO i = 1, 64
+   iparm(i) = 0
+END DO
+
+iparm(1) = 1 ! no solver default
+iparm(2) = 2 ! fill-in reordering from METIS
+iparm(4) = 0 ! no iterative-direct algorithm
+iparm(5) = 0 ! no user fill-in reducing permutation
+iparm(6) = 0 ! =0 solution on the first n components of x
+iparm(8) = 2 ! numbers of iterative refinement steps
+iparm(10) = 13 ! perturb the pivot elements with 1E-13
+iparm(11) = 1 ! use nonsymmetric permutation and scaling MPS
+iparm(13) = 0 ! maximum weighted matching algorithm is switched-off (default for symmetric). Try iparm(13) = 1 in case of inappropriate accuracy
+iparm(14) = 0 ! Output: number of perturbed pivots
+iparm(18) = -1 ! Output: number of nonzeros in the factor LU
+iparm(19) = -1 ! Output: Mflops for LU factorization
+iparm(20) = 0 ! Output: Numbers of CG Iterations
+
+error  = 0 ! initialize error flag
+msglvl = 1 ! print statistical information
+mtype  = -2 ! symmetric, indefinite
+nrhs = 1 
+maxfct = 1 
+mnum = 1
+!.. Initialize the internal solver memory pointer. This is only
+! necessary for the FIRST call of the PARDISO solver.
+
+ALLOCATE (pt(64))
+DO i = 1, 64
+   pt(i)%DUMMY =  0 
+END DO
+
+!.. Reordering and Symbolic Factorization, This step also allocates
+! all memory that is necessary for the factorization
+
+phase = 11 ! only reordering and symbolic factorization
+
+CALL pardiso (pt, maxfct, mnum, mtype, phase, neq, D, rowIndex, columns, &
+              idum, nrhs, iparm, msglvl, ddum, ddum, error)
+    
+WRITE(*,*) 'Reordering completed ... '
+IF (error /= 0) THEN
+   WRITE(*,*) 'The following ERROR was detected: ', error
+   GOTO 1000
+END IF
+WRITE(*,*) 'Number of nonzeros in factors = ',iparm(18)
+WRITE(*,*) 'Number of factorization MFLOPS = ',iparm(19)
+
+!.. Factorization.
+phase = 22 ! only factorization
+CALL pardiso (pt, maxfct, mnum, mtype, phase, neq, D, rowIndex, columns, &
+              idum, nrhs, iparm, msglvl, ddum, ddum, error)
+WRITE(*,*) 'Factorization completed ... '
+IF (error /= 0) THEN
+   WRITE(*,*) 'The following ERROR was detected: ', error
+   GOTO 1000
+ENDIF
+
+!.. Back substitution and iterative refinement
+iparm(8) = 2 ! max numbers of iterative refinement steps
+phase = 33 ! only solving
+DO i = 1, n
+   b(i) = 1.d0
+END DO
+CALL pardiso (pt, maxfct, mnum, mtype, phase, neq, D, rowIndex, columns, &
+              idum, nrhs, iparm, msglvl, V, x, error)
+WRITE(*,*) 'Solve completed ... '
+IF (error /= 0) THEN
+   WRITE(*,*) 'The following ERROR was detected: ', error
+   GOTO 1000
+ENDIF
+WRITE(*,*) 'The solution of the system is '
+DO i = 1, neq
+   WRITE(*,*) ' x(',i,') = ', x(i)
+END DO
+x = matmul(C, x)
+DO i = 1, neq
+   WRITE(*,*) ' x(',i,') = ', x(i)
+END DO      
+1000 CONTINUE
+!.. Termination and release of memory
+phase = -1 ! release internal memory
+CALL pardiso (pt, maxfct, mnum, mtype, phase, neq, ddum, idum, idum, &
+              idum, nrhs, iparm, msglvl, ddum, ddum, error1)
+
+IF (ALLOCATED(ia))      DEALLOCATE(ia)
+IF (ALLOCATED(ja))      DEALLOCATE(ja)
+IF (ALLOCATED(a))       DEALLOCATE(a)
+IF (ALLOCATED(b))       DEALLOCATE(b)
+IF (ALLOCATED(x))       DEALLOCATE(x)
+IF (ALLOCATED(iparm))   DEALLOCATE(iparm)
+
+IF (error1 /= 0) THEN
+   WRITE(*,*) 'The following ERROR on release stage was detected: ', error1
+   STOP 1
+ENDIF
+
+IF (error /= 0) STOP 1
+end subroutine pardiso_solver

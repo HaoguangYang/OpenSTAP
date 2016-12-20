@@ -51,6 +51,7 @@ module GLOBALS
    integer :: NCONECT   ! Total element numbers in connection matrix
    integer :: NLCASE
    integer :: CURLCASE  ! Current Load Case
+   integer :: NVALPT
    
    integer :: MODEX		! Solution mode: 0 - data check only;  1 -  execution                                   
 
@@ -66,8 +67,10 @@ module GLOBALS
    
    logical :: BANDWIDTHOPT = .FALSE.
 <<<<<<< HEAD
-   logical :: PARDISO = .TRUE.
+   logical :: pardisodoor = .false.
 =======
    logical :: PARDISO = .FALSE.
->>>>>>> fdbc334d64f548ac6f590e39028ccbb02bb0095e
+   logical :: LOADANALYSIS = .TRUE.
+   logical :: DYNANALYSIS = .FALSE.
+>>>>>>> f301bab224fca2981b7dd051c01663e0f13411dc
 end module GLOBALS
