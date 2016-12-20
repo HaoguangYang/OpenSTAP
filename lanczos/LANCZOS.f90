@@ -1,5 +1,4 @@
-    SUBROUTINE LANCZOS(A,B,MAXA,R,EIGV,TT,W,AR,BR,VEC,D,RTOLV,BUP,BLO, &
-              BUPC,NN,NNM,NWK,NWM,NROOT,RTOL,NC,NNC,NITEM,IFSS,IFPR,NSTIF,IOUT,Q)
+    SUBROUTINE LANCZOS(A,B,MAXA,R,EIGV,NN,NNM,NWK,NWM,NROOT,RTOL,NC,NNC,NITEM,IFSS,IFPR,NSTIF,IOUT)
 ! . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 ! .
 ! .   P R O G R A M
@@ -51,7 +50,7 @@
 ! .             EQ.1 CHECK
 ! .   IFPR = FLAG FOR PRINTING DURING ITERATION
 ! .           EQ.0 NO PRINTING
-! .        EQ.1 PRINT
+! .           EQ.1 PRINT
 ! .   NSTIF = SCRATCH FILE
 ! .   IOUT = UNIT USED FOR OUTPUT
 ! .   

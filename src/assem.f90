@@ -141,9 +141,8 @@ SUBROUTINE ADDBAN (A,MAXA,S,LM,ND)
   END DO
   
   RETURN
-END SUBROUTINE ADDBAN
-
-
+    END SUBROUTINE ADDBAN
+  
 SUBROUTINE COLSOL (A,V,MAXA,NN,NWK,NNM,KKK)
 ! . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 ! .                                                                   .
@@ -269,7 +268,7 @@ SUBROUTINE COLSOL (A,V,MAXA,NN,NWK,NNM,KKK)
          END IF
          N=N - 1
       END DO
-
   END IF
 
 END SUBROUTINE COLSOL
+

@@ -10,7 +10,6 @@
 ! .     Tsinghua Univerity                                                .
 ! .                                                                       .
 ! . . . . . . . . . . . . . .  . . .  . . . . . . . . . . . . . . . . . . .
-
 PROGRAM STAP90
 
   USE GLOBALS
@@ -19,7 +18,7 @@ PROGRAM STAP90
   IMPLICIT NONE
   INTEGER :: NEQ1, NLOAD, MM
   INTEGER :: LL, I
-  REAL :: TT
+  INTEGER :: TT
 
 ! OPEN INPUT DATA FILE, RESULTS OUTPUT FILE AND TEMPORARY FILES
   CALL OPENFILES()
@@ -45,8 +44,11 @@ PROGRAM STAP90
 !            0 : data check only;
 !            1 : execution
 
-  READ (IIN,'(A80,/,4I5)') HED,NUMNP,NUMEG,NLCASE,MODEX
-
+  READ (IIN,'(A80,/, 4I1,/,4I5)') HED, &
+                                  BANDWIDTHOPT,PARDISODOOR,LOADANALYSIS,DYNANALYSIS, &
+                                  NUMNP,NUMEG,NLCASE,MODEX
+!PARDISODOOR = .true.
+!BANDWIDTHOPT = .false.
 ! input node
   IF (NUMNP.EQ.0) STOP   ! Data check mode
 
@@ -75,7 +77,7 @@ PROGRAM STAP90
   CALL MEMALLOC(3,"Y    ",NUMNP,ITWO)
   CALL MEMALLOC(4,"Z    ",NUMNP,ITWO)
 
-  CALL INPUT (IA(NP(1)),DA(NP(2)),DA(NP(3)),DA(NP(4)),NUMNP,NEQ)   !OTHER SITUATIONS EXCEPT BEAM(THE FORMER ONE)
+  CALL INPUT (IA(NP(1)),DA(NP(2)),DA(NP(3)),DA(NP(4)),NUMNP,NEQ)
 
 ! Calculate and store load vectors
 !   R(NEQ) : Load vector
@@ -116,43 +118,40 @@ PROGRAM STAP90
      CALL LOADS (DA(NP(5)),IA(NP(6)),IA(NP(7)),DA(NP(8)),IA(NP(1)),NLOAD,NEQ) !OTHER SITUATIONS EXCEPT BEAM(THE FORMER ONE)
 
   END DO
+  
+! * * * * * * * * * * * * * * * * * * * * * *
+! *               SOLUTION PHASE            *
+! * * * * * * * * * * * * * * * * * * * * * *  
 
+  WRITE(*,'("Solution phase ... ")')
+! ********************************************************************8
 ! Read, generate and store element data
-
+! 从这里开始，用不用pardiso会变得很不一样
 ! Clear storage
 !   MHT(NEQ) - Vector of column heights
-
+if(.not. pardisodoor) then
+    
   CALL MEMFREEFROM(5)
   CALL MEMALLOC(5,"MHT  ",NEQ,1)
-
+  
   IND=1    ! Read and generate element information
-  CALL ELCAL
+  CALL ELCAL ! 到这里2,3,4才没用的
   CALL VTKgenerate (IND)        !Prepare Post-Processing Files.
 
   CALL SECOND (TIM(2))
-
-! * * * * * * * * * * * * * * * * * * * * * *
-! *               SOLUTION PHASE            *
-! * * * * * * * * * * * * * * * * * * * * * *
-
-  WRITE(*,'("Solution phase ... ")')
-
-! Assemble stiffness matrix
-
+  
 ! ALLOCATE STORAGE
 !    MAXA(NEQ+1)
   CALL MEMFREEFROM(7)
   CALL MEMFREEFROMTO(2,4)
   CALL MEMALLOC(2,"MAXA ",NEQ+1,1)
-
   CALL ADDRES (IA(NP(2)),IA(NP(5)))
-
+  CALL SECOND (TIM(3))
 ! ALLOCATE STORAGE
 !    A(NWK) - Global structure stiffness matrix K
 !    R(NEQ) - Load vector R and then displacement solution U
-
+ 
   MM=NWK/NEQ
-
   CALL MEMALLOC(3,"STFF ",NWK,ITWO)
   CALL MEMALLOC(4,"R    ",NEQ,ITWO)
   IF (DYNANALYSIS .EQV. .TRUE.) CALL MEMALLOC(5,"M    ",NWK,ITWO)
@@ -162,69 +161,103 @@ PROGRAM STAP90
 
   WRITE (IOUT,"(//,' TOTAL SYSTEM DATA',//,   &
                    '     NUMBER OF EQUATIONS',14(' .'),'(NEQ) = ',I5,/,   &
-                   '     NUMBER OF MATRIX ELEMENTS',11(' .'),'(NWK) = ',I11,/,   &
+                   '     NUMBER OF MATRIX ELEMENTS',11(' .'),'(NWK) = ',I9,/,   &
                    '     MAXIMUM HALF BANDWIDTH ',12(' .'),'(MK ) = ',I5,/,     &
                    '     MEAN HALF BANDWIDTH',14(' .'),'(MM ) = ',I5)") NEQ,NWK,MK,MM
+! ***************************************************************************************
+else !如果使用pardiso
+    
+  CALL MEMFREEFROMTO(5,8)
+  CALL MEMALLOC(5,"MHT  ",NEQ,1)
+  
+  IND=1    ! Read and generate element information
+  CALL ELCAL ! 到这里2,3,4才没用的
+  CALL VTKgenerate (IND)        !Prepare Post-Processing Files.
 
+  CALL SECOND (TIM(2))
+    
+  CALL MEMFREEFROMTO(2,4)
+  ! NP(2,3,4,5)均在这里被分配
+  CALL pardiso_input(IA(NP(1)))
+  CALL SECOND (TIM(3))
+  CALL MEMALLOC(11,"ELEGP",MAXEST,1)
+! Write total system data
+end if
 ! In data check only mode we skip all further calculations
-
   IF (MODEX.LE.0) THEN
-     CALL SECOND (TIM(3))
      CALL SECOND (TIM(4))
      CALL SECOND (TIM(5))
+     CALL SECOND (TIM(6))
   ELSE
      IND=2    ! Assemble structure stiffness matrix
      CALL ASSEM (A(NP(11)))
      
-     CALL SECOND (TIM(3))
-
-!    Triangularize stiffness matrix
-     NEQ1=NEQ + 1
-     !IF (DYNANALYSIS .EQV. .TRUE.) CALL EIGENVAL (DA(NP(3)), DA(NP(5)), IA(NP(2)), NEQ, NWK, NEQ1)
-     IF (LOADANALYSIS .EQV. .TRUE.) CALL COLSOL (DA(NP(3)),DA(NP(4)),IA(NP(2)),NEQ,NWK,NEQ1,1)
-
      CALL SECOND (TIM(4))
-
+     !IF (DYNANALYSIS .EQV. .TRUE.) CALL EIGENVAL (DA(NP(3)), DA(NP(5)), IA(NP(2)), NEQ, NWK, NEQ1)
+     if(.not. pardisodoor) then
+         !    Triangularize stiffness matrix
+        NEQ1=NEQ + 1
+        CALL COLSOL (DA(NP(3)),DA(NP(4)),IA(NP(2)),NEQ,NWK,NEQ1,1)
+     end if
+     
+      
      IND=3    ! Stress calculations
-     IF (LOADANALYSIS .EQV. .TRUE.) THEN
-        REWIND ILOAD
-        DO CURLCASE=1,NLCASE
-            CALL LOADV (DA(NP(4)),NEQ)   ! Read in the load vector
-    
-!           Solve the equilibrium equations to calculate the displacements
-            CALL COLSOL (DA(NP(3)),DA(NP(4)),IA(NP(2)),NEQ,NWK,NEQ1,2)
-    
-            WRITE (IOUT,"(//,' LOAD CASE ',I3)") CURLCASE
+
+     REWIND ILOAD
+     DO CURLCASE=1,NLCASE
+        CALL LOADV (DA(NP(4)),NEQ)   ! Read in the load vector
+        if(pardisodoor) then
+            call pardiso_crop(DA(NP(3)), IA(NP(2)), IA(NP(5)))
+            CALL SECOND (TIM(5))
+            WRITE (IOUT,"(//,' TOTAL SYSTEM DATA',//,   &
+                   '     NUMBER OF EQUATIONS',14(' .'),'(NEQ) = ',I5,/,   &
+                   '     NUMBER OF MATRIX ELEMENTS',11(' .'),'(NWK) = ',I9)") NEQ,NWK  
+            call pardiso_solver(DA(NP(3)),DA(NP(4)),IA(NP(2)), IA(NP(5)))
+        else
+!       Solve the equilibrium equations to calculate the displacements
+            CALL SECOND (TIM(5))
+            IF (LOADANALYSIS .EQV. .TRUE.) CALL COLSOL (DA(NP(3)),DA(NP(4)),IA(NP(2)),NEQ,NWK,NEQ1,2)
+        end if
+        WRITE (IOUT,"(//,' LOAD CASE ',I3)") CURLCASE
         
-            CALL WRITED (DA(NP(4)),IA(NP(1)),NEQ,NUMNP)  ! PRINT DISPLACEMENTS FOR OTHER SITUATIONS(THE FORMER ONE)
-            
+        CALL WRITED (DA(NP(4)),IA(NP(1)),NEQ,NUMNP)  ! PRINT DISPLACEMENTS FOR OTHER SITUATIONS(THE FORMER ONE)
 !           Calculation of stresses
             CALL STRESS (A(NP(11)))
 
-        END DO
-        CALL VTKgenerate (IND)
-     END IF
-     CALL SECOND (TIM(5))
+     END DO
+     CALL VTKgenerate (IND)
+     CALL SECOND (TIM(6))
   END IF
 
 ! Print solution times
 
   TT=0.
-  DO I=1,4
+  DO I=1,5
      TIM(I)=TIM(I+1) - TIM(I)
      TT=TT + TIM(I)
   END DO
   
   WRITE (IOUT,"(//,  &
-     ' S O L U T I O N   T I M E   L O G   I N   S E C',//,   &
-     '     TIME FOR INPUT PHASE ',14(' .'),' =',F15.5,/,     &
-     '     TIME FOR CALCULATION OF STIFFNESS MATRIX  . . . . =',F15.5, /,   &
-     '     TIME FOR FACTORIZATION OF STIFFNESS MATRIX  . . . =',F15.5, /,   &
-     '     TIME FOR LOAD CASE SOLUTIONS ',10(' .'),' =',F15.5,//,   &
-     '      T O T A L   S O L U T I O N   T I M E  . . . . . =',F15.5)") (TIM(I),I=1,4),TT
-     
+     ' S O L U T I O N   T I M E   L O G   I N   M I L L I S E C',//,   &
+     '     TIME FOR INPUT PHASE ',14(' .'),' =',I15,/,     &
+     '     TIME FOR PREPARATION OF MATRIX FORMAT . . . . . . =',I15,/,     &
+     '     TIME FOR CALCULATION OF STIFFNESS MATRIX  . . . . =',I15, /,   &
+     '     TIME FOR FACTORIZATION OF STIFFNESS MATRIX  . . . =',I15, /,   &
+     '     TIME FOR LOAD CASE SOLUTIONS ',10(' .'),' =',I15,//,   &
+     ' T O T A L   S O L U T I O N   T I M E . . . . . . . . =',I15)") (TIM(I),I=1,5),TT
+
+  WRITE (*,"(//,  &
+     ' S O L U T I O N   T I M E   L O G   I N   M I L L I S E C',//,   &
+     '     TIME FOR INPUT PHASE ',14(' .'),' =',I15,/,     &
+     '     TIME FOR PREPARATION OF MATRIX FORMAT . . . . . . =',I15,/,     &
+     '     TIME FOR CALCULATION OF STIFFNESS MATRIX  . . . . =',I15, /,   &
+     '     TIME FOR FACTORIZATION OF STIFFNESS MATRIX  . . . =',I15, /,   &
+     '     TIME FOR LOAD CASE SOLUTIONS ',10(' .'),' =',I15,//,   &
+     ' T O T A L   S O L U T I O N   T I M E . . . . . . . . =',I15)") (TIM(I),I=1,5),TT
      
   CALL CLOSEFILES()
+  write (*,*) "Press Any Key to Exit..."
+  read (*,*)
   STOP
 
 END PROGRAM STAP90
@@ -233,12 +266,16 @@ END PROGRAM STAP90
 SUBROUTINE SECOND (TIM)
 ! USE DFPORT   ! Only for Compaq Fortran
   IMPLICIT NONE
-  REAL :: TIM
-
+  character*8 date
+  character*10 time
+  character*5 zone
+  integer*4 values(8)
+  integer :: TIM
+  call DATE_AND_TIME(date, time, zone, values)
+  TIM = values(7)*1000+values(8)
 ! This is a Fortran 95 intrinsic subroutine
 ! Returns the processor time in seconds
 
-  CALL CPU_TIME(TIM)
 
   RETURN
 END SUBROUTINE SECOND
@@ -340,7 +377,7 @@ SUBROUTINE OPENFILES()
   OPEN(VTKFile, FILE = FileInp(1:i-1)//".OUT.vtk", STATUS = "REPLACE")
   OPEN(VTKTmpFile, File = "VTK.tmp", FORM = "UNFORMATTED", STATUS = "REPLACE")
   OPEN(VTKNodeTmp, FILE = "VTKNode.tmp", FORM = "UNFORMATTED", STATUS = "REPLACE")
-  OPEN(VTKElTypTmp, FILE = "VTKElTyp.tmp", FORM = "UNFORMATTED", Access='Stream', STATUS = "REPLACE") !FORM = "UNFORMATTED",
+  OPEN(VTKElTypTmp, FILE = "VTKElTyp.tmp", FORM = "UNFORMATTED", Access='Stream', STATUS = "REPLACE") !FORM = "UNFORMAED",
   
 END SUBROUTINE OPENFILES
 

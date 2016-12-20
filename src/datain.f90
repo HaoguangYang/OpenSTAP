@@ -25,7 +25,7 @@ SUBROUTINE INPUT (ID,X,Y,Z,NUMNP,NEQ)
 ! .                                                                       .
 ! . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-  USE GLOBALS, ONLY : IIN, IOUT, DIM, BANDWIDTHOPT, PARDISO
+  USE GLOBALS, ONLY : IIN, IOUT, DIM, bandwidthopt, pardisodoor
   ! For bandwith optimization and pardiso
   USE NODE_CLASS
   USE LIST_CLASS
@@ -54,7 +54,6 @@ SUBROUTINE INPUT (ID,X,Y,Z,NUMNP,NEQ)
   END DO
 
 ! Number unknowns
-
   NEQ=0
   DO N=1,NUMNP
      DO I=1,6
@@ -72,16 +71,11 @@ SUBROUTINE INPUT (ID,X,Y,Z,NUMNP,NEQ)
                    'DEGREES OF FREEDOM',/,'  NUMBER',/,  &
                    '     N',13X,'X    Y    Z   RX   RY   RZ',/,(1X,I5,9X,6I5))") (N,(ID(I,N),I=1,6),N=1,NUMNP)
 
-  ! Add bandwidth optimization and pardiso
-! Adding those two function need extra input
-IF( (BANDWIDTHOPT .EQV. .TRUE.) .OR. (PARDISO .EQV. .TRUE.) ) THEN
-    CALL SOLVERMODE(ID)
+! Add bandwidth optimization and pardiso
+! *******Adding those two function need extra input
+IF( BANDWIDTHOPT) THEN
+    CALL bdopt(ID)
 END IF
-  
-! Write equation numbers
-  WRITE (IOUT,"(//,' EQUATION NUMBERS',//,'   NODE',9X,  &
-                   'DEGREES OF FREEDOM',/,'  NUMBER',/,  &
-                   '     N',13X,'X    Y    Z   RX   RY   RZ',/,(1X,I5,9X,6I5))") (N,(ID(I,N),I=1,6),N=1,NUMNP)
 
   RETURN
 END SUBROUTINE INPUT
