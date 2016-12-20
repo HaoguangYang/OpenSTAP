@@ -57,6 +57,7 @@
 		<File RelativePath="..\..\src\elcal.f90"/>
 		<File RelativePath="..\..\src\globals.f90"/>
 		<File RelativePath="..\..\src\memalloc.f90"/>
+		<File RelativePath="..\..\src\modalanlsis.f90"/>
 		<File RelativePath="..\..\src\postprocessor.f90"/>
 		<File RelativePath="..\..\src\stap.f90"/></Filter></Filter>
 		<File RelativePath="..\Readme.txt"/></Files>

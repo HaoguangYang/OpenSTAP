@@ -193,7 +193,7 @@ end if
      CALL ASSEM (A(NP(11)))
      
      CALL SECOND (TIM(4))
-     !IF (DYNANALYSIS .EQV. .TRUE.) CALL EIGENVAL (DA(NP(3)), DA(NP(5)), IA(NP(2)), NEQ, NWK, NEQ1)
+     !IF (DYNANALYSIS .EQV. .TRUE.) CALL EIGENVAL (DA(NP(3)), DA(NP(5)), IA(NP(2)), NEQ, NWK, NEQ1,2)
      if(.not. pardisodoor) then
          !    Triangularize stiffness matrix
         NEQ1=NEQ + 1
