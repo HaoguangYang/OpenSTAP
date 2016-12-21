@@ -183,34 +183,32 @@ ELSE
      
     CALL SECOND (TIM(4))
     IF (DYNANALYSIS .EQV. .TRUE.) CALL EIGENVAL (DA(NP(3)), DA(NP(10)), IA(NP(2)), NEQ, NWK, NEQ1, 2)
-    if(.not. pardisodoor) then
+    if(pardisodoor) then
+        if (.not. DYNANALYSIS) call pardiso_crop(DA(NP(3)), IA(NP(2)), IA(NP(5)))          ! Condensing CSR format sparse matrix storage: deleting zeros
+    else
         !    Triangularize stiffness matrix
         NEQ1=NEQ + 1
         CALL COLSOL (DA(NP(3)),DA(NP(4)),IA(NP(2)),NEQ,NWK,NEQ1,1)
-    else
-        call pardiso_crop(DA(NP(3)), IA(NP(2)), IA(NP(5)))          ! Condensing CSR format sparse matrix storage: deleting zeros
     end if
      
       
     IND=3    ! Stress calculations
 
     REWIND ILOAD
+    CALL SECOND (TIM(5))
     DO CURLCASE=1,NLCASE
         CALL LOADV (DA(NP(4)),NEQ)   ! Read in the load vector
         if(pardisodoor) then
-            CALL SECOND (TIM(5))
             WRITE (IOUT,"(//,' TOTAL SYSTEM DATA',//,   &
                    '     NUMBER OF EQUATIONS',14(' .'),'(NEQ) = ',I5,/,   &
                    '     NUMBER OF MATRIX ELEMENTS',11(' .'),'(NWK) = ',I9)") NEQ,NWK  
             call pardiso_solver(DA(NP(3)),DA(NP(4)),IA(NP(2)), IA(NP(5)))
-            CALL SECOND (TIM(6))
         else
 !       Solve the equilibrium equations to calculate the displacements
-            CALL SECOND (TIM(5))
             IF (LOADANALYSIS .EQV. .TRUE.) CALL COLSOL (DA(NP(3)),DA(NP(4)),IA(NP(2)),NEQ,NWK,NEQ1,2)
-            CALL SECOND (TIM(6))
         end if
         WRITE (IOUT,"(//,' LOAD CASE ',I3)") CURLCASE
+        CALL SECOND (TIM(6))
         
         CALL WRITED (DA(NP(4)),IA(NP(1)),NEQ,NUMNP)  ! PRINT DISPLACEMENTS FOR OTHER SITUATIONS(THE FORMER ONE)
 !           Calculation of stresses
@@ -231,7 +229,7 @@ ELSE
   TT = TT - TIM(1)
   WRITE (IOUT,"(//,  &
      ' S O L U T I O N   T I M E   L O G   I N   S E C',//,   &
-     '     TIME FOR INPUT PHASE ',14(' .'),' =',I7,/,     &
+     '     TIME FOR INPUT PHASE ',14(' .'),' =',I7,//,     &
      '     TIME FOR PREPARATION OF MATRIX FORMAT . . . . . . =',I7,/,     &
      '     TIME FOR CALCULATION OF STIFFNESS MATRIX  . . . . =',I7, /,   &
      '     TIME FOR FACTORIZATION OF STIFFNESS MATRIX  . . . =',I7, /,   &
@@ -241,7 +239,7 @@ ELSE
 
   WRITE (*,"(//,  &
      ' S O L U T I O N   T I M E   L O G   I N   S E C',//,   &
-     '     TIME FOR INPUT PHASE ',14(' .'),' =',I7,/,     &
+     '     TIME FOR INPUT PHASE ',14(' .'),' =',I7,//,     &
      '     TIME FOR PREPARATION OF MATRIX FORMAT . . . . . . =',I7,/,     &
      '     TIME FOR CALCULATION OF STIFFNESS MATRIX  . . . . =',I7, /,   &
      '     TIME FOR FACTORIZATION OF STIFFNESS MATRIX  . . . =',I7, /,   &

@@ -410,7 +410,7 @@ SUBROUTINE BEAMELE (ID,X,Y,Z,U,MHT,E,G,AREA,I_X,I_Y,I_Z,J_X,J_Y,J_Z,LM,XYZ,MATP,
        GaussianCollection(:,N) = 0.5*(XYZ(4:6,N)+XYZ(1:3,N))
        StressCollection((/1,2,3,5,6,4/),N) = 0.5*(FORCE(7:12)-FORCE(1:6))
      END DO
-     call PostProcessor(NPAR(1), 3, XYZ, &
+     call PostProcessor(NPAR(1), 1, XYZ, &
                         Node, 1, GaussianCollection, StressCollection, U)
   ELSE 
      STOP "*** ERROR *** Invalid IND value."

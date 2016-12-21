@@ -111,8 +111,8 @@ subroutine PostProcessor (ElementType, Dimen, PositionData, &
         end do
         
     else if (Dimen == 2) then
-        if (ElementType==7 .OR. ElementType==9) then
-            NStress = 5                                                 !Shell
+        if ((ElementType .GE. 6) .AND. (ElementType .LE.9)) then
+            NStress = 5                                                 !Shell and plate
         else
             NStress = 3
         end if
@@ -150,7 +150,7 @@ subroutine PostProcessor (ElementType, Dimen, PositionData, &
                         ind0 = ind0 + 1
                         !write (*,*) x, y
                         !write (*,*) Stress(:,L)
-                       !write(*,*) Nval
+                        !write(*,*) Nval
                         !Error for element number 5 and 6
                     end do
                 end do
@@ -177,8 +177,12 @@ subroutine PostProcessor (ElementType, Dimen, PositionData, &
             end if
         end do
         
-    else if (Dimen == 1) then                                           !Truss
-        Nstress = 1
+    else if (Dimen == 1) then                                           !Truss or beam
+        if (ElementType ==1) then                                       !Truss
+            Nstress = 1
+        else if (ElementType == 5) then                                 !Beam
+            NStress = 6
+        end if
         allocate (value(i,6+NStress))
         do L =1, NUMNP
             coeff(:,:) = 0
@@ -199,8 +203,11 @@ subroutine PostProcessor (ElementType, Dimen, PositionData, &
                 end do
                 !sets = 1
                 Stress(:,L) = 1/Nval*(sum(value(1:Nval, 1:NStress),1))
-                write (IOUT,"(I6, 3X, E13.6, 5(2X, A13))") &
-                                                                    L, Stress(1,L), "---", "---", "---", "---", "---"
+                if (NStress == 1) then
+                    write (IOUT,"(I6, 3X, E13.6, 5(2X, A13))") L, Stress(1,L), "---", "---", "---", "---", "---"
+                else 
+                    write (IOUT,"(I6, 3X, E13.6, 5(2X, E13.6))") L, Stress(1:6,L)
+                end if
             end if
         end do
     
