@@ -23,9 +23,9 @@ subroutine pardiso_crop(A, rowIndex, columns)
     end do
     rowIndex(neq + 1) = rowIndex(neq)+temp
     nwk = j
-    end subroutine
+end subroutine
     
-    subroutine pardiso_addban(A, rowIndex, columns, S, LM, ND)
+subroutine pardiso_addban(A, rowIndex, columns, S, LM, ND)
   USE GLOBALS, ONLY : NWK, NEQ
   IMPLICIT NONE
   REAL(8) :: A(NWK),S(ND,ND)

@@ -143,11 +143,11 @@ subroutine pardiso_input(ID)
      END DO
      CALL SECOND (TIM(2))
      ! 注意这里分配了rowIndex
-     CALL MEMALLOC(2,"rowIndex",NEQ+1,1)
+     CALL MEMALLOC(2,"rwInd",NEQ+1,1)                   !RowIndex
      CALL assign_rowIndex(lists, IA(NP(2)))
      CALL MEMALLOC(3,"STFF ",NWK,ITWO)
      CALL MEMALLOC(4,"R    ",NEQ,ITWO)
-     CALL MEMALLOC(5,"columns",NWK,1)
+     CALL MEMALLOC(5,"colmn",NWK,1)
      CALL assign_columns(lists, IA(NP(5)))
      do i = 1, neq
          call delete_all(lists(i))

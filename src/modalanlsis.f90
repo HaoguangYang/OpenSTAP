@@ -1,3 +1,7 @@
+module Modal
+    integer, parameter :: StiffTmp = 16
+contains
+    
 subroutine EIGENVAL(Stiff, Mass, MAXA, NN, NWK, NNM, NRoot)
     USE GLOBALS, ONLY : IOUT
     implicit none
@@ -5,7 +9,6 @@ subroutine EIGENVAL(Stiff, Mass, MAXA, NN, NWK, NNM, NRoot)
     integer :: MAXA(NNM)
     integer :: NN, NWK, NNM
     real(8), parameter :: RTol = 1.0D-6
-    integer, parameter :: StiffTmp = 16
     integer :: NC, NRoot, NNC, NRestart
     real(8), allocatable :: EignVec(:,:),EignVal(:)
     logical :: IFSS, IFPR
@@ -17,7 +20,7 @@ subroutine EIGENVAL(Stiff, Mass, MAXA, NN, NWK, NNM, NRoot)
     NC = minval((/2*NRoot, NRoot+8, NWK/))
     allocate (EignVec(NN,NC),EignVal(NC))
     NNC=NC*(NC+1)/2
-    open(StiffTmp, FILE = "Stff.tmp", FORM = "UNFORMATTED", STATUS = "Replace")
+    
     !THE PARAMETERS NC AND/OR NRestart MUST BE INCREASED IF A SOLUTION HAS NOT CONVERGED
     call LANCZOS(Stiff, Mass, MAXA, EignVec, EignVal, NN, NNM, NWK, NWK, NRoot, RTol, NC, NNC, NRestart, IFSS, IFPR, StiffTmp, IOUT)
     write(IOUT,*)'------------------------------------------------------------------------------------'
@@ -25,3 +28,21 @@ subroutine EIGENVAL(Stiff, Mass, MAXA, NN, NWK, NNM, NRoot)
     REWIND StiffTmp
     READ (StiffTmp) Stiff
 end subroutine EIGENVAL
+
+subroutine prepare_SkylineK (Stiff)
+    use globals, only: PARDISODOOR, NWK
+    implicit none
+    real(8) :: Stiff(NWK), KTmp(NWK)
+    
+    open(StiffTmp, FILE = "Stff.tmp", FORM = "UNFORMATTED", STATUS = "Replace")
+    if (PARDISODOOR) then
+        REWIND StiffTmp
+        WRITE (StiffTmp) NWK,Stiff(1:NWK)
+    end if
+    !CALL ADDBAN (Stiff,IA(NP(2)),S,LM(:,N),ND)
+    REWIND StiffTmp
+    !if (PARDISODOOR) then
+    close(StiffTmp)
+end subroutine prepare_SkylineK
+
+end module Modal

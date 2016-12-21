@@ -16,7 +16,7 @@ subroutine EightHex
     
     implicit none
     integer :: NumberOfElements, NumberOfMaterials, ElementGroupSize, QuadratureOrder=2
-    integer :: N(11) !Pointers
+    integer :: N(8) !Pointers
     
     NPAR(5) = 8
     NPAR(4) = 0
@@ -31,7 +31,7 @@ subroutine EightHex
 ! N101: E(NumberOfMaterials)
 ! N102: v(NumberOfMaterials)
 ! N103: Density(NumberOfMaterials)
-! N104: Gravity(NumberOfMaterials)
+
 ! N105: LM(3*NPAR(5),NumberOfElements)
 ! N106: PositionData(3*NPAR(5),NumberOfElements)
 ! N107: MaterialData(NumberOfElements)
@@ -42,36 +42,34 @@ subroutine EightHex
     N(2) = N(1)+NumberOfMaterials*ITWO
     N(3) = N(2)+NumberOfMaterials*ITWO
     
-    if (NPAR(4) .GT. 0) then
+    if (DYNANALYSIS .EQV. .TRUE.) then
         N(4) = N(3)+NumberOfMaterials*ITWO
-        N(5) = N(4)+NumberOfMaterials*ITWO
     else
         N(4) = N(3)
-        N(5) = N(4)
     end if
     
-    N(6) = N(5) + 3*NPAR(5)*NumberOfElements
-    N(7) = N(6) + 3*NPAR(5)*NumberOfElements*ITWO
-    N(8) = N(7) + NumberOfElements
-    N(9) = N(8) + NPAR(5)*NPAR(2)
+    N(5) = N(4) + 3*NPAR(5)*NumberOfElements
+    N(6) = N(5) + 3*NPAR(5)*NumberOfElements*ITWO
+    N(7) = N(6) + NumberOfElements
+    N(8) = N(7) + NPAR(5)*NPAR(2)
     
-    MIDEST = N(9)
+    MIDEST = N(8)
     
     if (IND .EQ. 1) then
         call MemAlloc(11,"ELEGP",MIDEST,1)
     end if
     NFIRST = NP(11)
     N(:) = N(:) + NFIRST
-    NLAST  = N(9)
+    NLAST  = N(8)
     
     call HexEight (IA(NP(1)),DA(NP(2)),DA(NP(3)),DA(NP(4)),DA(NP(4)),IA(NP(5)),   &
-                  A(N(1)),A(N(2)),A(N(3)),A(N(4)),A(N(5)),A(N(6)),A(N(7)),A(N(8)))
+                  A(N(1)),A(N(2)),A(N(3)),A(N(4)),A(N(5)),A(N(6)),A(N(7)))
     
     !Reuse DA(NP(4)) at Solution Phase 3 as displacement U
     return
 end subroutine EightHex
 
-subroutine HexEight (ID,X,Y,Z,U,MHT,E, PoissonRatio, Density, Gravity, LM, PositionData, MaterialData, Node)
+subroutine HexEight (ID,X,Y,Z,U,MHT,E, PoissonRatio, Density, LM, PositionData, MaterialData, Node)
     use globals
     use MemAllocate
     use MathKernel
@@ -88,7 +86,7 @@ subroutine HexEight (ID,X,Y,Z,U,MHT,E, PoissonRatio, Density, Gravity, LM, Posit
                 Transformed(3), W(2), Weight(2,2,2), GaussianPts(2), GaussianCollection(3, NPAR(2)*2**3), &
                 StressCollection(6,NPAR(2)*2**3), M(3*NPAR(5),3*NPAR(5)), Rho
     real(8) ::  Young, v, S(3*NPAR(5),3*NPAR(5)), GaussianPtsPosit(3,2**3), Strain(6,2**3), Stress(6,2**3), &
-                Density, Gravity, NMatrix(3,3*NPAR(5)), NormalVec(3), Point(3*NPAR(5),3*NPAR(5))
+                Density(NPAR(3)), NMatrix(3,3*NPAR(5)), NormalVec(3), Point(3*NPAR(5),3*NPAR(5))
                 
     ElementType         = NPAR(1)
     NumberOfElements    = NPAR(2)
@@ -115,10 +113,17 @@ subroutine HexEight (ID,X,Y,Z,U,MHT,E, PoissonRatio, Density, Gravity, LM, Posit
                             ' NUMBER     MODULUS      RATIO',/,  &
                    15 X,'E', 12 X, 'v')")
 
-        DO I=1,NumberOfMaterials
-            READ (IIN,'(I5,2F10.0)') N,E(N), PoissonRatio(N)      ! Read material information for 3D Homogeneous
-            WRITE (IOUT,"(I5,4X,E12.5,2X,E14.6)") N,E(N), PoissonRatio(N)
-        END DO
+        if (DYNANALYSIS) then                                                       ! Dynamic Analysis Read In Density
+            DO I=1,NumberOfMaterials
+                READ (IIN,'(I5,3F10.0)') N,E(N), PoissonRatio(N), Density(N)        ! Read material information for 3D Homogeneous
+                WRITE (IOUT,"(I5,4X,E12.5,2X,E14.6)") N,E(N), PoissonRatio(N)
+            END DO
+        else                                                                        ! No Density
+            DO I=1,NumberOfMaterials
+                READ (IIN,'(I5,2F10.0)') N,E(N), PoissonRatio(N)                    ! Read material information for 3D Homogeneous
+                WRITE (IOUT,"(I5,4X,E12.5,2X,E14.6)") N,E(N), PoissonRatio(N)
+            END DO
+        end if
         WRITE (IOUT,"(//,' E L E M E N T   I N F O R M A T I O N',//,  &
                       ' ELEMENT        |------------------------- NODES -------------------------|       MATERIAL',/,   &
                       ' NUMBER-N        1       2       3       4       5       6       7       8       SET NUMBER')")
@@ -200,11 +205,10 @@ subroutine HexEight (ID,X,Y,Z,U,MHT,E, PoissonRatio, Density, Gravity, LM, Posit
             
             if(pardisodoor) then
                 call pardiso_addban(DA(NP(3)),IA(NP(2)),IA(NP(5)),S,LM(:,N),ND)
-            else
-                CALL ADDBAN (DA(NP(3)),IA(NP(2)),S,LM(:,N),ND)
+                !IF (DYNANALYSIS) then
+                !    call prepare_SkylineK(DA(NP(3)))
             end if
-
-            IF (DYNANALYSIS .EQV. .TRUE.) CALL ADDBAN (DA(NP(5)),IA(NP(2)),M,LM(:,N),ND)
+            IF (DYNANALYSIS) CALL ADDBAN (DA(NP(10)),IA(NP(2)),M,LM(:,N),ND)
         end do
         
     CASE (3)

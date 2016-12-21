@@ -120,26 +120,26 @@ PROGRAM STAP90
   END DO
   
 ! * * * * * * * * * * * * * * * * * * * * * *
-! *               SOLUTION PHASE            *
+! *             SOLUTION PHASE              *
 ! * * * * * * * * * * * * * * * * * * * * * *  
 
-  WRITE(*,'("Solution phase ... ")')
+WRITE(*,'("Solution phase ... ")')
+IND=1    ! Read and generate element information
+
+CALL MEMFREEFROM(5)
+CALL MEMALLOC(5,"MHT  ",NEQ,1)
+CALL ELCAL ! 到这里2,3,4才没用的
+CALL VTKgenerate (IND)        !Prepare Post-Processing Files.
+IF (DYNANALYSIS .EQV. .TRUE.) CALL MEMALLOC(10,"M    ",NWK,ITWO)
+
 ! ********************************************************************8
 ! Read, generate and store element data
 ! 从这里开始，用不用pardiso会变得很不一样
 ! Clear storage
 !   MHT(NEQ) - Vector of column heights
-if(.not. pardisodoor) then
-    
-  CALL MEMFREEFROM(5)
-  CALL MEMALLOC(5,"MHT  ",NEQ,1)
-  
-  IND=1    ! Read and generate element information
-  CALL ELCAL ! 到这里2,3,4才没用的
-  CALL VTKgenerate (IND)        !Prepare Post-Processing Files.
 
-  CALL SECOND (TIM(2))
-  
+if(.not. pardisodoor) then
+  CALL SECOND (TIM(2)) 
 ! ALLOCATE STORAGE
 !    MAXA(NEQ+1)
   CALL MEMFREEFROM(7)
@@ -154,7 +154,6 @@ if(.not. pardisodoor) then
   MM=NWK/NEQ
   CALL MEMALLOC(3,"STFF ",NWK,ITWO)
   CALL MEMALLOC(4,"R    ",NEQ,ITWO)
-  IF (DYNANALYSIS .EQV. .TRUE.) CALL MEMALLOC(5,"M    ",NWK,ITWO)
   CALL MEMALLOC(11,"ELEGP",MAXEST,1)
 
 ! Write total system data
@@ -166,14 +165,6 @@ if(.not. pardisodoor) then
                    '     MEAN HALF BANDWIDTH',14(' .'),'(MM ) = ',I5)") NEQ,NWK,MK,MM
 ! ***************************************************************************************
 else !如果使用pardiso
-    
-  CALL MEMFREEFROMTO(5,8)
-  CALL MEMALLOC(5,"MHT  ",NEQ,1)
-  
-  IND=1    ! Read and generate element information
-  CALL ELCAL ! 到这里2,3,4才没用的
-  CALL VTKgenerate (IND)        !Prepare Post-Processing Files.
-    
   CALL MEMFREEFROMTO(2,4)
   ! NP(2,3,4,5)均在这里被分配
   CALL pardiso_input(IA(NP(1)))
@@ -191,7 +182,7 @@ end if
      CALL ASSEM (A(NP(11)))
      
      CALL SECOND (TIM(4))
-     !IF (DYNANALYSIS .EQV. .TRUE.) CALL EIGENVAL (DA(NP(3)), DA(NP(5)), IA(NP(2)), NEQ, NWK, NEQ1,2)
+     !IF (DYNANALYSIS .EQV. .TRUE.) CALL EIGENVAL (DA(NP(3)), DA(NP(10)), IA(NP(2)), NEQ, NWK, NEQ1,2)
      if(.not. pardisodoor) then
          !    Triangularize stiffness matrix
         NEQ1=NEQ + 1
@@ -240,22 +231,22 @@ end if
   WRITE (IOUT,"(//,  &
      ' S O L U T I O N   T I M E   L O G   I N   S E C',//,   &
      '     TIME FOR INPUT PHASE ',14(' .'),' =',I5,/,     &
-     '     TIME FOR PREPARATION OF MATRIX FORMAT ... . . . . =',I5,/,     &
+     '     TIME FOR PREPARATION OF MATRIX FORMAT . . . . . . =',I5,/,     &
      '     TIME FOR CALCULATION OF STIFFNESS MATRIX  . . . . =',I5, /,   &
      '     TIME FOR FACTORIZATION OF STIFFNESS MATRIX  . . . =',I5, /,   &
-     '     TIME FOR LOAD CASE SOLUTIONS ',10(' .'),' =',I5,//,   &
-     '     TIME FOR CALCLUATE STRESS ',10(' .'),' =',I5,//,   &
-     '      T O T A L   S O L U T I O N   T I M E  . . . . . =',I5)") (TIM(I),I=1,6),TT
+     '     TIME FOR LOAD CASE SOLUTIONS ',10(' .'),' =',I5,/,   &
+     '     TIME FOR CALCLUATE STRESS',12(' .'),' =',I5,//,   &
+     'T O T A L   S O L U T I O N   T I M E  . . . . . . . . =',I5)") (TIM(I),I=1,6),TT
 
   WRITE (*,"(//,  &
      ' S O L U T I O N   T I M E   L O G   I N   S E C',//,   &
      '     TIME FOR INPUT PHASE ',14(' .'),' =',I5,/,     &
-     '     TIME FOR PREPARATION OF MATRIX FORMAT ... . . . . =',I5,/,     &
+     '     TIME FOR PREPARATION OF MATRIX FORMAT . . . . . . =',I5,/,     &
      '     TIME FOR CALCULATION OF STIFFNESS MATRIX  . . . . =',I5, /,   &
      '     TIME FOR FACTORIZATION OF STIFFNESS MATRIX  . . . =',I5, /,   &
      '     TIME FOR LOAD CASE SOLUTIONS ',10(' .'),' =',I5,/,   &
-     '     TIME FOR CALCLUATE STRESS ',10(' .'),' =',I5,//,   &
-     '      T O T A L   S O L U T I O N   T I M E  . . . . . =',I5)") (TIM(I),I=1,6),TT
+     '     TIME FOR CALCLUATE STRESS',12(' .'),' =',I5,//,   &
+     'T O T A L   S O L U T I O N   T I M E  . . . . . . . . =',I5)") (TIM(I),I=1,6),TT
      
   CALL CLOSEFILES()
   write (*,*) "Press Any Key to Exit..."
