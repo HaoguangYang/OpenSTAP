@@ -228,32 +228,23 @@ end if
   TT = TT - TIM(1)
   WRITE (IOUT,"(//,  &
      ' S O L U T I O N   T I M E   L O G   I N   S E C',//,   &
-     '     TIME FOR INPUT PHASE ',14(' .'),' =',I5,/,     &
-     '     TIME FOR PREPARATION OF MATRIX FORMAT . . . . . . =',I5,/,     &
-     '     TIME FOR CALCULATION OF STIFFNESS MATRIX  . . . . =',I5, /,   &
-     '     TIME FOR FACTORIZATION OF STIFFNESS MATRIX  . . . =',I5, /,   &
-     '     TIME FOR LOAD CASE SOLUTIONS ',10(' .'),' =',I5,/,   &
-     '     TIME FOR CALCLUATE STRESS',12(' .'),' =',I5,//,   &
-     'T O T A L   S O L U T I O N   T I M E  . . . . . . . . =',I5)") (TIM(I),I=1,6),TT
+     '     TIME FOR INPUT PHASE ',14(' .'),' =',I7,/,     &
+     '     TIME FOR PREPARATION OF MATRIX FORMAT . . . . . . =',I7,/,     &
+     '     TIME FOR CALCULATION OF STIFFNESS MATRIX  . . . . =',I7, /,   &
+     '     TIME FOR FACTORIZATION OF STIFFNESS MATRIX  . . . =',I7, /,   &
+     '     TIME FOR LOAD CASE SOLUTIONS ',10(' .'),' =',I7,/,   &
+     '     TIME FOR CALCLUATE STRESS',12(' .'),' =',I7,//,   &
+     'T O T A L   S O L U T I O N   T I M E  . . . . . . . . =',I7)") (TIM(I),I=1,6),TT
 
   WRITE (*,"(//,  &
      ' S O L U T I O N   T I M E   L O G   I N   S E C',//,   &
      '     TIME FOR INPUT PHASE ',14(' .'),' =',I5,/,     &
-<<<<<<< HEAD
-     '     TIME FOR PREPARATION OF MATRIX FORMAT . . . . . . =',I5,/,     &
-     '     TIME FOR CALCULATION OF STIFFNESS MATRIX  . . . . =',I5, /,   &
-     '     TIME FOR FACTORIZATION OF STIFFNESS MATRIX  . . . =',I5, /,   &
-     '     TIME FOR LOAD CASE SOLUTIONS ',10(' .'),' =',I5,/,   &
-     '     TIME FOR CALCLUATE STRESS',12(' .'),' =',I5,//,   &
-     'T O T A L   S O L U T I O N   T I M E  . . . . . . . . =',I5)") (TIM(I),I=1,6),TT
-=======
-     '     TIME FOR PREPARATION OF MATRIX FORMAT ... . . . . =',I7,/,     &
+     '     TIME FOR PREPARATION OF MATRIX FORMAT . . . . . . =',I7,/,     &
      '     TIME FOR CALCULATION OF STIFFNESS MATRIX  . . . . =',I7, /,   &
      '     TIME FOR FACTORIZATION OF STIFFNESS MATRIX  . . . =',I7, /,   &
      '     TIME FOR LOAD CASE SOLUTIONS ',10(' .'),' =',I7,/,   &
-     '     TIME FOR CALCLUATE STRESS ',10(' .'),' =',I7,//,   &
-     '      T O T A L   S O L U T I O N   T I M E  . . . . . =',I7)") (TIM(I),I=1,6),TT
->>>>>>> 0c46ea791f6c1a67248e713fb22e91fdf304500a
+     '     TIME FOR CALCLUATE STRESS',12(' .'),' =',I7,//,   &
+     'T O T A L   S O L U T I O N   T I M E  . . . . . . . . =',I7)") (TIM(I),I=1,6),TT
      
   CALL CLOSEFILES()
   write (*,*) "Press Any Key to Exit..."
