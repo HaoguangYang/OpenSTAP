@@ -128,7 +128,6 @@ CALL MEMFREEFROM(5)
 CALL MEMALLOC(5,"MHT  ",NEQ,1)                  !if (.NOT. PARDISODOOR)
 CALL ELCAL ! 到这里2,3,4才没用的
 CALL VTKgenerate (IND)        !Prepare Post-Processing Files.
-IF (DYNANALYSIS .EQV. .TRUE.) CALL MEMALLOC(10,"M    ",NWK,ITWO)
 
 ! ********************************************************************8
 ! Read, generate and store element data
@@ -171,32 +170,36 @@ else !如果使用pardiso
 ! Write total system data
 end if
 ! In data check only mode we skip all further calculations
-  IF (MODEX.LE.0) THEN
-     CALL SECOND (TIM(4))
-     CALL SECOND (TIM(5))
-     CALL SECOND (TIM(6))
-  ELSE
-     IND=2                                                          ! Assemble structure stiffness matrix
-     CALL ASSEM (A(NP(11)))                                         ! Loop Into Element Groups
+
+IF (DYNANALYSIS .EQV. .TRUE.) call prepare_MassMatrix
+
+IF (MODEX.LE.0) THEN
+    CALL SECOND (TIM(4))
+    CALL SECOND (TIM(5))
+    CALL SECOND (TIM(6))
+ELSE
+    IND=2                                                           ! Assemble structure stiffness matrix
+    CALL ASSEM (A(NP(11)))                                          ! Loop Into Element Groups
      
-     CALL SECOND (TIM(4))
-     IF (DYNANALYSIS .EQV. .TRUE.) CALL EIGENVAL (DA(NP(3)), DA(NP(10)), IA(NP(2)), NEQ, NWK, NEQ1,2)
-     if(.not. pardisodoor) then
+    CALL SECOND (TIM(4))
+    IF (DYNANALYSIS .EQV. .TRUE.) CALL EIGENVAL (DA(NP(3)), DA(NP(10)), IA(NP(2)), NEQ, NWK, NEQ1, 2)
+    if(.not. pardisodoor) then
         !    Triangularize stiffness matrix
         NEQ1=NEQ + 1
         CALL COLSOL (DA(NP(3)),DA(NP(4)),IA(NP(2)),NEQ,NWK,NEQ1,1)
-     end if
+    else
+        call pardiso_crop(DA(NP(3)), IA(NP(2)), IA(NP(5)))          ! Condensing CSR format sparse matrix storage: deleting zeros
+    end if
      
       
-     IND=3    ! Stress calculations
+    IND=3    ! Stress calculations
 
-     REWIND ILOAD
-     DO CURLCASE=1,NLCASE
+    REWIND ILOAD
+    DO CURLCASE=1,NLCASE
         CALL LOADV (DA(NP(4)),NEQ)   ! Read in the load vector
         if(pardisodoor) then
             CALL SECOND (TIM(5))
-            call pardiso_crop(DA(NP(3)), IA(NP(2)), IA(NP(5)))
-              WRITE (IOUT,"(//,' TOTAL SYSTEM DATA',//,   &
+            WRITE (IOUT,"(//,' TOTAL SYSTEM DATA',//,   &
                    '     NUMBER OF EQUATIONS',14(' .'),'(NEQ) = ',I5,/,   &
                    '     NUMBER OF MATRIX ELEMENTS',11(' .'),'(NWK) = ',I9)") NEQ,NWK  
             call pardiso_solver(DA(NP(3)),DA(NP(4)),IA(NP(2)), IA(NP(5)))

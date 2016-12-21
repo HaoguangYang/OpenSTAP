@@ -1,5 +1,6 @@
 subroutine EIGENVAL(Stiff, Mass, MAXA, NN, NWK, NNM, NRoot)
     USE GLOBALS, ONLY : IOUT, PARDISODOOR
+    use memallocate
     implicit none
     real(8) :: Stiff(NWK), Mass(NWK)
     integer :: MAXA(NNM)            !NNM = NN+1
@@ -13,7 +14,7 @@ subroutine EIGENVAL(Stiff, Mass, MAXA, NN, NWK, NNM, NRoot)
     !dfeast_scsrgv variables
     character(1) :: uplo
     integer :: fpm(128), info, loop
-    real(8) :: epsout
+    real(8) :: epsout, emin, emax
     real(8),allocatable :: res(:)
     
     write(IOUT,*)'-------------------------------------------------------------------------------------'
@@ -34,10 +35,31 @@ subroutine EIGENVAL(Stiff, Mass, MAXA, NN, NWK, NNM, NRoot)
     else
         uplo = 'U'
         allocate (res(NC))
-        !call dfeast_scsrgv(uplo, NN, Stiff, iStiff, jStiff, Mass, iMass, jMass, fpm, epsout, loop, emin, emax, NC, EignVal, EignVec, NRoot, res, info)
+        !IA(NP(9))      --  Mass Row Index
+        !IA(NP(8))      --  Mass Column Indicator
+        !IA(NP(5))      --  Stiffness Column Indicator
+        !IA(NP(2))      --  Stiffness Row Index
+        !DA(NP(10))     --  Mass Matrix
+        !DA(NP(3))      --  Stiffness Matrix
+        call pardiso_crop(DA(NP(10)), IA(NP(9)), IA(NP(8)))
+        call dfeast_scsrgv(uplo, NN, Stiff, IA(NP(2)), IA(NP(5)), Mass, IA(NP(9)), IA(NP(8)), fpm, epsout, loop, emin, emax, NC, EignVal, EignVec, NRoot, res, info)
         deallocate (res)
     end if
     write(IOUT,*)'-------------------------------------------------------------------------------------'
     deallocate (EignVec, EignVal)
 end subroutine EIGENVAL
+    
+subroutine prepare_MassMatrix
+    use globals
+    use memallocate
+    implicit none
+
+    CALL MEMALLOC(10,"M    ",NWK,ITWO)
+    if (PARDISODOOR) then
+        call memalloc(9,"MrInd",NEQ+1,1)
+        call memalloc(8,"Mcolm",NWK,1)
+        IA(NP(8):NP(8)+NWK) = IA(NP(5):NP(5)+NWK)
+        IA(NP(9):NP(9)+NEQ+1) = IA(NP(2):NP(2)+NEQ+1)
+    end if
+end subroutine prepare_MassMatrix
 
