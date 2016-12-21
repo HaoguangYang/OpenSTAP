@@ -125,7 +125,7 @@ WRITE(*,'("Solution phase ... ")')
 IND=1    ! Read and generate element information
 
 CALL MEMFREEFROM(5)
-CALL MEMALLOC(5,"MHT  ",NEQ,1)
+CALL MEMALLOC(5,"MHT  ",NEQ,1)                  !if (.NOT. PARDISODOOR)
 CALL ELCAL ! 到这里2,3,4才没用的
 CALL VTKgenerate (IND)        !Prepare Post-Processing Files.
 IF (DYNANALYSIS .EQV. .TRUE.) CALL MEMALLOC(10,"M    ",NWK,ITWO)
@@ -163,7 +163,7 @@ if(.not. pardisodoor) then
                    '     MEAN HALF BANDWIDTH',14(' .'),'(MM ) = ',I5)") NEQ,NWK,MK,MM
 ! ***************************************************************************************
 else !如果使用pardiso
-  CALL MEMFREEFROMTO(2,4)
+  CALL MEMFREEFROMTO(2,5)
   ! NP(2,3,4,5)均在这里被分配
   CALL pardiso_input(IA(NP(1)))
   CALL SECOND (TIM(3))

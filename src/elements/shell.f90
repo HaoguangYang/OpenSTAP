@@ -167,7 +167,7 @@ SUBROUTINE SHELL4Q (ID,X,Y,Z,U,MHT,E,POSSION,LM,XYZ,MATP, THICK, Node)
            LM(L+15,N)=ID(L-3,Node(N,4))
         END DO
 !       Update column heights and bandwidth
-        CALL COLHT (MHT,ND,LM(1,N))   
+        if (.NOT. PARDISODOOR) CALL COLHT (MHT,ND,LM(1,N))   
 
         WRITE (IOUT,"(I5,6X,I5,4X,I5,4X,I5,4X,I5,7X,I5)") N,Node(N,1:NPAR(5)),MTYPE
         write (VTKNodeTmp) NPAR(5), Node(N,:)-1

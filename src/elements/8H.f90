@@ -148,7 +148,7 @@ subroutine HexEight (ID,X,Y,Z,U,MHT,E, PoissonRatio, Density, LM, PositionData, 
             END DO
             
             
-            CALL COLHT (MHT,ND,LM(:,N))
+            if (.NOT. PARDISODOOR) CALL COLHT (MHT,ND,LM(:,N))
             WRITE (IOUT,"(I7,5X,7(I7,1X),I7,4X,I5)") N,Node(N,1:ElementShapeNodes),MaterialType
             
             !write (IOUT,*) 'MHT',MHT
@@ -207,8 +207,10 @@ subroutine HexEight (ID,X,Y,Z,U,MHT,E, PoissonRatio, Density, LM, PositionData, 
                 call pardiso_addban(DA(NP(3)),IA(NP(2)),IA(NP(5)),S,LM(:,N),ND)
                 !IF (DYNANALYSIS) then
                 !    call prepare_SkylineK(DA(NP(3)))
+            else
+                call ADDBAN(DA(NP(3)),IA(NP(2)),S,LM(:,N),ND)
+                IF (DYNANALYSIS) CALL ADDBAN (DA(NP(10)),IA(NP(2)),M,LM(:,N),ND)
             end if
-            IF (DYNANALYSIS) CALL ADDBAN (DA(NP(10)),IA(NP(2)),M,LM(:,N),ND)
         end do
         
     CASE (3)
