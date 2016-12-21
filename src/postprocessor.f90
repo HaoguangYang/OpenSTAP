@@ -37,7 +37,7 @@ subroutine PostProcessor (ElementType, Dimen, PositionData, &
     NodeRelationFlag(:,:) = 0
     ref1 = NPAR(5)*2+11                                             !Set Node-Connection Counter Position Reference
     ref2 = NPAR(5)*2+12                                             !Set First-Node Counter Position Reference
-    
+    Stress(:,:) = 0D0
     DO N = 1, NPAR(2)                                               !NumberOfElements
         do i = 1,NPAR(5)
             j = NodeRelationFlag(Node(N,i),ref1) + 1                !How many elements connected to the node
@@ -177,7 +177,6 @@ subroutine PostProcessor (ElementType, Dimen, PositionData, &
             end if
         end do
         
-!>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>WORKING PROGRESS
     else if (Dimen == 1) then                                           !Truss
         Nstress = 1
         allocate (value(i,6+NStress))
@@ -229,9 +228,9 @@ subroutine VTKgenerate (Flag)
     use globals
     use memallocate
     implicit none
-    integer :: i,j,Flag, Dat(NEL+100)
+    integer :: i,j,k,Flag, Dat(NEL+100)
     character(len=25) :: string
-    real(8) :: Dat1(6)
+    real(8) :: Dat1(6), Stress(6,NUMNP)
     
 select case (Flag)
 case (1)                                                            !Called in solution phase IND=1
@@ -271,6 +270,7 @@ case (2)                                                            !Called in e
      
 case (3)                                                            !Called in stap.f90, STAP at solution phase IND=3
 !>>>>>>>>>>>>>>>>>>>>>>>>>>HOW TO RESOLVE CONNECTION POINTS BETWEEN TWO ELEMENT GROUPS??? THESE POINTS ARE REPEATED
+    Stress(:,:) = 0D0
     write (VTKFile,*) "CELLS ", NEL, NCONECT                        !Sum up all elements to generate a global picture
     rewind (VTKNodeTmp)
     do i = 1 , NEL
@@ -292,11 +292,16 @@ case (3)                                                            !Called in s
             read (VTKTmpFile) Dat1(1:Dat(1))
             write (VTKFile,*) Dat1(1:Dat(1))
         end do
-        read (VTKTmpFile) string(1:19), Dat(1:2)                    !Fetch Stress of Load Cases
-        write (VTKFile,*) string(1:19), Dat(1:2), "double"          !Dat(1) should be <=6 for no more than 6 stress components
+        do k = 1, NUMEG
+            read (VTKTmpFile) string(1:19), Dat(1:2)                            !Fetch Stress of Load Cases
+            if (k == 1) write (VTKFile,*) string(1:19), 6, Dat(2), "double"      !Dat(1) should be <=6 for no more than 6 stress components
+            do j = 1, NUMNP
+                read (VTKTmpFile) Dat1(1:Dat(1))
+                Stress(1:Dat(1),j) = 0.5*(Stress(1:Dat(1),j)+Dat1(1:Dat(1)))
+            end do
+        end do
         do j = 1, NUMNP
-            read (VTKTmpFile) Dat1(1:Dat(1))
-            write (VTKFile,*) Dat1(1:Dat(1))
+            write (VTKFile,*) Stress(1:6, j)
         end do
     end do
 end select
