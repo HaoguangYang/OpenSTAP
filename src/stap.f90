@@ -178,8 +178,8 @@ IF (MODEX.LE.0) THEN
     CALL SECOND (TIM(5))
     CALL SECOND (TIM(6))
 ELSE
-    IND=2                                                          ! Assemble structure stiffness matrix
-    CALL ASSEM (A(NP(11)))                                         ! Loop Into Element Groups
+    IND=2                                                           ! Assemble structure stiffness matrix
+    CALL ASSEM (A(NP(11)))                                          ! Loop Into Element Groups
      
     CALL SECOND (TIM(4))
     IF (DYNANALYSIS .EQV. .TRUE.) CALL EIGENVAL (DA(NP(3)), DA(NP(10)), IA(NP(2)), NEQ, NWK, NEQ1, 2)
@@ -187,6 +187,8 @@ ELSE
         !    Triangularize stiffness matrix
         NEQ1=NEQ + 1
         CALL COLSOL (DA(NP(3)),DA(NP(4)),IA(NP(2)),NEQ,NWK,NEQ1,1)
+    else
+        call pardiso_crop(DA(NP(3)), IA(NP(2)), IA(NP(5)))          ! Condensing CSR format sparse matrix storage: deleting zeros
     end if
      
       
@@ -197,8 +199,7 @@ ELSE
         CALL LOADV (DA(NP(4)),NEQ)   ! Read in the load vector
         if(pardisodoor) then
             CALL SECOND (TIM(5))
-            call pardiso_crop(DA(NP(3)), IA(NP(2)), IA(NP(5)))
-              WRITE (IOUT,"(//,' TOTAL SYSTEM DATA',//,   &
+            WRITE (IOUT,"(//,' TOTAL SYSTEM DATA',//,   &
                    '     NUMBER OF EQUATIONS',14(' .'),'(NEQ) = ',I5,/,   &
                    '     NUMBER OF MATRIX ELEMENTS',11(' .'),'(NWK) = ',I9)") NEQ,NWK  
             call pardiso_solver(DA(NP(3)),DA(NP(4)),IA(NP(2)), IA(NP(5)))

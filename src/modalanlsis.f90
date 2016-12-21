@@ -1,5 +1,6 @@
 subroutine EIGENVAL(Stiff, Mass, MAXA, NN, NWK, NNM, NRoot)
     USE GLOBALS, ONLY : IOUT, PARDISODOOR
+    use memallocate
     implicit none
     real(8) :: Stiff(NWK), Mass(NWK)
     integer :: MAXA(NNM)            !NNM = NN+1
@@ -13,7 +14,7 @@ subroutine EIGENVAL(Stiff, Mass, MAXA, NN, NWK, NNM, NRoot)
     !dfeast_scsrgv variables
     character(1) :: uplo
     integer :: fpm(128), info, loop
-    real(8) :: epsout
+    real(8) :: epsout, emin, emax
     real(8),allocatable :: res(:)
     
     write(IOUT,*)'-------------------------------------------------------------------------------------'
@@ -34,12 +35,14 @@ subroutine EIGENVAL(Stiff, Mass, MAXA, NN, NWK, NNM, NRoot)
     else
         uplo = 'U'
         allocate (res(NC))
-        !IA(NP(9))
-        !IA(NP(8))
-        !IA(NP(5))
-        !IA(NP(2))
-        !call pardiso_crop(DA(NP(10)), IA(NP(9)), IA(NP(8)))
-        !call dfeast_scsrgv(uplo, NN, Stiff, iStiff, jStiff, Mass, iMass, jMass, fpm, epsout, loop, emin, emax, NC, EignVal, EignVec, NRoot, res, info)
+        !IA(NP(9))      --  Mass Row Index
+        !IA(NP(8))      --  Mass Column Indicator
+        !IA(NP(5))      --  Stiffness Column Indicator
+        !IA(NP(2))      --  Stiffness Row Index
+        !DA(NP(10))     --  Mass Matrix
+        !DA(NP(3))      --  Stiffness Matrix
+        call pardiso_crop(DA(NP(10)), IA(NP(9)), IA(NP(8)))
+        call dfeast_scsrgv(uplo, NN, Stiff, IA(NP(2)), IA(NP(5)), Mass, IA(NP(9)), IA(NP(8)), fpm, epsout, loop, emin, emax, NC, EignVal, EignVec, NRoot, res, info)
         deallocate (res)
     end if
     write(IOUT,*)'-------------------------------------------------------------------------------------'
