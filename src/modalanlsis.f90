@@ -32,6 +32,7 @@ subroutine EIGENVAL(Stiff, Mass, MAXA, NN, NWK, NNM, NRoot)
         READ (StiffTmp) Stiff
         close(StiffTmp)
     else
+        uplo = 'U'
         allocate (res(NC))
         !call dfeast_scsrgv(uplo, NN, Stiff, iStiff, jStiff, Mass, iMass, jMass, fpm, epsout, loop, emin, emax, NC, EignVal, EignVec, NRoot, res, info)
         deallocate (res)

@@ -49,6 +49,7 @@
 		<File RelativePath="..\..\src\module\list.f90"/>
 		<File RelativePath="..\..\src\module\mathkernel.f90"/>
 		<File RelativePath="..\..\src\module\mkl_pardiso.f90"/>
+		<File RelativePath="..\..\src\module\mkl_solvers_ee.fi"/>
 		<File RelativePath="..\..\src\module\node.f90"/>
 		<File RelativePath="..\..\src\module\pardiso.f90"/>
 		<File RelativePath="..\..\src\module\solver_mode.f90"/></Filter>
