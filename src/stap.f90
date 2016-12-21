@@ -238,7 +238,7 @@ end if
 
   WRITE (*,"(//,  &
      ' S O L U T I O N   T I M E   L O G   I N   S E C',//,   &
-     '     TIME FOR INPUT PHASE ',14(' .'),' =',I5,/,     &
+     '     TIME FOR INPUT PHASE ',14(' .'),' =',I7,/,     &
      '     TIME FOR PREPARATION OF MATRIX FORMAT . . . . . . =',I7,/,     &
      '     TIME FOR CALCULATION OF STIFFNESS MATRIX  . . . . =',I7, /,   &
      '     TIME FOR FACTORIZATION OF STIFFNESS MATRIX  . . . =',I7, /,   &
