@@ -205,8 +205,7 @@ subroutine HexEight (ID,X,Y,Z,U,MHT,E, PoissonRatio, Density, LM, PositionData, 
             
             if(pardisodoor) then
                 call pardiso_addban(DA(NP(3)),IA(NP(2)),IA(NP(5)),S,LM(:,N),ND)
-                !IF (DYNANALYSIS) then
-                !    call prepare_SkylineK(DA(NP(3)))
+                IF (DYNANALYSIS) call pardiso_addban(DA(NP(10)),IA(NP(2)),IA(NP(5)),S,LM(:,N),ND)
             else
                 call ADDBAN(DA(NP(3)),IA(NP(2)),S,LM(:,N),ND)
                 IF (DYNANALYSIS) CALL ADDBAN (DA(NP(10)),IA(NP(2)),M,LM(:,N),ND)

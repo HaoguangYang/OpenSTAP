@@ -3,7 +3,7 @@ module Modal
 contains
     
 subroutine EIGENVAL(Stiff, Mass, MAXA, NN, NWK, NNM, NRoot)
-    USE GLOBALS, ONLY : IOUT
+    USE GLOBALS, ONLY : IOUT, PARDISODOOR
     implicit none
     real(8) :: Stiff(NWK), Mass(NWK)
     integer :: MAXA(NNM)
@@ -13,36 +13,29 @@ subroutine EIGENVAL(Stiff, Mass, MAXA, NN, NWK, NNM, NRoot)
     real(8), allocatable :: EignVec(:,:),EignVal(:)
     logical :: IFSS, IFPR
     
-    write(IOUT,*)'------------------------------------------------------------------------------------'
+    open(StiffTmp, FILE = "Stff.tmp", FORM = "UNFORMATTED", STATUS = "Replace")
+    REWIND StiffTmp
+    WRITE (StiffTmp) Stiff(1:NWK)
+    write(IOUT,*)'-------------------------------------------------------------------------------------'
     write(IOUT,*)'           E I G E N   V A L U E   C A L C U L A T I O N   R E S U L T S'
     
-
-    NC = minval((/2*NRoot, NRoot+8, NWK/))
-    allocate (EignVec(NN,NC),EignVal(NC))
-    NNC=NC*(NC+1)/2
+    if (.NOT. PARDISODOOR) then
+        NC = minval((/2*NRoot, NRoot+8, NWK/))
+        allocate (EignVec(NN,NC),EignVal(NC))
+        NNC=NC*(NC+1)/2
     
-    !THE PARAMETERS NC AND/OR NRestart MUST BE INCREASED IF A SOLUTION HAS NOT CONVERGED
-    call LANCZOS(Stiff, Mass, MAXA, EignVec, EignVal, NN, NNM, NWK, NWK, NRoot, RTol, NC, NNC, NRestart, IFSS, IFPR, StiffTmp, IOUT)
-    write(IOUT,*)'------------------------------------------------------------------------------------'
-    deallocate (EignVec, EignVal)
-    REWIND StiffTmp
-    READ (StiffTmp) Stiff
-end subroutine EIGENVAL
-
-subroutine prepare_SkylineK (Stiff)
-    use globals, only: PARDISODOOR, NWK
-    implicit none
-    real(8) :: Stiff(NWK), KTmp(NWK)
-    
-    open(StiffTmp, FILE = "Stff.tmp", FORM = "UNFORMATTED", STATUS = "Replace")
-    if (PARDISODOOR) then
-        REWIND StiffTmp
-        WRITE (StiffTmp) NWK,Stiff(1:NWK)
+        !THE PARAMETERS NC AND/OR NRestart MUST BE INCREASED IF A SOLUTION HAS NOT CONVERGED
+        call LANCZOS(Stiff, Mass, MAXA, EignVec, EignVal, NN, NNM, NWK, NWK, NRoot, RTol, NC, NNC, NRestart, IFSS, IFPR, StiffTmp, IOUT)
+    !else
+        !call dfeast_scsrgv(uplo, n, a, ia, ja, b, ib, jb, fpm, epsout, loop, emin, emax, m0, e, x, m, res, info)
     end if
-    !CALL ADDBAN (Stiff,IA(NP(2)),S,LM(:,N),ND)
-    REWIND StiffTmp
-    !if (PARDISODOOR) then
-    close(StiffTmp)
-end subroutine prepare_SkylineK
+    write(IOUT,*)'-------------------------------------------------------------------------------------'
+    deallocate (EignVec, EignVal)
+    if (.NOT. PARDISODOOR) then
+        REWIND StiffTmp
+        READ (StiffTmp) Stiff
+        close(StiffTmp)
+    end if
+end subroutine EIGENVAL
 
 end module Modal

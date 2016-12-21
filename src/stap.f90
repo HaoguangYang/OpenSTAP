@@ -176,13 +176,13 @@ end if
      CALL SECOND (TIM(5))
      CALL SECOND (TIM(6))
   ELSE
-     IND=2    ! Assemble structure stiffness matrix
-     CALL ASSEM (A(NP(11)))
+     IND=2                                                          ! Assemble structure stiffness matrix
+     CALL ASSEM (A(NP(11)))                                         ! Loop Into Element Groups
      
      CALL SECOND (TIM(4))
      !IF (DYNANALYSIS .EQV. .TRUE.) CALL EIGENVAL (DA(NP(3)), DA(NP(10)), IA(NP(2)), NEQ, NWK, NEQ1,2)
      if(.not. pardisodoor) then
-         !    Triangularize stiffness matrix
+        !    Triangularize stiffness matrix
         NEQ1=NEQ + 1
         CALL COLSOL (DA(NP(3)),DA(NP(4)),IA(NP(2)),NEQ,NWK,NEQ1,1)
      end if
