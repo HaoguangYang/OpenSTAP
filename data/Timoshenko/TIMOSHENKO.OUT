@@ -1,0 +1,102 @@
+
+ TIMOSHENKO                                                                      
+
+ C O N T R O L   I N F O R M A T I O N
+
+      NUMBER OF NODAL POINTS . . . . . . . . . . (NUMNP)  =     2
+      NUMBER OF ELEMENT GROUPS . . . . . . . . . (NUMEG)  =     1
+      NUMBER OF LOAD CASES . . . . . . . . . . . (NLCASE) =     1
+      SOLUTION MODE  . . . . . . . . . . . . . . (MODEX)  =     1
+         EQ.0, DATA CHECK
+         EQ.1, EXECUTION
+
+
+ N O D A L   P O I N T   D A T A
+
+  NODE          BOUNDARY                         NODAL POINT
+ NUMBER     CONDITION  CODES                     COORDINATES
+               X    Y    Z   RX   RY   RZ               X            Y            Z
+    1          1    1    1    1    1    1         0.000        0.000        0.000
+    2          0    0    0    0    0    0         0.000        2.000        0.000
+
+
+ EQUATION NUMBERS
+
+   NODE         DEGREES OF FREEDOM
+  NUMBER
+     N             X    Y    Z   RX   RY   RZ
+     1             0    0    0    0    0    0
+     2             1    2    3    4    5    6
+
+
+ L O A D   C A S E   D A T A
+
+     LOAD CASE NUMBER . . . . . . . =     1
+     NUMBER OF CONCENTRATED LOADS . =     1
+
+    NODE       DIRECTION      LOAD
+   NUMBER                   MAGNITUDE
+      2            3       -0.10000E+04
+
+
+ E L E M E N T   G R O U P   D A T A
+
+
+ E L E M E N T   D E F I N I T I O N
+
+ ELEMENT TYPE  . . . . . . . . . . . . .( NPAR(1) ) . . =   12
+     EQ.1, TRUSS ELEMENTS
+     EQ.2, ELEMENTS CURRENTLY
+     EQ.5, 3D BEAM
+
+ NUMBER OF ELEMENTS. . . . . . . . . . .( NPAR(2) ) . . =    1
+
+ M A T E R I A L   D E F I N I T I O N
+
+ NUMBER OF DIFFERENT SETS OF MATERIAL
+ AND CROSS-SECTIONAL  CONSTANTS  . . . .( NPAR(3) ) . . =    1
+
+  SET       YOUNG'S     SHEARING     AREA     I_X     I_Y     I_Z     J_X     J_Y     J_Z
+ NUMBER     MODULUS          MODULUS
+               E              A
+    1  0.20000E+12  0.70000E+11  0.30000E+02  0.10000E+03  0.10000E+03  0.10000E+03  0.20000E+03  0.20000E+03  0.20000E+03
+
+
+ E L E M E N T   I N F O R M A T I O N
+
+ ELEMENT     NODE     NODE       MATERIAL
+ NUMBER-N      I        J       SET NUMBER
+    1          1        2           1
+
+
+ TOTAL SYSTEM DATA
+
+     NUMBER OF EQUATIONS . . . . . . . . . . . . . .(NEQ) =     6
+     NUMBER OF MATRIX ELEMENTS . . . . . . . . . . .(NWK) =        21
+     MAXIMUM HALF BANDWIDTH  . . . . . . . . . . . .(MK ) =     6
+     MEAN HALF BANDWIDTH . . . . . . . . . . . . . .(MM ) =     3
+
+
+ LOAD CASE   1
+
+
+ D I S P L A C E M E N T S
+
+  NODE    X-DISPLACEMENT  Y-DISPLACEMENT  Z-DISPLACEMENT  X-ROTATION  Y-ROTATION  Z-ROTATION
+     1       0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+     2       0.000000E+00  0.000000E+00 -0.121429E-08 -0.100000E-09  0.000000E+00  0.000000E+00
+
+
+ S T R E S S  C A L C U L A T I O N S  F O R  E L E M E N T  G R O U P   1
+
+  ELEMENT  FORCE_X1   FORCE_Y1   FORCE_Z1   MOMENT_X1   MOMENT_Y1   MOMENT_Z1   FORCE_X2   FORCE_Y2   FORCE_Z2   MOMENT_X2   MOMENT_Y2   MOMENT_Z2
+  NUMBER
+     1 0.000000E+00 0.000000E+00 0.100000E+04 0.200000E+04 0.000000E+00 0.000000E+00 0.000000E+00 0.000000E+00 -.100000E+04 0.227374E-12 0.000000E+00 0.000000E+00
+
+
+
+                    S T R E S S   R E C O V E R Y   A T   N O D A L   P O I N T S
+   Node   |-----------------------------------------Stress----------------------------------------|
+  Number     Sigma_XX       Sigma_YY       Sigma_ZZ       Sigma_XY       Sigma_YZ       Sigma_ZX
+     1    0.000000E+00   0.000000E+00  -0.100000E+04   0.000000E+00  -0.100000E+04   0.000000E+00
+     2    0.000000E+00   0.000000E+00  -0.100000E+04   0.000000E+00  -0.100000E+04   0.000000E+00
