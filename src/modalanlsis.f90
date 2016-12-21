@@ -34,10 +34,29 @@ subroutine EIGENVAL(Stiff, Mass, MAXA, NN, NWK, NNM, NRoot)
     else
         uplo = 'U'
         allocate (res(NC))
+        !IA(NP(9))
+        !IA(NP(8))
+        !IA(NP(5))
+        !IA(NP(2))
+        !call pardiso_crop(DA(NP(10)), IA(NP(9)), IA(NP(8)))
         !call dfeast_scsrgv(uplo, NN, Stiff, iStiff, jStiff, Mass, iMass, jMass, fpm, epsout, loop, emin, emax, NC, EignVal, EignVec, NRoot, res, info)
         deallocate (res)
     end if
     write(IOUT,*)'-------------------------------------------------------------------------------------'
     deallocate (EignVec, EignVal)
 end subroutine EIGENVAL
+    
+subroutine prepare_MassMatrix
+    use globals
+    use memallocate
+    implicit none
+
+    CALL MEMALLOC(10,"M    ",NWK,ITWO)
+    if (PARDISODOOR) then
+        call memalloc(9,"MrInd",NEQ+1,1)
+        call memalloc(8,"Mcolm",NWK,1)
+        IA(NP(8):NP(8)+NWK) = IA(NP(5):NP(5)+NWK)
+        IA(NP(9):NP(9)+NEQ+1) = IA(NP(2):NP(2)+NEQ+1)
+    end if
+end subroutine prepare_MassMatrix
 

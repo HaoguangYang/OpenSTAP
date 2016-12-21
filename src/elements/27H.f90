@@ -200,8 +200,13 @@ subroutine HexTwnSeven (ID,X,Y,Z,U,MHT,E, PoissonRatio, Density, Gravity, LM, Po
             
             !write(*,*) "S",S
             
-            CALL ADDBAN (DA(NP(3)),IA(NP(2)),S,LM(:,N),ND)
-            IF (DYNANALYSIS .EQV. .TRUE.) CALL ADDBAN (DA(NP(5)),IA(NP(2)),M,LM(:,N),ND)
+            if(pardisodoor) then
+                call pardiso_addban(DA(NP(3)),IA(NP(2)),IA(NP(5)),S,LM(:,N),ND)
+                IF (DYNANALYSIS) call pardiso_addban(DA(NP(10)),IA(NP(2)),IA(NP(5)),S,LM(:,N),ND)
+            else
+                call ADDBAN(DA(NP(3)),IA(NP(2)),S,LM(:,N),ND)
+                IF (DYNANALYSIS) CALL ADDBAN (DA(NP(10)),IA(NP(2)),M,LM(:,N),ND)
+            end if
             
         end do
         
