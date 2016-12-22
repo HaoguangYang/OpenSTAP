@@ -42,3 +42,28 @@
  E L E M E N T   G R O U P   D A T A
 
 
+ E L E M E N T   D E F I N I T I O N
+
+ ELEMENT TYPE  . . . . . . . . . . . . .( NPAR(1) ) . . = 1000
+     EQ.1, TRUSS ELEMENTS
+     EQ.2, ELEMENTS CURRENTLY
+     EQ.3, NOT AVAILABLE
+
+ NUMBER OF ELEMENTS. . . . . . . . . . .( NPAR(2) ) . . =    1
+
+ M A T E R I A L   D E F I N I T I O N
+
+ NUMBER OF DIFFERENT SETS OF MATERIAL
+ AND CROSS-SECTIONAL  CONSTANTS  . . . .( NPAR(3) ) . . =    1
+
+  SET       YOUNG'S     CROSS-SECTIONAL     YIELD-STRESS     PLASTIC-MODULES
+ NUMBER     MODULUS          AREA
+               E              A             SIGMA-Y               K
+    1     0.10000E+12    0.100000E-05     0.10000E+08     0.10000E+11
+
+
+ E L E M E N T   I N F O R M A T I O N
+
+ ELEMENT     NODE     NODE       MATERIAL     HISTORY
+ NUMBER-N      I        J       SET NUMBER
+    1          1        2           1          0

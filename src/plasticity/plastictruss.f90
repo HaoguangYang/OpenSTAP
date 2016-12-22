@@ -1,3 +1,7 @@
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!             PLASTIC TRUSS SYSTEM                  !
+!                LIU CHANGWU                        !
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!    
 SUBROUTINE PLASTICTRUSS
 ! . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 ! .                                                                   .
@@ -70,7 +74,7 @@ SUBROUTINE PLASTICRUSS (ID,X,Y,Z,U,MHT,E,AREA,YIELDSTRESS,PLASTICK,HISTORY,LM,XY
 
   INTEGER :: NPAR1, NUME, NUMMAT, ND, I, J, L, N, Node(NPAR(2),NPAR(5))
   INTEGER :: MTYPE, IPRINT
-  REAL(8) :: XL2, XL, SQRT, XX, YY, STR, P
+  REAL(8) :: XL2, XL, SQRT, XX, YY, STR, P, MAXSTR
 
   NPAR1  = NPAR(1)
   NUME   = NPAR(2)
@@ -95,22 +99,22 @@ SUBROUTINE PLASTICRUSS (ID,X,Y,Z,U,MHT,E,AREA,YIELDSTRESS,PLASTICK,HISTORY,LM,XY
                    ' AND CROSS-SECTIONAL  CONSTANTS ',         &
                    4 (' .'),'( NPAR(3) ) . . =',I5,/)") NUMMAT
 
-     WRITE (IOUT,"('  SET       YOUNG''S     CROSS-SECTIONAL',/,  &
+     WRITE (IOUT,"('  SET       YOUNG''S     CROSS-SECTIONAL     YIELD-STRESS     PLASTIC-MODULES',/,  &
                    ' NUMBER     MODULUS',10X,'AREA',/,  &
-                   15 X,'E',14X,'A')")
+                   15 X,'E',14X,'A',13X,'SIGMA-Y',15X,'K')")
 
      DO I=1,NUMMAT
-        READ (IIN,'(I5,2F10.0)') N,E(N),AREA(N)  ! Read material information
-        WRITE (IOUT,"(I5,4X,E12.5,2X,E14.6)") N,E(N),AREA(N)
+        READ (IIN,'(I5,4F10.0)') N,E(N),AREA(N) ,YIELDSTRESS(N),PLASTICK(N) ! Read material information
+        WRITE (IOUT,"(I5,4X,E12.5,2X,E14.6,4X,E12.5,4X,E12.5)") N,E(N),AREA(N),YIELDSTRESS(N),PLASTICK(N)
      END DO
 
      WRITE (IOUT,"(//,' E L E M E N T   I N F O R M A T I O N',//,  &
-                      ' ELEMENT     NODE     NODE       MATERIAL',/,   &
+                      ' ELEMENT     NODE     NODE       MATERIAL     HISTORY',/,   &
                       ' NUMBER-N      I        J       SET NUMBER')")
 
      N=0
      DO WHILE (N .NE. NUME)
-        READ (IIN,'(5I5)') N,Node(N,1:2),MTYPE  ! Read in element information
+        READ (IIN,'(5I5)') N,Node(N,1:2),MTYPE,HISTORY(N)  ! Read in element information
 
 !       Save element information
         XYZ(1:NPAR(5)*3-1:3,N)=X(Node(N,:))  ! Coordinates of the element's nodes
@@ -138,7 +142,7 @@ SUBROUTINE PLASTICRUSS (ID,X,Y,Z,U,MHT,E,AREA,YIELDSTRESS,PLASTICK,HISTORY,LM,XY
 >>>>>>> bca3464570c9657a1e8abf9bd4b019c43a30e518
 >>>>>>> cdd17f008b644ad4497db898d5e9ec786411efc3
 
-        WRITE (IOUT,"(I5,6X,I5,4X,I5,7X,I5)") N,Node(N,1:2),MTYPE
+        WRITE (IOUT,"(I5,6X,I5,4X,I5,7X,I5,6X,I5)") N,Node(N,1:2),MTYPE,HISTORY
 !        write (VTKNodeTmp) NPAR(5), Node(N,:)-1
 
      END DO
@@ -157,8 +161,12 @@ SUBROUTINE PLASTICRUSS (ID,X,Y,Z,U,MHT,E,AREA,YIELDSTRESS,PLASTICK,HISTORY,LM,XY
            XL2=XL2 + D(L)*D(L)
         END DO
         XL=SQRT(XL2)   ! Length of element N
-
-        XX=E(MTYPE)*AREA(MTYPE)*XL   !  E*A*l
+        
+        IF (HISTORY(N) .EQ. 0) THEN
+            XX=E(MTYPE)*AREA(MTYPE)*XL
+        ELSE IF (HISTORY(N) .EQ. 1) THEN
+            XX=PLASTICK(MTYPE)*AREA(MTYPE)*XL
+        ENDIF
 
         DO L=1,3
            ST(L)=D(L)/XL2
@@ -171,6 +179,12 @@ SUBROUTINE PLASTICRUSS (ID,X,Y,Z,U,MHT,E,AREA,YIELDSTRESS,PLASTICK,HISTORY,LM,XY
               S(I,J)=ST(I)*YY
            END DO
         END DO
+        
+        DO I=2,ND
+            DO J=1,I-1
+                S(I,J)=S(J,I)
+            ENDDO
+        ENDDO
 
 !        if(pardisodoor) then
 !            call pardiso_addban(DA(NP(3)),IA(NP(2)),IA(NP(5)),S,LM(1,N),ND)
@@ -186,12 +200,11 @@ SUBROUTINE PLASTICRUSS (ID,X,Y,Z,U,MHT,E,AREA,YIELDSTRESS,PLASTICK,HISTORY,LM,XY
   ELSE IF (IND .EQ. 3) THEN
 
      IPRINT=0
+     MAXSTR=0
+     
      DO N=1,NUME
-        IPRINT=IPRINT + 1
-        IF (IPRINT.GT.50) IPRINT=1
-        IF (IPRINT.EQ.1) WRITE (IOUT,"(//,' S T R E S S  C A L C U L A T I O N S  F O R  ',  &
-                                           'E L E M E N T  G R O U P',I4,//,   &
-                                           '  ELEMENT',13X,'FORCE',12X,'STRESS',/,'  NUMBER')") NG
+       
+          
         MTYPE=MATP(N)
 
         XL2=0.
@@ -199,11 +212,18 @@ SUBROUTINE PLASTICRUSS (ID,X,Y,Z,U,MHT,E,AREA,YIELDSTRESS,PLASTICK,HISTORY,LM,XY
            D(L) = XYZ(L,N) - XYZ(L+3,N)
            XL2=XL2 + D(L)*D(L)
         END DO
-
-        DO L=1,3
-           ST(L)=(D(L)/XL2)*E(MTYPE)
-           ST(L+3)=-ST(L)
-        END DO
+        
+        IF (HISTORY(N) .EQ. 0) THEN 
+          DO L=1,3
+             ST(L)=(D(L)/XL2)*E(MTYPE)
+             ST(L+3)=-ST(L)
+          END DO
+        ELSE IF (HISTORY(N) .EQ. 1) THEN
+           DO L=1,3
+             ST(L)=(D(L)/XL2)*PLASTICK(MTYPE)
+             ST(L+3)=-ST(L)
+           END DO
+        ENDIF
 
         STR=0.0
         DO L=1,3
@@ -213,13 +233,44 @@ SUBROUTINE PLASTICRUSS (ID,X,Y,Z,U,MHT,E,AREA,YIELDSTRESS,PLASTICK,HISTORY,LM,XY
            J=LM(L+3,N)
            IF (J.GT.0) STR=STR + ST(L+3)*U(J)
         END DO
+        
+        IF (PLASTICTRIAL) THEN
+            IF (STR .GE. YIELDSTRESS(MTYPE)) THEN
+                PLASTICITERATION=.TRUE.
+                HISTORY(N)=1
+                
+                IF (STR .GT. MAXSTR) THEN
+                MAXSTR=STR
+                ENDIF
+            ENDIF
+            
+        ELSE
+        ENDIF
+        
+        
 
         P=STR*AREA(MTYPE)
-
-        WRITE (IOUT,"(1X,I5,11X,E13.6,4X,E13.6)") N,P,STR
+        
+        IF (PLASTICTRIAL) THEN
+          IPRINT=IPRINT + 1
+          IF (IPRINT.GT.50) IPRINT=1
+          IF (IPRINT.EQ.1) WRITE (IOUT,"(//,' ELASTIC TRIAL SOLUTION  F O R  ',  &
+                                           'E L E M E N T  G R O U P ',I4,//,   &
+                                           '  ELEMENT',13X,'FORCE',12X,'STRESS',/,'  NUMBER')") NG
+          WRITE (IOUT,"(1X,I5,11X,E13.6,4X,E13.6)") N,P,STR
+        ENDIF
+        
+       
 !        GaussianCollection(:,N) = 0.5*(XYZ(4:6,N)+XYZ(1:3,N))
 !        StressCollection(1,N) = STR
      END DO
+     
+     IF ((PLASTICTRIAL) .AND. (PLASTICITERATION))THEN
+         
+         !CALL ITERATIONINIT(MAXSTR,YIELDSTRESS(MTYPE))
+         
+         PLASTICTRIAL=.FALSE.
+     ENDIF
 !>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>WORKING PROGRESS
 !     StressCollection(2,:) = 0D0
 !     call PostProcessor(NPAR(1), 1, XYZ, &
@@ -231,3 +282,14 @@ SUBROUTINE PLASTICRUSS (ID,X,Y,Z,U,MHT,E,AREA,YIELDSTRESS,PLASTICK,HISTORY,LM,XY
   END IF
 
 END SUBROUTINE PLASTICRUSS
+    
+!SUBROUTINE ITERATIONINIT(MAXSTR,YIELD)
+   
+!  USE GLOBALS
+
+!  IMPLICIT NONE
+!  REAL(4):: MAXSTR,YIELD
+  
+!  ITERATENUM = MAXSTR/YIELD*1000.0
+
+!ENDSUBROUTINE ITERATIONINIT
