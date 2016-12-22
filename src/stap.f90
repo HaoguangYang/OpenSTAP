@@ -116,7 +116,7 @@ PROGRAM STAP90
   END DO
   
 ! * * * * * * * * * * * * * * * * * * * * * *
-! *             SOLUTION PHASE              *
+! *               SOLUTION PHASE            *
 ! * * * * * * * * * * * * * * * * * * * * * *  
 
 WRITE(*,'("Solution phase ... ")')
@@ -160,11 +160,7 @@ if(.not. pardisodoor) then
                    '     MEAN HALF BANDWIDTH',14(' .'),'(MM ) = ',I10)") NEQ,NWK,MK,MM
 ! ***************************************************************************************
 else !如果使用pardiso
-<<<<<<< HEAD
   CALL MEMFREEFROMTO(2,4)
-=======
-  CALL MEMFREEFROMTO(2,5)
->>>>>>> bca3464570c9657a1e8abf9bd4b019c43a30e518
   ! NP(2,3,4,5)均在这里被分配
   CALL pardiso_input(IA(NP(1)))
   CALL SECOND (TIM(3))
@@ -175,39 +171,27 @@ end if
 IF (DYNANALYSIS .EQV. .TRUE.) call prepare_MassMatrix
 
 ! In data check only mode we skip all further calculations
-
-IF (DYNANALYSIS .EQV. .TRUE.) call prepare_MassMatrix
-
-IF (MODEX.LE.0) THEN
-    CALL SECOND (TIM(4))
-    CALL SECOND (TIM(5))
-    CALL SECOND (TIM(6))
-ELSE
-    IND=2                                                           ! Assemble structure stiffness matrix
-    CALL ASSEM (A(NP(11)))                                          ! Loop Into Element Groups
+  IF (MODEX.LE.0) THEN
+     CALL SECOND (TIM(4))
+     CALL SECOND (TIM(5))
+     CALL SECOND (TIM(6))
+  ELSE
+     IND=2    ! Assemble structure stiffness matrix
+     CALL ASSEM (A(NP(11)))
      
-<<<<<<< HEAD
      CALL SECOND (TIM(4))
      IF (DYNANALYSIS .EQV. .TRUE.) CALL EIGENVAL (DA(NP(3)), DA(NP(10)), IA(NP(2)), NEQ, NWK, NEQ1, 2)
      if(pardisodoor) then
         if (.not. DYNANALYSIS) call pardiso_crop(DA(NP(3)), IA(NP(2)), IA(NP(5)))          ! Condensing CSR format sparse matrix storage: deleting zeros
      else
-=======
-    CALL SECOND (TIM(4))
-    IF (DYNANALYSIS .EQV. .TRUE.) CALL EIGENVAL (DA(NP(3)), DA(NP(10)), IA(NP(2)), NEQ, NWK, NEQ1, 2)
-    if(pardisodoor) then
-        if (.not. DYNANALYSIS) call pardiso_crop(DA(NP(3)), IA(NP(2)), IA(NP(5)))          ! Condensing CSR format sparse matrix storage: deleting zeros
-    else
->>>>>>> bca3464570c9657a1e8abf9bd4b019c43a30e518
         !    Triangularize stiffness matrix
         NEQ1=NEQ + 1
         CALL COLSOL (DA(NP(3)),DA(NP(4)),IA(NP(2)),NEQ,NWK,NEQ1,1)
-    end if
+     end if
      
       
-    IND=3    ! Stress calculations
+     IND=3    ! Stress calculations
 
-<<<<<<< HEAD
      REWIND ILOAD
      CALL SECOND (TIM(5))
      DO CURLCASE=1,NLCASE
@@ -216,16 +200,6 @@ ELSE
             WRITE (IOUT,"(//,' TOTAL SYSTEM DATA',//,   &
                    '     NUMBER OF EQUATIONS',14(' .'),'(NEQ) = ',I10,/,   &
                    '     NUMBER OF MATRIX ELEMENTS',11(' .'),'(NWK) = ',I9)") NEQ,NWK
-=======
-    REWIND ILOAD
-    CALL SECOND (TIM(5))
-    DO CURLCASE=1,NLCASE
-        CALL LOADV (DA(NP(4)),NEQ)   ! Read in the load vector
-        if(pardisodoor) then
-            WRITE (IOUT,"(//,' TOTAL SYSTEM DATA',//,   &
-                   '     NUMBER OF EQUATIONS',14(' .'),'(NEQ) = ',I5,/,   &
-                   '     NUMBER OF MATRIX ELEMENTS',11(' .'),'(NWK) = ',I9)") NEQ,NWK  
->>>>>>> bca3464570c9657a1e8abf9bd4b019c43a30e518
             call pardiso_solver(DA(NP(3)),DA(NP(4)),IA(NP(2)), IA(NP(5)))
         else
 !       Solve the equilibrium equations to calculate the displacements
@@ -233,7 +207,6 @@ ELSE
         end if
         CALL SECOND (TIM(6))
         WRITE (IOUT,"(//,' LOAD CASE ',I3)") CURLCASE
-        CALL SECOND (TIM(6))
         
         CALL WRITED (DA(NP(4)),IA(NP(1)),NEQ,NUMNP)  ! PRINT DISPLACEMENTS FOR OTHER SITUATIONS(THE FORMER ONE)
 !           Calculation of stresses
@@ -254,7 +227,6 @@ ELSE
   TT = TT - TIM(1)
   WRITE (IOUT,"(//,  &
      ' S O L U T I O N   T I M E   L O G   I N   S E C',//,   &
-<<<<<<< HEAD
      '     TIME FOR INPUT PHASE ',14(' .'),' =',I10,/,     &
      '     TIME FOR PREPARATION OF MATRIX FORMAT ... . . . . =',I10,/,     &
      '     TIME FOR CALCULATION OF STIFFNESS MATRIX  . . . . =',I10, /,   &
@@ -272,25 +244,6 @@ ELSE
      '     TIME FOR LOAD CASE SOLUTIONS ',10(' .'),' =',I10,/,   &
      '     TIME FOR CALCLUATE STRESS',12(' .'),' =',I10,//,   &
      'T O T A L   S O L U T I O N   T I M E  . . . . . . . . =',I10)") (TIM(I),I=1,6),TT
-=======
-     '     TIME FOR INPUT PHASE ',14(' .'),' =',I7,//,     &
-     '     TIME FOR PREPARATION OF MATRIX FORMAT . . . . . . =',I7,/,     &
-     '     TIME FOR CALCULATION OF STIFFNESS MATRIX  . . . . =',I7, /,   &
-     '     TIME FOR FACTORIZATION OF STIFFNESS MATRIX  . . . =',I7, /,   &
-     '     TIME FOR LOAD CASE SOLUTIONS ',10(' .'),' =',I7,/,   &
-     '     TIME FOR CALCLUATE STRESS',12(' .'),' =',I7,//,   &
-     'T O T A L   S O L U T I O N   T I M E  . . . . . . . . =',I7)") (TIM(I),I=1,6),TT
-
-  WRITE (*,"(//,  &
-     ' S O L U T I O N   T I M E   L O G   I N   S E C',//,   &
-     '     TIME FOR INPUT PHASE ',14(' .'),' =',I7,//,     &
-     '     TIME FOR PREPARATION OF MATRIX FORMAT . . . . . . =',I7,/,     &
-     '     TIME FOR CALCULATION OF STIFFNESS MATRIX  . . . . =',I7, /,   &
-     '     TIME FOR FACTORIZATION OF STIFFNESS MATRIX  . . . =',I7, /,   &
-     '     TIME FOR LOAD CASE SOLUTIONS ',10(' .'),' =',I7,/,   &
-     '     TIME FOR CALCLUATE STRESS',12(' .'),' =',I7,//,   &
-     'T O T A L   S O L U T I O N   T I M E  . . . . . . . . =',I7)") (TIM(I),I=1,6),TT
->>>>>>> bca3464570c9657a1e8abf9bd4b019c43a30e518
      
   CALL CLOSEFILES()
   write (*,*) "Press Any Key to Exit..."

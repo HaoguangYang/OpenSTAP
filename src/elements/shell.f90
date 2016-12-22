@@ -84,7 +84,7 @@ SUBROUTINE SHELL4Q (ID,X,Y,Z,U,MHT,E,POSSION,LM,XYZ,MATP, THICK, Node)
   INTEGER :: NPAR1, NUME, NUMMAT, ND, K, L, M, N, J
   INTEGER :: MTYPE, IPRINT, Node(NPAR(2),NPAR(5))
 
-  REAL(8) :: Cb(3, 3),Cc(3, 3), Cs, Etemp, Ptemp, detJ
+  REAL(8) :: Cb(3, 3),Cc(3, 3), Cs, Etemp, Ptemp, detJ, N1, N2, N3, N4
   REAL(8) :: GAUSS(2), W(2)
   REAL(8) :: G1, G2, GN(2,4), Ja(2,2), Ja_inv(2,2), Bk(3,20),By(2,20),Bm(3,20), S(20,20), BB(2,4), NShape(1,4), NN0(1,4)
   REAL(8) :: X_Y(4, 2), XY_G(1,2), STR1(3), STR2(2), GaussianCollection(3,NPAR(2)*4), StressCollection(6,NPAR(2)*4)
@@ -253,6 +253,10 @@ SUBROUTINE SHELL4Q (ID,X,Y,Z,U,MHT,E,POSSION,LM,XYZ,MATP, THICK, Node)
                S = S + (matmul(matmul(transpose(Bk), Cb), Bk) + Cs*matmul(transpose(By), By)+ &
                     matmul(matmul(transpose(Bm), Cc), Bm))*abs(detJ)
          
+                              
+                   
+        
+                
             END DO
         END DO
         if(pardisodoor) then
@@ -299,17 +303,12 @@ SUBROUTINE SHELL4Q (ID,X,Y,Z,U,MHT,E,POSSION,LM,XYZ,MATP, THICK, Node)
         Cc = Cb
         
         Cs = Etemp/(2*(1+Ptemp))
-                
 ! Gauss 积分常数
         S = 0
         DO L=1,2
             DO M=1,2
                 G1 = GAUSS(L)
                 G2 = GAUSS(M)
-                NN0(1,1)=(1-G1)*(1-G2)/4
-                NN0(1,2)=(1+G1)*(1-G2)/4
-                NN0(1,3)=(1+G1)*(1+G2)/4
-                NN0(1,4)=(1-G1)*(1+G2)/4
 ! 计算Jacobian
                 GN = reshape((/G2-1,G1-1, 1-G2,-G1-1, 1+G2,1+G1, -G2-1,1-G1/), shape(GN))/4
                 Ja = matmul(GN,X_Y)
@@ -331,17 +330,10 @@ SUBROUTINE SHELL4Q (ID,X,Y,Z,U,MHT,E,POSSION,LM,XYZ,MATP, THICK, Node)
 ! 为剪切部分的By赋值。改成循环
                 By = 0
                 DO K = 1,4
-<<<<<<< HEAD
                     By(1,5*K-4) = BB(1,K)
                     By(1,5*K-3) = -NN0(1, K)
                     By(2,5*K-4) = BB(2,K)
                     By(2,5*K-2)   = -NN0(1, K)
-=======
-                    By(1,3*K-2) = BB(1,K)
-                    By(1,3*K-1) = -NN0(1,K)
-                    By(2,3*K-2) = BB(2,K)
-                    By(2,3*K)   = -NN0(1,K)
->>>>>>> bca3464570c9657a1e8abf9bd4b019c43a30e518
                 END DO
 ! 为平面部分的Bm赋值。改成循环
                 Bm = 0
@@ -357,8 +349,12 @@ SUBROUTINE SHELL4Q (ID,X,Y,Z,U,MHT,E,POSSION,LM,XYZ,MATP, THICK, Node)
                 WRITE (IOUT,"(5X,5E14.2)") STR1, STR2
                 
                 !N Matrix Elements
+                N1 = 0.25*(1.0-G2)*(1.0-G1)
+                N2 = 0.25*(1.0+G2)*(1.0-G1)
+                N3 = 0.25*(1.0+G2)*(1.0+G1)
+                N4 = 0.25*(1.0-G2)*(1.0+G1)
                 
-                GaussianCollection(1:3, N*4+2*L+M-6) = matmul(reshape(XYZ(:,N),(/3,4/)), NN0(1,1:4))
+                GaussianCollection(1:3, N*4+2*L+M-6) = matmul(reshape(XYZ(:,N),(/3,4/)), (/N1, N2, N3, N4/))
                 StressCollection(1:5, N*4+2*L+M-6) = (/STR1, STR2/)
             END DO
         END DO
