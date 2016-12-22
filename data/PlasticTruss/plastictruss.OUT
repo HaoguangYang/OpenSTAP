@@ -42,3 +42,53 @@
  E L E M E N T   G R O U P   D A T A
 
 
+ E L E M E N T   D E F I N I T I O N
+
+ ELEMENT TYPE  . . . . . . . . . . . . .( NPAR(1) ) . . = 1000
+     EQ.1, TRUSS ELEMENTS
+     EQ.2, ELEMENTS CURRENTLY
+     EQ.3, NOT AVAILABLE
+
+ NUMBER OF ELEMENTS. . . . . . . . . . .( NPAR(2) ) . . =    1
+
+ M A T E R I A L   D E F I N I T I O N
+
+ NUMBER OF DIFFERENT SETS OF MATERIAL
+ AND CROSS-SECTIONAL  CONSTANTS  . . . .( NPAR(3) ) . . =    1
+
+  SET       YOUNG'S     CROSS-SECTIONAL     YIELD-STRESS     PLASTIC-MODULES
+ NUMBER     MODULUS          AREA
+               E              A             SIGMA-Y               K
+    1     0.10000E+12    0.100000E-05     0.10000E+08     0.10000E+11
+
+
+ E L E M E N T   I N F O R M A T I O N
+
+ ELEMENT     NODE     NODE       MATERIAL     HISTORY
+ NUMBER-N      I        J       SET NUMBER
+    1          1        2           1          0
+
+
+ TOTAL SYSTEM DATA
+
+     NUMBER OF EQUATIONS . . . . . . . . . . . . . .(NEQ) =     1
+     NUMBER OF MATRIX ELEMENTS . . . . . . . . . . .(NWK) =         1
+     MAXIMUM HALF BANDWIDTH  . . . . . . . . . . . .(MK ) =     1
+     MEAN HALF BANDWIDTH . . . . . . . . . . . . . .(MM ) =     1
+
+
+ LOAD CASE   1
+
+
+ D I S P L A C E M E N T S
+
+  NODE    X-DISPLACEMENT  Y-DISPLACEMENT  Z-DISPLACEMENT  X-ROTATION  Y-ROTATION  Z-ROTATION
+     1       0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+     2       0.100000E+01  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+
+
+ ELASTIC TRIAL SOLUTION  F O R  E L E M E N T  G R O U P    1
+
+  ELEMENT             FORCE            STRESS
+  NUMBER
+     1            0.100000E+06     0.100000E+12

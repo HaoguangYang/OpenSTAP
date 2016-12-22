@@ -68,5 +68,8 @@ module GLOBALS
    logical :: PARDISODOOR
    logical :: LOADANALYSIS
    logical :: DYNANALYSIS
+   
+   LOGICAL :: PLASTICTRIAL =  .TRUE.
+   LOGICAL :: PLASTICITERATION =  .FALSE.
 
 end module GLOBALS
