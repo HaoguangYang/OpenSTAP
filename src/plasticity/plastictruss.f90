@@ -1,3 +1,7 @@
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!             PLASTIC TRUSS SYSTEM                  !
+!                LIU CHANGWU                        !
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!    
 SUBROUTINE PLASTICTRUSS
 ! . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 ! .                                                                   .
@@ -70,7 +74,7 @@ SUBROUTINE PLASTICRUSS (ID,X,Y,Z,U,MHT,E,AREA,YIELDSTRESS,PLASTICK,HISTORY,LM,XY
 
   INTEGER :: NPAR1, NUME, NUMMAT, ND, I, J, L, N, Node(NPAR(2),NPAR(5))
   INTEGER :: MTYPE, IPRINT
-  REAL(8) :: XL2, XL, SQRT, XX, YY, STR, P
+  REAL(8) :: XL2, XL, SQRT, XX, YY, STR, P, MAXSTR
 
   NPAR1  = NPAR(1)
   NUME   = NPAR(2)
@@ -188,6 +192,8 @@ SUBROUTINE PLASTICRUSS (ID,X,Y,Z,U,MHT,E,AREA,YIELDSTRESS,PLASTICK,HISTORY,LM,XY
   ELSE IF (IND .EQ. 3) THEN
 
      IPRINT=0
+     MAXSTR=0
+     
      DO N=1,NUME
        
           
@@ -224,9 +230,16 @@ SUBROUTINE PLASTICRUSS (ID,X,Y,Z,U,MHT,E,AREA,YIELDSTRESS,PLASTICK,HISTORY,LM,XY
             IF (STR .GE. YIELDSTRESS(MTYPE)) THEN
                 PLASTICITERATION=.TRUE.
                 HISTORY(N)=1
+                
+                IF (STR .GT. MAXSTR) THEN
+                MAXSTR=STR
+                ENDIF
             ENDIF
+            
         ELSE
         ENDIF
+        
+        
 
         P=STR*AREA(MTYPE)
         
@@ -243,6 +256,13 @@ SUBROUTINE PLASTICRUSS (ID,X,Y,Z,U,MHT,E,AREA,YIELDSTRESS,PLASTICK,HISTORY,LM,XY
 !        GaussianCollection(:,N) = 0.5*(XYZ(4:6,N)+XYZ(1:3,N))
 !        StressCollection(1,N) = STR
      END DO
+     
+     IF ((PLASTICTRIAL) .AND. (PLASTICITERATION))THEN
+         
+         !CALL ITERATIONINIT(MAXSTR,YIELDSTRESS(MTYPE))
+         
+         PLASTICTRIAL=.FALSE.
+     ENDIF
 !>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>WORKING PROGRESS
 !     StressCollection(2,:) = 0D0
 !     call PostProcessor(NPAR(1), 1, XYZ, &
@@ -254,3 +274,14 @@ SUBROUTINE PLASTICRUSS (ID,X,Y,Z,U,MHT,E,AREA,YIELDSTRESS,PLASTICK,HISTORY,LM,XY
   END IF
 
 END SUBROUTINE PLASTICRUSS
+    
+!SUBROUTINE ITERATIONINIT(MAXSTR,YIELD)
+   
+!  USE GLOBALS
+
+!  IMPLICIT NONE
+!  REAL(4):: MAXSTR,YIELD
+  
+!  ITERATENUM = MAXSTR/YIELD*1000.0
+
+!ENDSUBROUTINE ITERATIONINIT

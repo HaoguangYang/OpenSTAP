@@ -67,28 +67,3 @@
  ELEMENT     NODE     NODE       MATERIAL     HISTORY
  NUMBER-N      I        J       SET NUMBER
     1          1        2           1          0
-
-
- TOTAL SYSTEM DATA
-
-     NUMBER OF EQUATIONS . . . . . . . . . . . . . .(NEQ) =     1
-     NUMBER OF MATRIX ELEMENTS . . . . . . . . . . .(NWK) =         1
-     MAXIMUM HALF BANDWIDTH  . . . . . . . . . . . .(MK ) =     1
-     MEAN HALF BANDWIDTH . . . . . . . . . . . . . .(MM ) =     1
-
-
- LOAD CASE   1
-
-
- D I S P L A C E M E N T S
-
-  NODE    X-DISPLACEMENT  Y-DISPLACEMENT  Z-DISPLACEMENT  X-ROTATION  Y-ROTATION  Z-ROTATION
-     1       0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
-     2       0.100000E+01  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
-
-
- ELASTIC TRIAL SOLUTION  F O R  E L E M E N T  G R O U P    1
-
-  ELEMENT             FORCE            STRESS
-  NUMBER
-     1            0.100000E+06     0.100000E+12
