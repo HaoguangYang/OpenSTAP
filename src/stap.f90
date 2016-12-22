@@ -177,13 +177,22 @@ IF (DYNANALYSIS .EQV. .TRUE.) call prepare_MassMatrix
      CALL SECOND (TIM(6))
   ELSE
      IND=2    ! Assemble structure stiffness matrix
+     WRITE(*,'("Begin assembling ")')
      CALL ASSEM (A(NP(11)))
-     
+     WRITE(*,'("End   assembling ")')
      CALL SECOND (TIM(4))
      IF (DYNANALYSIS .EQV. .TRUE.) CALL EIGENVAL (DA(NP(3)), DA(NP(10)), IA(NP(2)), NEQ, NWK, NEQ1, 2)
      if(pardisodoor) then
-        if (.not. DYNANALYSIS) call pardiso_crop(DA(NP(3)), IA(NP(2)), IA(NP(5)))          ! Condensing CSR format sparse matrix storage: deleting zeros
-     else
+        if (.not. DYNANALYSIS) then
+            WRITE(*,'("Begin cropping ")')
+            if(huge) then
+                call pardiso_crop(stff, IA(NP(2)), columns)
+            else
+                call pardiso_crop(DA(NP(3)), IA(NP(2)), IA(NP(5)))          ! Condensing CSR format sparse matrix storage: deleting zeros
+            end if
+            WRITE(*,'("End   cropping ")')
+        end if
+    else
         !    Triangularize stiffness matrix
         NEQ1=NEQ + 1
         CALL COLSOL (DA(NP(3)),DA(NP(4)),IA(NP(2)),NEQ,NWK,NEQ1,1)
@@ -200,7 +209,13 @@ IF (DYNANALYSIS .EQV. .TRUE.) call prepare_MassMatrix
             WRITE (IOUT,"(//,' TOTAL SYSTEM DATA',//,   &
                    '     NUMBER OF EQUATIONS',14(' .'),'(NEQ) = ',I10,/,   &
                    '     NUMBER OF MATRIX ELEMENTS',11(' .'),'(NWK) = ',I9)") NEQ,NWK
-            call pardiso_solver(DA(NP(3)),DA(NP(4)),IA(NP(2)), IA(NP(5)))
+            if(huge) then
+                call pardiso_solver(stff,DA(NP(4)),IA(NP(2)), columns)
+                deallocate(stff)
+                deallocate(columns)
+            else
+                call pardiso_solver(DA(NP(3)),DA(NP(4)),IA(NP(2)), IA(NP(5)))
+            end if
         else
 !       Solve the equilibrium equations to calculate the displacements
             IF (LOADANALYSIS .EQV. .TRUE.) CALL COLSOL (DA(NP(3)),DA(NP(4)),IA(NP(2)),NEQ,NWK,NEQ1,2)

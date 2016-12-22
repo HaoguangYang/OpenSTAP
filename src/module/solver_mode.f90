@@ -98,7 +98,7 @@ end subroutine bdopt
     
 subroutine pardiso_input(ID)
     USE vector_CLASS
-    USE GLOBALS, ONLY : IIN, IOUT, NEQ, NUMNP, NWK, pardisodoor, TIM
+    USE GLOBALS, ONLY : IIN, IOUT, NEQ, NUMNP, NWK, pardisodoor, TIM, huge
     USE MEMALLOCATE
     
     implicit none
@@ -162,12 +162,29 @@ subroutine pardiso_input(ID)
      WRITE(*,'("End create vectors ")')
      CALL SECOND (TIM(2))
      ! 注意这里分配了rowIndex
+     WRITE(*,'("Begin calculating rowIndex ")')
      CALL MEMALLOC(2,"rowIndex",NEQ+1,1)
      CALL assign_rowIndex(vectors, IA(NP(2)))
-     CALL MEMALLOC(3,"STFF ",NWK,ITWO)
-     CALL MEMALLOC(4,"R    ",NEQ,ITWO)
-     CALL MEMALLOC(5,"columns",NWK,1)
-     CALL assign_columns(vectors, IA(NP(5)))
+     WRITE(*,'("End calculating rowIndex ")')
+     if( MTOT < nplast + nwk*2 + neq) then ! Job-4
+         huge = .true.
+     end if
+     WRITE(*,'("Begin calculating columns ")')
+     if(huge) then
+        CALL MEMALLOC(3,"STFF ",1,ITWO)
+        CALL MEMALLOC(4,"R    ",NEQ,ITWO)
+        CALL MEMALLOC(5,"columns",1,1)
+        allocate(stff(nwk))
+        allocate(columns(nwk))
+        CALL assign_columns(vectors, columns)
+     else
+         !huge = .false.
+        CALL MEMALLOC(3,"STFF ",NWK,ITWO)
+        CALL MEMALLOC(4,"R    ",NEQ,ITWO)
+        CALL MEMALLOC(5,"columns",NWK,1)
+        CALL assign_columns(vectors, IA(NP(5)))
+     end if
+     WRITE(*,'("End calculating columns ")')
      WRITE(*,'("Begin delete vectors ")')
      do i = 1, neq
          call delete(vectors(i))

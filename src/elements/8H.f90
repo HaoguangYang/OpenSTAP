@@ -199,7 +199,11 @@ subroutine HexEight (ID,X,Y,Z,U,MHT,E, PoissonRatio, Density, Gravity, LM, Posit
             !write(*,*) "S",S
             
             if(pardisodoor) then
-                call pardiso_addban(DA(NP(3)),IA(NP(2)),IA(NP(5)),S,LM(:,N),ND)
+                if(huge) then
+                    call pardiso_addban(stff,IA(NP(2)),columns,S,LM(1,N),ND)
+                else
+                    call pardiso_addban(DA(NP(3)),IA(NP(2)),IA(NP(5)),S,LM(1,N),ND)
+                end if
             else
                 CALL ADDBAN (DA(NP(3)),IA(NP(2)),S,LM(:,N),ND)
             end if

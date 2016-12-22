@@ -54,7 +54,7 @@ module GLOBALS
    
    integer :: MODEX		! Solution mode: 0 - data check only;  1 -  execution                                   
 
-   integer(8) :: TIM(10)		! Timing information
+   integer :: TIM(10)		! Timing information
    character*80 :: HED	! Master heading information for use in labeling the output
 
    integer :: NFIRST
@@ -68,5 +68,5 @@ module GLOBALS
    logical :: PARDISODOOR
    logical :: LOADANALYSIS
    logical :: DYNANALYSIS
-
+   logical :: HUGE = .true.
 end module GLOBALS
