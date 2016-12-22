@@ -21,7 +21,7 @@
 
 module memAllocate
 
-   integer, parameter :: MTOT = 151200000  ! Speed storage available for execution
+   integer, parameter :: MTOT = 300000000  ! Speed storage available for execution
    integer, parameter :: ITWO = 2      ! Double precision indicator
                                         !   1 - Single precision arithmetic
                                         !   2 - Double precision arithmetic
@@ -31,7 +31,7 @@ module memAllocate
 
    equivalence (A,IA), (A,DA)  ! A, DA, and IA share the same storage units
 
-   integer, parameter :: amax = 200    ! Maximum number of arrays allowed
+   integer, parameter :: amax = 20    ! Maximum number of arrays allowed
 
    integer :: np(amax) = 0    ! Pointer to each array
    integer :: alen(amax) = 0  ! Length of each array
@@ -40,7 +40,6 @@ module memAllocate
 
    integer :: nplast = 0      ! Pointer to the last allocated element in A
                                ! nplast is in the unit of single precision
-
 contains
 
    subroutine memalloc(num, name, len, prec)
@@ -223,7 +222,7 @@ contains
       character*8 dtype(3)
       data dtype/"integer","real","double"/
 
-      write(*,'("Contents of storage starting from ", I5, " in ", A8, ":")') ptr, dtype(atype+1)
+      write(*,'("Contents of storage starting from ", I10, " in ", A8, ":")') ptr, dtype(atype+1)
       if (atype == 0) then
          write(*,'(8I10)') (IA(i), i=ptr,ptr+len-1)
       else if (atype == 1) then

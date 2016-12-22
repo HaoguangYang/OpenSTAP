@@ -99,25 +99,25 @@ subroutine HexEight (ID,X,Y,Z,U,MHT,E, PoissonRatio, Density, Gravity, LM, Posit
     SELECT CASE (IND)
     CASE(1)
         WRITE (IOUT,"(' E L E M E N T   D E F I N I T I O N',//,  &
-                   ' ELEMENT TYPE ',13(' .'),'( NPAR(1) ) . . =',I5,/,   &
+                   ' ELEMENT TYPE ',13(' .'),'( NPAR(1) ) . . =',I10,/,   &
                    '     EQ.1, TRUSS ELEMENTS',/,       &
                    '     EQ.2, 2D TRIANGLE',/,          &
                    '     EQ.3, 2D QUADRANGLE',/,        &
                    '     EQ.4, 3D HEXAHEDRAL',//,       &
-                   ' NUMBER OF ELEMENTS.',10(' .'),'( NPAR(2) ) . . =',I5,/)") ElementType, NumberOfElements
+                   ' NUMBER OF ELEMENTS.',10(' .'),'( NPAR(2) ) . . =',I10,/)") ElementType, NumberOfElements
         IF (NumberOfMaterials.EQ.0) NumberOfMaterials=1
         WRITE (IOUT,"(' M A T E R I A L   D E F I N I T I O N',//,  &
                    ' NUMBER OF DIFFERENT SETS OF MATERIAL',/,  &
                    ' AND CROSS-SECTIONAL  CONSTANTS ',         &
-                   4 (' .'),'( NPAR(3) ) . . =',I5,/)") NumberOfMaterials
+                   4 (' .'),'( NPAR(3) ) . . =',I10,/)") NumberOfMaterials
         
         WRITE (IOUT,"('  SET       YOUNG''S    POISSON',/,  & 
                             ' NUMBER     MODULUS      RATIO',/,  &
                    15 X,'E', 12 X, 'v')")
 
         DO I=1,NumberOfMaterials
-            READ (IIN,'(I5,2F10.0)') N,E(N), PoissonRatio(N)      ! Read material information for 3D Homogeneous
-            WRITE (IOUT,"(I5,4X,E12.5,2X,E14.6)") N,E(N), PoissonRatio(N)
+            READ (IIN,'(I10,2F10.0)') N,E(N), PoissonRatio(N)      ! Read material information for 3D Homogeneous
+            WRITE (IOUT,"(I10,4X,E12.5,2X,E14.6)") N,E(N), PoissonRatio(N)
         END DO
         WRITE (IOUT,"(//,' E L E M E N T   I N F O R M A T I O N',//,  &
                       ' ELEMENT        |------------------------- NODES -------------------------|       MATERIAL',/,   &
@@ -127,7 +127,7 @@ subroutine HexEight (ID,X,Y,Z,U,MHT,E, PoissonRatio, Density, Gravity, LM, Posit
         CALL GaussianMask(GaussianPts, W, QuadratureOrder)
         
         DO WHILE (N .NE. NumberOfElements)
-            READ (IIN,'(11I5)') N,Node(N,1:NPAR(5)),MaterialType          ! Read in element information
+            READ (IIN,'(11I10)') N,Node(N,1:NPAR(5)),MaterialType          ! Read in element information
     !       Save element information
             PositionData(1:ElementShapeNodes*3-1:3,N)=X(Node(N,:))        ! Coordinates of the element's nodes
             PositionData(2:ElementShapeNodes*3  :3,N)=Y(Node(N,:))
@@ -143,8 +143,8 @@ subroutine HexEight (ID,X,Y,Z,U,MHT,E, PoissonRatio, Density, Gravity, LM, Posit
             END DO
             
             
-            CALL COLHT (MHT,ND,LM(:,N))
-            WRITE (IOUT,"(I7,5X,7(I7,1X),I7,4X,I5)") N,Node(N,1:ElementShapeNodes),MaterialType
+            if (.NOT. PARDISODOOR) CALL COLHT (MHT,ND,LM(:,N))
+            WRITE (IOUT,"(I7,5X,7(I7,1X),I7,4X,I10)") N,Node(N,1:ElementShapeNodes),MaterialType
             
             !write (IOUT,*) 'MHT',MHT
             write (VTKNodeTmp) NPAR(5), Node(N,:)-1

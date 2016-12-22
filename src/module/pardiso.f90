@@ -30,28 +30,36 @@ subroutine pardiso_crop(A, rowIndex, columns)
   IMPLICIT NONE
   REAL(8) :: A(NWK),S(ND,ND)
   INTEGER :: rowIndex(NEQ+1),columns(nwk), LM(ND)
-  INTEGER :: ND, I, J, II, JJ, k, KK, tempJ
+  INTEGER :: ND, I, J, II, JJ, k, KK, KKK, tempJ
   DO J=1,ND
      JJ=LM(J)
      IF (JJ .GT. 0) THEN
         DO I=J,ND
            II=LM(I)
            IF (II .GT. 0) THEN
-              IF (JJ .GT. II) THEN ! 如果JJ > II
-                 loop1: do k = rowIndex(II), rowIndex(II+1)-1
-                    if(columns(k) .EQ. JJ) then
+              !IF (JJ .GT. II) THEN ! 如果JJ > II
+              !   loop1: do k = rowIndex(II), rowIndex(II+1)-1
+              !      if(columns(k) .EQ. JJ) then
+              !          A(k) = A(k) + S(I,J)
+              !          exit loop1
+              !      end if
+              !  end do loop1
+              !else ! 如果II < JJ
+              !    loop2: do k = rowIndex(JJ), rowIndex(JJ+1)-1
+              !      if(columns(k) .EQ. II) then
+              !          A(k) = A(k) + S(I,J)
+              !          exit loop2
+              !      end if
+              !  end do loop2                  
+              !END IF
+              KK = min(II,JJ)
+              KKK = max(II,JJ)
+              loop: do k = rowIndex(KK), rowIndex(KK+1)-1
+                  if (columns(k) .EQ. KKK) then
                         A(k) = A(k) + S(I,J)
-                        exit loop1
+                        exit loop
                     end if
-                end do loop1
-              else ! 如果II < JJ
-                  loop2: do k = rowIndex(JJ), rowIndex(JJ+1)-1
-                    if(columns(k) .EQ. II) then
-                        A(k) = A(k) + S(I,J)
-                        exit loop2
-                    end if
-                end do loop2                  
-              END IF              
+              end do loop              
            END IF
         END DO
      END IF
@@ -62,7 +70,7 @@ end subroutine
 
 subroutine pardiso_solver(K,V, rowIndex, columns)
 USE mkl_pardiso
-USE GLOBALS, only : neq, nwk, tim
+USE GLOBALS, only : neq, nwk, tim, IOUT
 IMPLICIT NONE
 !.. Internal solver memory pointer 
 TYPE(MKL_PARDISO_HANDLE)  :: pt(64)
@@ -93,6 +101,7 @@ iparm(14) = 0 ! Output: number of perturbed pivots
 iparm(18) = -1 ! Output: number of nonzeros in the factor LU
 iparm(19) = -1 ! Output: Mflops for LU factorization
 iparm(20) = 0 ! Output: Numbers of CG Iterations
+iparm(60) = 1 ! Whether to use out-of-core storage
 
 error  = 0 ! initialize error flag
 msglvl = 1 ! print statistical information
@@ -154,9 +163,8 @@ V = x
 phase = -1 ! release internal memory
 CALL pardiso (pt, maxfct, mnum, mtype, phase, neq, ddum, idum, idum, &
               idum, nrhs, iparm, msglvl, ddum, ddum, error1)
-
 IF (error1 /= 0) THEN
-   WRITE(*,*) 'The following ERROR on release stage was detected: ', error1
+   WRITE(IOUT,*) 'The following ERROR on release stage was detected: ', error1, error
    STOP 1
 ENDIF
 

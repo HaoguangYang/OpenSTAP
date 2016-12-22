@@ -18,15 +18,16 @@ subroutine bdopt(ID)
     DO I = 1,NUMNP
         DO J = 1,6
             IF(ID(J,I) .NE. 0) THEN
-                CALL SET(lists(ID(J,I)), I, J)
+                !CALL SET(lists(ID(J,I)), I, J)
             END IF
         END DO
     END DO
     ! input phase
-     READ (IIN,"(I5)") NUME ! 总element数
+
+     READ (IIN,"(I10)") NUME ! 总element数
      DO I = 1,NUME
-         READ (IIN,"(I5)") N ! 这个element对应的节点数
-         READ (IIN, "(8I5)") (TEMP_NODE(J), J = 1,N)
+         READ (IIN,"(I10)") N ! 这个element对应的节点数
+         READ (IIN, "(8I10)") (TEMP_NODE(J), J = 1,N)
          FREE_DOF = 0
          DO J = 1,N
              DO K = 1,6
@@ -54,7 +55,7 @@ subroutine bdopt(ID)
                 TEMP_INDEX = I
             END IF
         END DO
-        ID(lists(TEMP_INDEX)%column_, lists(TEMP_INDEX)%row_) = ID_NEW
+        !ID(lists(TEMP_INDEX)%column_, lists(TEMP_INDEX)%row_) = ID_NEW
         ID_NEW = ID_NEW + 1
         ! 后续的搜索循环
         p_node => lists(temp_index)%head_
@@ -74,7 +75,7 @@ subroutine bdopt(ID)
                   end if
              end if
            end do
-           id(lists(temp_index)%column_, lists(temp_index)%row_) = id_new
+           !id(lists(temp_index)%column_, lists(temp_index)%row_) = id_new
            id_new = id_new+1
            p_node => lists(temp_index)%head_
            do while(associated(p_node))
@@ -88,7 +89,7 @@ subroutine bdopt(ID)
         ! Write equation numbers
         WRITE (IOUT,"(//,' EQUATION NUMBERS',//,'   NODE',9X,  &
                      'DEGREES OF FREEDOM',/,'  NUMBER',/,  &
-                     '     N',13X,'X    Y    Z   RX   RY   RZ',/,(1X,I5,9X,6I5))") (N,(ID(I,N),I=1,6),N=1,NUMNP)
+                     '     N',13X,'X    Y    Z   RX   RY   RZ',/,(1X,I10,9X,6I10))") (N,(ID(I,N),I=1,6),N=1,NUMNP)
      !  清空list，释放内存
      do i = 1, neq
          call delete_all(lists(i))
@@ -96,14 +97,12 @@ subroutine bdopt(ID)
 end subroutine bdopt
     
 subroutine pardiso_input(ID)
-    USE LIST_CLASS
-    USE NODE_CLASS
+    USE vector_CLASS
     USE GLOBALS, ONLY : IIN, IOUT, NEQ, NUMNP, NWK, pardisodoor, TIM
     USE MEMALLOCATE
     
     implicit none
-    TYPE(LIST) :: LISTS(NEQ)
-    TYPE(NODE), POINTER :: P_NODE
+    TYPE(vector) :: vectors(NEQ)
     INTEGER :: ID(6, NUMNP), ID_NEW
     INTEGER :: NUME ! 全部总共的节点个数
     INTEGER :: N    ! 节点中的函数
@@ -113,88 +112,101 @@ subroutine pardiso_input(ID)
     INTEGER :: temp_length, TEMP_INDEX
     INTEGER :: FREE_DOF ! 单元中自由的自由度
     ! input phase
-     READ (IIN,"(I5)") NUME ! 总element数
+     READ (IIN,"(I10)") NUME ! 总element数
      ! 为了节省空间，这里用sign_表示序号好了
-     DO i = 1,NEQ
-         lists(i)%sign_ = i
-     end do
+     WRITE(*,'("Begin create vectors ")')
      DO I = 1,NUME
-         READ (IIN,"(I5)") N ! 这个element对应的节点数
-         READ (IIN, "(<N>I5)") (TEMP_NODE(J), J = 1,N)
+         READ (IIN,"(I10)") N ! 这个element对应的节点数
+         READ (IIN, "(<N>I10)") (TEMP_NODE(J), J = 1,N)
+         FREE_DOF = 0
+         ! 首先确认vector的长度
+         DO J = 1,N
+             DO K = 1,6
+                 if(ID(K, TEMP_NODE(J)) .ne. 0) then
+                     select case(N)
+                     case(2)
+                        vectors(ID(K, TEMP_NODE(J)))%length_ = vectors(ID(K, TEMP_NODE(J)))%length_+11
+                     case(4)
+                        vectors(ID(K, TEMP_NODE(J)))%length_ = vectors(ID(K, TEMP_NODE(J)))%length_+19
+                     case(8)
+                        vectors(ID(K, TEMP_NODE(J)))%length_ = vectors(ID(K, TEMP_NODE(J)))%length_+23
+                    end select
+                 end if
+             END DO
+        END DO
+     END DO
+    WRITE(*,'("Begin allocate vectors ")')
+    do i = 1,neq
+        call set(vectors(i), i)
+    end do
+    WRITE(*,'("End allocate vectors ")')
+    ! 向vector中加入节点
+     DO I = 1,NUME
+         READ (IIN,"(I10)") N ! 这个element对应的节点数
+         READ (IIN, "(<N>I10)") (TEMP_NODE(J), J = 1,N)
          FREE_DOF = 0
          DO J = 1,N
              DO K = 1,6
-                 IF (ID(K, TEMP_NODE(J)) .NE. 0) THEN
                      FREE_DOF = FREE_DOF + 1
                      TEMP_ID(FREE_DOF) = ID(K, TEMP_NODE(J))
-                 END IF
              END DO
          END DO
          DO K = 1, FREE_DOF
              DO J = 1, FREE_DOF
-                 CALL NEW(P_NODE, TEMP_ID(J))
-                 if( (K.eq.1) .and. (I.eq.55) ) then
-                     ID_new = K
-                 end if
-                 call ADD_WITH_SORT(lists(TEMP_ID(K)), P_NODE)
+                 if((temp_id(K) .ne. 0).and.(temp_id(J) .ne. 0)) then
+                    call add(vectors(TEMP_ID(K)), temp_id(j))
+                end if
              END DO
          END DO
-     END DO
+     END DO    
+     WRITE(*,'("End create vectors ")')
      CALL SECOND (TIM(2))
      ! 注意这里分配了rowIndex
      CALL MEMALLOC(2,"rowIndex",NEQ+1,1)
-     CALL assign_rowIndex(lists, IA(NP(2)))
+     CALL assign_rowIndex(vectors, IA(NP(2)))
      CALL MEMALLOC(3,"STFF ",NWK,ITWO)
      CALL MEMALLOC(4,"R    ",NEQ,ITWO)
      CALL MEMALLOC(5,"columns",NWK,1)
-     CALL assign_columns(lists, IA(NP(5)))
+     CALL assign_columns(vectors, IA(NP(5)))
+     WRITE(*,'("Begin delete lists ")')
      do i = 1, neq
-         call delete_all(lists(i))
+         call delete(vectors(i))
      end do
+     WRITE(*,'("End delete lists ")')
     end subroutine pardiso_input
 
-subroutine assign_rowIndex(lists, rowIndex)
+subroutine assign_rowIndex(vectors, rowIndex)
     use GLOBALS, only : neq, nwk
-    use list_class
-    use node_class
+    use vector_class
     
     implicit none
-    type(list) :: lists(neq)
+    type(vector) :: vectors(neq)
     integer :: rowIndex(neq+1)
-    type(node), pointer :: p_node
     integer :: i, j
     
     nwk = 0
     do i=1, neq
         rowIndex(i) = 1 + nwk
-        nwk = nwk + lists(i)%length_
+        nwk = nwk + vectors(i)%length_real_
     end do
     rowIndex(neq+1) = nwk+1
     end subroutine assign_rowIndex
     
-subroutine assign_columns(lists, columns)
+subroutine assign_columns(vectors, columns)
     use GLOBALS, only : neq, nwk
-    use list_class
-    use node_class
+    use vector_class
     
     implicit none
-    type(list) :: lists(neq)
+    type(vector) :: vectors(neq)
     integer :: columns(nwk)
-    type(node), pointer :: p_node
-    integer :: i, j
+    integer :: i, j, k
     
-    j = 1
+    k = 1
     do i = 1, neq
-        p_node => lists(i)%head_
-        do while(associated(p_node))
-            columns(j) = p_node%index_
-            p_node => p_node%next_
-            j = j + 1
-            if( j == nwk+1) then
-                j = j-1
-                exit
-            end if
+        do j = 1, vectors(i)%length_real_
+            columns(k) = vectors(i)%nodes_(j)
+            k = k+1
         end do
     end do
-    end subroutine assign_columns
+end subroutine assign_columns
     

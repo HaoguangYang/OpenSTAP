@@ -95,26 +95,26 @@ SUBROUTINE BEAMELE (ID,X,Y,Z,U,MHT,E,G,AREA,I_X,I_Y,I_Z,J_X,J_Y,J_Z,LM,XYZ,MATP,
   IF (IND .EQ. 1) THEN
 
      WRITE (IOUT,"(' E L E M E N T   D E F I N I T I O N',//,  &
-                   ' ELEMENT TYPE ',13(' .'),'( NPAR(1) ) . . =',I5,/,   &
+                   ' ELEMENT TYPE ',13(' .'),'( NPAR(1) ) . . =',I10,/,   &
                    '     EQ.1, TRUSS ELEMENTS',/,      &
                    '     EQ.2, ELEMENTS CURRENTLY',/,  &
                    '     EQ.5, 3D BEAM',//,      &
-                   ' NUMBER OF ELEMENTS.',10(' .'),'( NPAR(2) ) . . =',I5,/)") NPAR1,NUME
+                   ' NUMBER OF ELEMENTS.',10(' .'),'( NPAR(2) ) . . =',I10,/)") NPAR1,NUME
 
      IF (NUMMAT.EQ.0) NUMMAT=1
 
      WRITE (IOUT,"(' M A T E R I A L   D E F I N I T I O N',//,  &
                    ' NUMBER OF DIFFERENT SETS OF MATERIAL',/,  &
                    ' AND CROSS-SECTIONAL  CONSTANTS ',         &
-                   4 (' .'),'( NPAR(3) ) . . =',I5,/)") NUMMAT
+                   4 (' .'),'( NPAR(3) ) . . =',I10,/)") NUMMAT
 
      WRITE (IOUT,"('  SET       YOUNG''S     SHEARING     AREA     I_X     I_Y     I_Z     J_X     J_Y     J_Z',/,  &
                    ' NUMBER     MODULUS',10X,'MODULUS',/,  &
                    15 X,'E',14X,'A')")
 
      DO I=1,NUMMAT
-        READ (IIN,'(I5,9F10.0)') N,E(N),G(N),AREA(N),I_X(N),I_Y(N),I_Z(N),J_X(N),J_Y(N),J_Z(N)  ! Read material information
-        WRITE (IOUT,"(I5,1X,E12.5,1X,E12.5,1X,E12.5,1X,E12.5,1X,E12.5,1X, E12.5,1X,E12.5, 1X,E12.5,1X,E12.5)") &
+        READ (IIN,'(I10,9F10.0)') N,E(N),G(N),AREA(N),I_X(N),I_Y(N),I_Z(N),J_X(N),J_Y(N),J_Z(N)  ! Read material information
+        WRITE (IOUT,"(I10,1X,E12.5,1X,E12.5,1X,E12.5,1X,E12.5,1X,E12.5,1X, E12.5,1X,E12.5, 1X,E12.5,1X,E12.5)") &
         N,E(N),G(N),AREA(N),I_X(N),I_Y(N),I_Z(N),J_X(N),J_Y(N),J_Z(N)
      END DO
 
@@ -124,7 +124,7 @@ SUBROUTINE BEAMELE (ID,X,Y,Z,U,MHT,E,G,AREA,I_X,I_Y,I_Z,J_X,J_Y,J_Z,LM,XYZ,MATP,
 
      N=0
      DO WHILE (N .NE. NUME)
-        READ (IIN,'(5I5)') N,Node(N,1:NPAR(5)),MTYPE  ! Read in element information
+        READ (IIN,'(5I10)') N,Node(N,1:NPAR(5)),MTYPE  ! Read in element information
 
 !       Save element information
         XYZ(1:NPAR(5)*3-1:3,N)=X(Node(N,:))  ! Coordinates of the element's nodes
@@ -143,9 +143,9 @@ SUBROUTINE BEAMELE (ID,X,Y,Z,U,MHT,E,G,AREA,I_X,I_Y,I_Z,J_X,J_Y,J_Z,LM,XYZ,MATP,
         END DO
 
 !       Update column heights and bandwidth
-        CALL COLHT (MHT,ND,LM(1,N))   
+        if (.NOT. PARDISODOOR) CALL COLHT (MHT,ND,LM(1,N))   
 
-        WRITE (IOUT,"(I5,6X,I5,4X,I5,7X,I5)") N,Node(N,1:NPAR(5)),MTYPE
+        WRITE (IOUT,"(I10,6X,I10,4X,I10,7X,I10)") N,Node(N,1:NPAR(5)),MTYPE
         write (VTKNodeTmp) NPAR(5), Node(N,:)-1
 
      END DO
@@ -406,11 +406,11 @@ SUBROUTINE BEAMELE (ID,X,Y,Z,U,MHT,E,G,AREA,I_X,I_Y,I_Z,J_X,J_Y,J_Z,LM,XYZ,MATP,
         
        !PRINT THE RESULTS FOR POSTPROCESSING
        
-       WRITE (IOUT,"(1X,I5,1X,12(E12.6,1X))") N,(FORCE(I),I=1,12)
+       WRITE (IOUT,"(1X,I10,1X,12(E12.6,1X))") N,(FORCE(I),I=1,12)
        GaussianCollection(:,N) = 0.5*(XYZ(4:6,N)+XYZ(1:3,N))
        StressCollection((/1,2,3,5,6,4/),N) = 0.5*(FORCE(7:12)-FORCE(1:6))
      END DO
-     call PostProcessor(NPAR(1), 3, XYZ, &
+     call PostProcessor(NPAR(1), 1, XYZ, &
                         Node, 1, GaussianCollection, StressCollection, U)
   ELSE 
      STOP "*** ERROR *** Invalid IND value."

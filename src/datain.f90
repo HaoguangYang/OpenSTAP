@@ -38,7 +38,7 @@ SUBROUTINE INPUT (ID,X,Y,Z,NUMNP,NEQ)
 
   N = 0
   DO WHILE (N.NE.NUMNP)
-     READ (IIN,"(7I5,3F10.0,I5)") N,(ID(I,N),I=1,6),X(N),Y(N),Z(N)
+     READ (IIN,"(I10,6I10,3F10.0,I10)") N,(ID(I,N),I=1,6),X(N),Y(N),Z(N)
   END DO
 
 ! Write complete nodal data
@@ -50,7 +50,7 @@ SUBROUTINE INPUT (ID,X,Y,Z,NUMNP,NEQ)
                 'X    Y    Z   RX   RY   RZ',15X,'X',12X,'Y',12X,'Z')")
 
   DO N=1,NUMNP
-     WRITE (IOUT,"(I5,6X,6I5,1X,3F13.3)") N,(ID(I,N),I=1,6),X(N),Y(N),Z(N)
+     WRITE (IOUT,"(I10,6X,6I10,1X,3F13.3)") N,(ID(I,N),I=1,6),X(N),Y(N),Z(N)
   END DO
 
 ! Number unknowns
@@ -69,7 +69,7 @@ SUBROUTINE INPUT (ID,X,Y,Z,NUMNP,NEQ)
 ! Write equation numbers
   WRITE (IOUT,"(//,' EQUATION NUMBERS',//,'   NODE',9X,  &
                    'DEGREES OF FREEDOM',/,'  NUMBER',/,  &
-                   '     N',13X,'X    Y    Z   RX   RY   RZ',/,(1X,I5,9X,6I5))") (N,(ID(I,N),I=1,6),N=1,NUMNP)
+                   '     N',13X,'X    Y    Z   RX   RY   RZ',/,(1X,I10,9X,6I10))") (N,(ID(I,N),I=1,6),N=1,NUMNP)
 
 ! Add bandwidth optimization and pardiso
 ! *******Adding those two function need extra input
@@ -98,9 +98,9 @@ SUBROUTINE LOADS (R,NOD,IDIRN,FLOAD,ID,NLOAD,NEQ)
 
   WRITE (IOUT,"(/,'    NODE       DIRECTION      LOAD',/, '   NUMBER',19X,'MAGNITUDE')")
 
-  READ (IIN,"(2I5,F10.0)") (NOD(I),IDIRN(I),FLOAD(I),I=1,NLOAD)
+  READ (IIN,"(I10,I10,F10.0)") (NOD(I),IDIRN(I),FLOAD(I),I=1,NLOAD)
 
-  WRITE (IOUT,"(' ',I6,9X,I4,7X,E12.5)") (NOD(I),IDIRN(I),FLOAD(I),I=1,NLOAD)
+  WRITE (IOUT,"(' ',I10,9X,I10,7X,E12.5)") (NOD(I),IDIRN(I),FLOAD(I),I=1,NLOAD)
 
   IF (MODEX.EQ.0) RETURN
 

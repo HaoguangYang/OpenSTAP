@@ -4,17 +4,17 @@ module list_class
 private
     
     type list
-        integer :: row_    = 0
-        integer :: column_ = 0
+        !integer :: row_    = 0 !如果用半带宽需要打开
+        !integer :: column_ = 0
         integer :: length_ = 0
         integer :: sign_ = 0
         type(node), pointer :: head_ => null()
         type(node), pointer :: tail_ => null()
     end type list
     
-    interface set
-        module procedure set_this
-    end interface
+    !interface set
+    !    module procedure set_this
+    !end interface
     
     interface search
         module procedure search_this
@@ -32,26 +32,17 @@ private
         module procedure delete_all_this
     end interface
     
-    public node, list, add, search, add_with_search, delete, set, delete_all, add_with_sort
+    public node, list, add, search, add_with_search, delete, delete_all, add_with_sort !,set
 
-    contains
-    !new a node
-    subroutine new_this(this, index)
-        type(node) , pointer:: this
-        integer    :: index
-        integer(4) :: err
-        allocate(this, stat = err)
-        this%index_ = index
-    end subroutine new_this
-    
+    contains   
     ! set the row and colum for the list
-    subroutine set_this(this, row, column)
-        type(list) :: this
-        integer :: row
-        integer :: column
-        this%row_ = row
-        this%column_ = column
-    end subroutine set_this
+    !subroutine set_this(this, row, column)
+    !    type(list) :: this
+    !    integer :: row
+    !    integer :: column
+    !    this%row_ = row
+    !    this%column_ = column
+    !end subroutine set_this
 
     ! search for p_node0
     logical function search_this(this, p_node0)
@@ -180,8 +171,8 @@ private
                         nullify(p_node%next_%prev_)
                     else
                         ! 原链表中只有一个节点
-                        nullify(this%head_)
-                        nullify(this%tail_)
+                        deallocate(this%head_)
+                        deallocate(this%tail_)
                     end if
                 else ! 不是头节点
                     if(associated(p_node%next_)) then
@@ -193,7 +184,8 @@ private
                     end if
                 end if
                 this%length_ = this%length_ - 1
-                
+                deallocate(p_node%prev_, stat = err)
+                deallocate(p_node%next_, stat = err)
                 deallocate(p_node, stat = err)
                 if(err .ne. 0) stop 'Fail to delete this node'
                 exit
