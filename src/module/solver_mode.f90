@@ -168,11 +168,11 @@ subroutine pardiso_input(ID)
      CALL MEMALLOC(4,"R    ",NEQ,ITWO)
      CALL MEMALLOC(5,"columns",NWK,1)
      CALL assign_columns(vectors, IA(NP(5)))
-     WRITE(*,'("Begin delete lists ")')
+     WRITE(*,'("Begin delete vectors ")')
      do i = 1, neq
          call delete(vectors(i))
      end do
-     WRITE(*,'("End delete lists ")')
+     WRITE(*,'("End delete vectors ")')
     end subroutine pardiso_input
 
 subroutine assign_rowIndex(vectors, rowIndex)
@@ -209,4 +209,3 @@ subroutine assign_columns(vectors, columns)
         end do
     end do
 end subroutine assign_columns
-    

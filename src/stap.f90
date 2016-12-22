@@ -225,13 +225,13 @@ IF (DYNANALYSIS .EQV. .TRUE.) call prepare_MassMatrix
      TT=TT + TIM(I)
   END DO
   TT = TT - TIM(1)
-  WRITE (IOUT,"(//,  &
+  WRITE (*,"(//,  &
      ' S O L U T I O N   T I M E   L O G   I N   S E C',//,   &
      '     TIME FOR INPUT PHASE ',14(' .'),' =',I10,/,     &
      '     TIME FOR PREPARATION OF MATRIX FORMAT ... . . . . =',I10,/,     &
-     '     TIME FOR CALCULATION OF STIFFNESS MATRIX  . . . . =',I10, /,   &
+     '     TIME FOR ASSEMBLING  . ...................... . . =',I10, /,   &
      '     TIME FOR FACTORIZATION OF STIFFNESS MATRIX  . . . =',I10, /,   &
-     '     TIME FOR LOAD CASE SOLUTIONS ',10(' .'),' =',I10,//,   &
+     '     TIME FOR LOAD CASE SOLUTIONS ',10(' .'),' =',I10,/,   &
      '     TIME FOR CALCLUATE STRESS',12(' .'),' =',I10,//,   &
      'T O T A L   S O L U T I O N   T I M E  . . . . . . . . =',I10)") (TIM(I),I=1,6),TT
 
@@ -239,7 +239,7 @@ IF (DYNANALYSIS .EQV. .TRUE.) call prepare_MassMatrix
      ' S O L U T I O N   T I M E   L O G   I N   S E C',//,   &
      '     TIME FOR INPUT PHASE ',14(' .'),' =',I10,/,     &
      '     TIME FOR PREPARATION OF MATRIX FORMAT ... . . . . =',I10,/,     &
-     '     TIME FOR CALCULATION OF STIFFNESS MATRIX  . . . . =',I10, /,   &
+     '     TIME FOR ASSEMBLING  . ...................... . . =',I10, /,   &
      '     TIME FOR FACTORIZATION OF STIFFNESS MATRIX  . . . =',I10, /,   &
      '     TIME FOR LOAD CASE SOLUTIONS ',10(' .'),' =',I10,/,   &
      '     TIME FOR CALCLUATE STRESS',12(' .'),' =',I10,//,   &
@@ -262,7 +262,7 @@ SUBROUTINE SECOND (TIM)
   integer*4 values(8)
   integer :: TIM
   call DATE_AND_TIME(date, time, zone, values)
-  TIM = values(7)*1000+values(8)+values(6)*60
+  TIM = values(7)*1000+values(8)+values(6)*60000
 ! This is a Fortran 95 intrinsic subroutine
 ! Returns the processor time in seconds
 

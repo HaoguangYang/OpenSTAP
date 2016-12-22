@@ -101,7 +101,7 @@ iparm(14) = 0 ! Output: number of perturbed pivots
 iparm(18) = -1 ! Output: number of nonzeros in the factor LU
 iparm(19) = -1 ! Output: Mflops for LU factorization
 iparm(20) = 0 ! Output: Numbers of CG Iterations
-iparm(60) = 1 ! Whether to use out-of-core storage
+iparm(60) = 0 ! Whether to use out-of-core storage
 
 error  = 0 ! initialize error flag
 msglvl = 1 ! print statistical information
@@ -116,42 +116,6 @@ DO i = 1, 64
    pt(i)%DUMMY =  0 
 END DO
 
-!.. Reordering and Symbolic Factorization, This step also allocates
-! all memory that is necessary for the factorization
-
-!phase = 11 ! only reordering and symbolic factorization
-
-!CALL pardiso (pt, maxfct, mnum, mtype, phase, neq, K, rowIndex, columns, &
-!              idum, nrhs, iparm, msglvl, ddum, ddum, error)
-    
-!WRITE(*,*) 'Reordering completed ... '
-!IF (error /= 0) THEN
-!   WRITE(*,*) 'The following ERROR was detected: ', error
-!   GOTO 1000
-!END IF
-!WRITE(*,*) 'Number of nonzeros in factors = ',iparm(18)
-!WRITE(*,*) 'Number of factorization MFLOPS = ',iparm(19)
-
-!.. Factorization.
-!phase = 22 ! only factorization
-!CALL pardiso (pt, maxfct, mnum, mtype, phase, neq, K, rowIndex, columns, &
-!              idum, nrhs, iparm, msglvl, ddum, ddum, error)
-!WRITE(*,*) 'Factorization completed ... '
-!IF (error /= 0) THEN
-!   WRITE(*,*) 'The following ERROR was detected: ', error
-!   GOTO 1000
-!ENDIF
-
-!.. Back substitution and iterative refinement
-!iparm(8) = 2 ! max numbers of iterative refinement steps
-!phase = 33 ! only solving
-!CALL pardiso (pt, maxfct, mnum, mtype, phase, neq, K, rowIndex, columns, &
-!              idum, nrhs, iparm, msglvl, V, x, error)
-!WRITE(*,*) 'Solve completed ... '
-!IF (error /= 0) THEN
-!   WRITE(*,*) 'The following ERROR was detected: ', error
-!   GOTO 1000
-!ENDIF
 iparm(8) = 2 ! max numbers of iterative refinement steps
 phase = 13 ! only solving
 CALL pardiso (pt, maxfct, mnum, mtype, phase, neq, K, rowIndex, columns, &
