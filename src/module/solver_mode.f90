@@ -162,6 +162,7 @@ subroutine pardiso_input(ID)
      WRITE(*,'("End create vectors ")')
      CALL SECOND (TIM(2))
      ! 注意这里分配了rowIndex
+<<<<<<< HEAD
      CALL MEMALLOC(2,"rowIndex",NEQ+1,1)
      CALL assign_rowIndex(vectors, IA(NP(2)))
      CALL MEMALLOC(3,"STFF ",NWK,ITWO)
@@ -169,6 +170,14 @@ subroutine pardiso_input(ID)
      CALL MEMALLOC(5,"columns",NWK,1)
      CALL assign_columns(vectors, IA(NP(5)))
      WRITE(*,'("Begin delete lists ")')
+=======
+     CALL MEMALLOC(2,"rwInd",NEQ+1,1)                   !RowIndex
+     CALL assign_rowIndex(lists, IA(NP(2)))
+     CALL MEMALLOC(3,"STFF ",NWK,ITWO)
+     CALL MEMALLOC(4,"R    ",NEQ,ITWO)
+     CALL MEMALLOC(5,"colmn",NWK,1)
+     CALL assign_columns(lists, IA(NP(5)))
+>>>>>>> bca3464570c9657a1e8abf9bd4b019c43a30e518
      do i = 1, neq
          call delete(vectors(i))
      end do

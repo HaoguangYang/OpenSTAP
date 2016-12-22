@@ -23,9 +23,9 @@ subroutine pardiso_crop(A, rowIndex, columns)
     end do
     rowIndex(neq + 1) = rowIndex(neq)+temp
     nwk = j
-    end subroutine
+end subroutine
     
-    subroutine pardiso_addban(A, rowIndex, columns, S, LM, ND)
+subroutine pardiso_addban(A, rowIndex, columns, S, LM, ND)
   USE GLOBALS, ONLY : NWK, NEQ
   IMPLICIT NONE
   REAL(8) :: A(NWK),S(ND,ND)
@@ -44,14 +44,23 @@ subroutine pardiso_crop(A, rowIndex, columns)
               !          exit loop1
               !      end if
               !  end do loop1
+<<<<<<< HEAD
               !else ! 如果II < JJ
+=======
+              !else ! 如果II > JJ
+>>>>>>> bca3464570c9657a1e8abf9bd4b019c43a30e518
               !    loop2: do k = rowIndex(JJ), rowIndex(JJ+1)-1
               !      if(columns(k) .EQ. II) then
               !          A(k) = A(k) + S(I,J)
               !          exit loop2
               !      end if
+<<<<<<< HEAD
               !  end do loop2                  
               !END IF
+=======
+              !  end do loop2
+              !END IF              
+>>>>>>> bca3464570c9657a1e8abf9bd4b019c43a30e518
               KK = min(II,JJ)
               KKK = max(II,JJ)
               loop: do k = rowIndex(KK), rowIndex(KK+1)-1
@@ -59,7 +68,11 @@ subroutine pardiso_crop(A, rowIndex, columns)
                         A(k) = A(k) + S(I,J)
                         exit loop
                     end if
+<<<<<<< HEAD
               end do loop              
+=======
+              end do loop
+>>>>>>> bca3464570c9657a1e8abf9bd4b019c43a30e518
            END IF
         END DO
      END IF
@@ -105,7 +118,7 @@ iparm(60) = 1 ! Whether to use out-of-core storage
 
 error  = 0 ! initialize error flag
 msglvl = 1 ! print statistical information
-mtype  = 2 ! symmetric, indefinite
+mtype  = 2 ! symmetric, positive definite
 nrhs = 1 
 maxfct = 1 
 mnum = 1

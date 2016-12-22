@@ -129,11 +129,12 @@ SUBROUTINE ADDBAN (A,MAXA,S,LM,ND)
         DO I=1,J
            II=LM(I)
            IF (II .GT. 0) THEN
-              IF (JJ .GE. II) THEN
-                 KK= MAXA(JJ) + JJ - II
-              ELSE
-                 KK= MAXA(II) + II - JJ
-              END IF              
+              !IF (JJ .GE. II) THEN
+              !   KK= MAXA(JJ) + JJ - II
+              !ELSE
+              !   KK= MAXA(II) + II - JJ
+              !END IF              
+              KK = MAXA(max(JJ, II))+abs(JJ - II)
               A(KK)=A(KK) + S(I,J)
            END IF
         END DO
@@ -141,7 +142,7 @@ SUBROUTINE ADDBAN (A,MAXA,S,LM,ND)
   END DO
   
   RETURN
-    END SUBROUTINE ADDBAN
+  END SUBROUTINE ADDBAN
   
 SUBROUTINE COLSOL (A,V,MAXA,NN,NWK,NNM,KKK)
 ! . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .

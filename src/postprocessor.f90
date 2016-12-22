@@ -115,8 +115,8 @@ subroutine PostProcessor (ElementType, Dimen, PositionData, &
         end do
         
     else if (Dimen == 2) then
-        if (ElementType==7 .OR. ElementType==9) then
-            NStress = 5                                                 !Shell
+        if ((ElementType .GE. 6) .AND. (ElementType .LE.9)) then
+            NStress = 5                                                 !Shell and plate
         else
             NStress = 3
         end if
@@ -154,11 +154,19 @@ subroutine PostProcessor (ElementType, Dimen, PositionData, &
                             value(ind0,1:Ncoeff+NStress) = reshape((/1D0, x, y, Stress(1:NStress,L)/), (/Ncoeff+NStress/))
                         case (0)
                             value(ind0,1:NStress) = Stress(1:NStress,L)
+<<<<<<< HEAD
                         end select
                         !ind0 = ind0 + 1
                         !write(*,*) 'Nval= ',Nval,'-----------------------------------------------------'
                         !write (*,*)'x,y,z= ', x, y, z
                         !write (*,*)'Stress = ', Stress(:,L)
+=======
+                        ind0 = ind0 + 1
+                        !write (*,*) x, y
+                        !write (*,*) Stress(:,L)
+                        !write(*,*) Nval
+                        !Error for element number 5 and 6
+>>>>>>> bca3464570c9657a1e8abf9bd4b019c43a30e518
                     end do
                 end do
                 !sets = 3
@@ -210,7 +218,11 @@ subroutine PostProcessor (ElementType, Dimen, PositionData, &
                     end do
                 end do
                 !sets = 1
+<<<<<<< HEAD
                 Stress(1:NStress,L) = (sum(value(1:Nval, 1:NStress),DIM = 1))/NVal
+=======
+                Stress(:,L) = 1/Nval*(sum(value(1:Nval, 1:NStress),1))
+>>>>>>> bca3464570c9657a1e8abf9bd4b019c43a30e518
                 if (NStress == 1) then
                     write (IOUT,"(I6, 3X, E13.6, 5(2X, A13))") L, Stress(1,L), "---", "---", "---", "---", "---"
                 else 
@@ -284,6 +296,11 @@ case (2)                                                            !Called in e
      end select
      
 case (3)                                                            !Called in stap.f90, STAP at solution phase IND=3
+<<<<<<< HEAD
+=======
+!>>>>>>>>>>>>>>>>>>>>>>>>>>HOW TO RESOLVE CONNECTION POINTS BETWEEN TWO ELEMENT GROUPS??? THESE POINTS ARE REPEATED
+    Stress(:,:) = 0D0
+>>>>>>> bca3464570c9657a1e8abf9bd4b019c43a30e518
     write (VTKFile,*) "CELLS ", NEL, NCONECT                        !Sum up all elements to generate a global picture
     rewind (VTKNodeTmp)
     do i = 1 , NEL
@@ -313,7 +330,11 @@ case (3)                                                            !Called in s
                 Stress(1:Dat(1),j) = 0.5*(Stress(1:Dat(1),j)+Dat1(1:Dat(1)))
             end do
         end do
+<<<<<<< HEAD
         do j = 1,NUMNP
+=======
+        do j = 1, NUMNP
+>>>>>>> bca3464570c9657a1e8abf9bd4b019c43a30e518
             write (VTKFile,*) Stress(1:6, j)
         end do
     end do
