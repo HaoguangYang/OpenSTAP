@@ -10,15 +10,15 @@
 ! Author:    Haoguang Yang
 ! 
 !===========================================================================================
-subroutine EightHex
+subroutine FourTet
     use globals
     use memallocate
     
     implicit none
-    integer :: NumberOfElements, NumberOfMaterials, ElementGroupSize
+    integer :: NumberOfElements, NumberOfMaterials, ElementGroupSize, NGauss=4
     integer :: N(11) !Pointers
     
-    NPAR(5) = 8
+    NPAR(5) = 4
     NPAR(4) = 0
     
     NumberOfElements = NPAR(2)
@@ -46,10 +46,10 @@ subroutine EightHex
         N(4) = N(3)
     end if
     
-    N(5) = N(4) + 3*NPAR(5)*NumberOfElements
-    N(6) = N(5) + 3*NPAR(5)*NumberOfElements*ITWO
-    N(7) = N(6) + NumberOfElements
-    N(8) = N(7) + NPAR(5)*NPAR(2)
+    N(6) = N(5) + 3*NPAR(5)*NumberOfElements
+    N(7) = N(6) + 3*NPAR(5)*NumberOfElements*ITWO
+    N(8) = N(7) + NumberOfElements
+    N(9) = N(8) + NPAR(5)*NPAR(2)
     
     MIDEST = N(9)
     
@@ -60,37 +60,38 @@ subroutine EightHex
     N(:) = N(:) + NFIRST
     NLAST  = N(9)
     
-    call HexEight (IA(NP(1)),DA(NP(2)),DA(NP(3)),DA(NP(4)),DA(NP(4)),IA(NP(5)),   &
-                  A(N(1)),A(N(2)),A(N(3)),A(N(4)),A(N(5)),A(N(6)),A(N(7)))
+    call TetFour (IA(NP(1)),DA(NP(2)),DA(NP(3)),DA(NP(4)),DA(NP(4)),IA(NP(5)),   &
+                  A(N(1)),A(N(2)),A(N(3)),A(N(4)),A(N(5)),A(N(6)),A(N(7)),A(N(8)))
     
     !Reuse DA(NP(4)) at Solution Phase 3 as displacement U
     return
-end subroutine EightHex
+end subroutine FourTet
 
-subroutine HexEight (ID,X,Y,Z,U,MHT,E, PoissonRatio, Density, LM, PositionData, MaterialData, Node)
+subroutine TetFour (ID,X,Y,Z,U,MHT,E, PoissonRatio, Density, LM, PositionData, MaterialData, Node)
     use globals
     use MemAllocate
     use MathKernel
     
     implicit none
     integer ::  ElementShapeNodes, NumberOfMaterials, NumberOfElements
-    integer ::  QuadratureOrder     = 2                     ! NPAR(6) -- Element Load Nodes
+    integer ::  NGauss     = 4                     ! NPAR(6) -- Element Load Nodes
     INTEGER ::  ID(6,NUMNP), MHT(NEQ), MaterialData(NPAR(2))
-    integer ::  MaterialType, MaterialComp, ND, L, N, i, j, LM(24,NPAR(2)), ElementType, ind0, iprint, k, &
+    integer ::  MaterialType, MaterialComp, ND, L, N, i, j, LM(12,NPAR(2)), ElementType, ind0, iprint, k, &
                 ind1, ind2, Node(NPAR(2),NPAR(5))
     real(8) ::  X(NUMNP), Y(NUMNP), Z(NUMNP), U(NEQ), &
-                DetJ(2,2,2), E(NPAR(3)), PoissonRatio(NPAR(3)), ElementDisp(24)
+                DetJ(4), E(NPAR(3)), PoissonRatio(NPAR(3)), ElementDisp(12)
     real(8) ::  BMatrix(6, 3*NPAR(5)), PositionData(3*NPAR(5), NPAR(2)), DMatrix(6,6), &
-                Transformed(3), W(2), Weight(2,2,2), GaussianPts(2), GaussianCollection(3, NPAR(2)*2**3), &
-                StressCollection(6,NPAR(2)*2**3), M(3*NPAR(5),3*NPAR(5)), Rho
-    real(8) ::  Young, v, S(3*NPAR(5),3*NPAR(5)), GaussianPtsPosit(3,2**3), Strain(6,2**3), Stress(6,2**3), &
+                Transformed(3), W(2), GaussianPts(2), GaussianCollection(3, NPAR(2)*4), &
+                StressCollection(6,NPAR(2)*4), M(3*NPAR(5),3*NPAR(5)), Rho
+    real(8) ::  Young, v, S(3*NPAR(5),3*NPAR(5)), GaussianPtsPosit(3,4), Strain(6,4), Stress(6,4), &
                 Density, Gravity, NMatrix(3,3*NPAR(5)), NormalVec(3), Point(3*NPAR(5),3*NPAR(5))
+    real(8), parameter :: Weight(4) = (/ /), GaussianPts(4,3) = (/ /)
                 
     ElementType         = NPAR(1)
     NumberOfElements    = NPAR(2)
     NumberOfMaterials   = NPAR(3)
     ElementShapeNodes   = NPAR(5)                           !NPAR(5)=8
-    ND = 24
+    ND = 12
     
     SELECT CASE (IND)
     CASE(1)
@@ -116,14 +117,14 @@ subroutine HexEight (ID,X,Y,Z,U,MHT,E, PoissonRatio, Density, LM, PositionData, 
             WRITE (IOUT,"(I10,4X,E12.5,2X,E14.6)") N,E(N), PoissonRatio(N)
         END DO
         WRITE (IOUT,"(//,' E L E M E N T   I N F O R M A T I O N',//,  &
-                      ' ELEMENT        |------------------------- NODES -------------------------|       MATERIAL',/,   &
-                      ' NUMBER-N        1       2       3       4       5       6       7       8       SET NUMBER')")
+                      ' ELEMENT        |--------- NODES ---------|       MATERIAL',/,   &
+                      ' NUMBER-N        1       2       3       4       SET NUMBER')")
         N=0
         
         CALL GaussianMask(GaussianPts, W, QuadratureOrder)
         
         DO WHILE (N .NE. NumberOfElements)
-            READ (IIN,'(11I10)') N,Node(N,1:NPAR(5)),MaterialType          ! Read in element information
+            READ (IIN,'(7I10)') N,Node(N,1:NPAR(5)),MaterialType          ! Read in element information
     !       Save element information
             PositionData(1:ElementShapeNodes*3-1:3,N)=X(Node(N,:))        ! Coordinates of the element's nodes
             PositionData(2:ElementShapeNodes*3  :3,N)=Y(Node(N,:))
@@ -140,7 +141,7 @@ subroutine HexEight (ID,X,Y,Z,U,MHT,E, PoissonRatio, Density, LM, PositionData, 
             
             
             if (.NOT. PARDISODOOR) CALL COLHT (MHT,ND,LM(:,N))
-            WRITE (IOUT,"(I7,5X,7(I7,1X),I7,4X,I10)") N,Node(N,1:ElementShapeNodes),MaterialType
+            WRITE (IOUT,"(I7,5X,3(I7,1X),I7,4X,I10)") N,Node(N,1:ElementShapeNodes),MaterialType
             
             !write (IOUT,*) 'MHT',MHT
             write (VTKNodeTmp) NPAR(5), Node(N,:)-1
@@ -149,15 +150,7 @@ subroutine HexEight (ID,X,Y,Z,U,MHT,E, PoissonRatio, Density, LM, PositionData, 
         return
     
     CASE (2)
-        CALL GaussianMask(GaussianPts, W, QuadratureOrder)
-        do i = 1, QuadratureOrder
-            do j = 1, QuadratureOrder
-                do k = 1, QuadratureOrder
-                    Weight(i,j,k)  = W(i)*W(j)*W(k)
-                end do
-            end do
-        end do
-        
+!>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>WORKING PROGRESS
         MaterialComp = -1
         do N = 1, NumberOfElements
             S(:,:) = 0
