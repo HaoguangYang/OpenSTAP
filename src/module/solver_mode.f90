@@ -208,4 +208,5 @@ subroutine assign_columns(vectors, columns)
             k = k+1
         end do
     end do
+
 end subroutine assign_columns

@@ -225,11 +225,11 @@ IF (DYNANALYSIS .EQV. .TRUE.) call prepare_MassMatrix
      TT=TT + TIM(I)
   END DO
   TT = TT - TIM(1)
-  WRITE (*,"(//,  &
+  WRITE (IOUT,"(//,  &
      ' S O L U T I O N   T I M E   L O G   I N   S E C',//,   &
      '     TIME FOR INPUT PHASE ',14(' .'),' =',I10,/,     &
-     '     TIME FOR PREPARATION OF MATRIX FORMAT ... . . . . =',I10,/,     &
-     '     TIME FOR ASSEMBLING  . ...................... . . =',I10, /,   &
+     '     TIME FOR PREPARATION OF MATRIX FORMAT . . . . . . =',I10,/,     &
+     '     TIME FOR ASSEMBLING . . . . . . . . . . . . . . . =',I10, /,   &
      '     TIME FOR FACTORIZATION OF STIFFNESS MATRIX  . . . =',I10, /,   &
      '     TIME FOR LOAD CASE SOLUTIONS ',10(' .'),' =',I10,/,   &
      '     TIME FOR CALCLUATE STRESS',12(' .'),' =',I10,//,   &
@@ -238,16 +238,16 @@ IF (DYNANALYSIS .EQV. .TRUE.) call prepare_MassMatrix
   WRITE (*,"(//,  &
      ' S O L U T I O N   T I M E   L O G   I N   S E C',//,   &
      '     TIME FOR INPUT PHASE ',14(' .'),' =',I10,/,     &
-     '     TIME FOR PREPARATION OF MATRIX FORMAT ... . . . . =',I10,/,     &
-     '     TIME FOR ASSEMBLING  . ...................... . . =',I10, /,   &
+     '     TIME FOR PREPARATION OF MATRIX FORMAT . . . . . . =',I10,/,     &
+     '     TIME FOR ASSEMBLING . . . . . . . . . . . . . . . =',I10, /,   &
      '     TIME FOR FACTORIZATION OF STIFFNESS MATRIX  . . . =',I10, /,   &
      '     TIME FOR LOAD CASE SOLUTIONS ',10(' .'),' =',I10,/,   &
      '     TIME FOR CALCLUATE STRESS',12(' .'),' =',I10,//,   &
      'T O T A L   S O L U T I O N   T I M E  . . . . . . . . =',I10)") (TIM(I),I=1,6),TT
      
   CALL CLOSEFILES()
-  write (*,*) "Press Any Key to Exit..."
-  read (*,*)
+  !write (*,*) "Press Any Key to Exit..."
+  !read (*,*)
   STOP
 
 END PROGRAM STAP90
@@ -263,6 +263,7 @@ SUBROUTINE SECOND (TIM)
   integer :: TIM
   call DATE_AND_TIME(date, time, zone, values)
   TIM = values(7)*1000+values(8)+values(6)*60000
+
 ! This is a Fortran 95 intrinsic subroutine
 ! Returns the processor time in seconds
 

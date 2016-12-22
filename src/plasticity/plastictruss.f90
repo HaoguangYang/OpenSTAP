@@ -131,8 +131,12 @@ SUBROUTINE PLASTICRUSS (ID,X,Y,Z,U,MHT,E,AREA,YIELDSTRESS,PLASTICK,HISTORY,LM,XY
 <<<<<<< HEAD
         if (.NOT. PARDISODOOR) CALL COLHT (MHT,ND,LM(1,N))   
 =======
+<<<<<<< HEAD
+        if (.NOT. PARDISODOOR) CALL COLHT (MHT,ND,LM(1,N))   
+=======
         CALL COLHT (MHT,ND,LM(1,N))   
 >>>>>>> bca3464570c9657a1e8abf9bd4b019c43a30e518
+>>>>>>> cdd17f008b644ad4497db898d5e9ec786411efc3
 
         WRITE (IOUT,"(I5,6X,I5,4X,I5,7X,I5)") N,Node(N,1:2),MTYPE
 !        write (VTKNodeTmp) NPAR(5), Node(N,:)-1
