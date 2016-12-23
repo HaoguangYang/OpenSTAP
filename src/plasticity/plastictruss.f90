@@ -74,7 +74,7 @@ SUBROUTINE PLASTICRUSS (ID,X,Y,Z,U,MHT,E,AREA,YIELDSTRESS,PLASTICK,HISTORY,LM,XY
 
   INTEGER :: NPAR1, NUME, NUMMAT, ND, I, J, L, N, Node(NPAR(2),NPAR(5))
   INTEGER :: MTYPE, IPRINT
-  REAL(8) :: XL2, XL, SQRT, XX, YY, STR, P, MAXSTR
+  REAL(8) :: XL2, XL, SQRT, XX, YY, STR, P, MAXSTR, PRESTR
 
   NPAR1  = NPAR(1)
   NUME   = NPAR(2)
@@ -211,6 +211,7 @@ SUBROUTINE PLASTICRUSS (ID,X,Y,Z,U,MHT,E,AREA,YIELDSTRESS,PLASTICK,HISTORY,LM,XY
            D(L) = XYZ(L,N) - XYZ(L+3,N)
            XL2=XL2 + D(L)*D(L)
         END DO
+        XL=SQRT(XL2)
         
         IF (HISTORY(N) .EQ. 0) THEN 
           DO L=1,3
@@ -233,7 +234,14 @@ SUBROUTINE PLASTICRUSS (ID,X,Y,Z,U,MHT,E,AREA,YIELDSTRESS,PLASTICK,HISTORY,LM,XY
            IF (J.GT.0) STR=STR + ST(L+3)*U(J)
         END DO
         
+        !对于迭代的调用，已经算出了这个载荷步下的应力增量
+        !对于弹性试探步，算出了假定弹性情况下的总应力
+        
+        !迭代情况下应该更新历史变量
+        
+        
         IF (PLASTICTRIAL) THEN
+          !在弹性试探步中只需要判断有没有杆进入塑形以及最大的应力值（为确定迭代步数）
             IF (STR .GE. YIELDSTRESS(MTYPE)) THEN
                 PLASTICITERATION=.TRUE.
                 IF (STR .GT. MAXSTR) THEN
@@ -242,6 +250,11 @@ SUBROUTINE PLASTICRUSS (ID,X,Y,Z,U,MHT,E,AREA,YIELDSTRESS,PLASTICK,HISTORY,LM,XY
             ENDIF
             
         ELSE
+            !更新单元的弹塑性状态
+            
+            !首先获得杆的目前应力大小，只有弹性杆才需要判断会不会进入塑形，塑性杆已经是塑形了
+           
+            
         ENDIF
         
         
@@ -312,3 +325,5 @@ SUBROUTINE ITERATIONINIT(MAXSTR,YIELD)
   PLASTICTRIAL= .FALSE. 
   
 ENDSUBROUTINE ITERATIONINIT
+    
+    
