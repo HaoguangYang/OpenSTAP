@@ -99,3 +99,22 @@
   NODE    X-DISPLACEMENT  Y-DISPLACEMENT  Z-DISPLACEMENT  X-ROTATION  Y-ROTATION  Z-ROTATION
           1       0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
           2       0.100000E-03  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+
+
+ ELASTIC TRIAL SOLUTION  F O R  E L E M E N T  G R O U P    1
+
+  ELEMENT             FORCE            STRESS
+  NUMBER
+     1            0.100000E+02     0.100000E+08
+
+
+ S O L U T I O N   T I M E   L O G   I N   S E C
+
+     TIME FOR INPUT PHASE  . . . . . . . . . . . . . . =        11
+     TIME FOR PREPARATION OF MATRIX FORMAT . . . . . . =         0
+     TIME FOR ASSEMBLING . . . . . . . . . . . . . . . =         0
+     TIME FOR FACTORIZATION OF STIFFNESS MATRIX  . . . =         1
+     TIME FOR LOAD CASE SOLUTIONS  . . . . . . . . . . =         0
+     TIME FOR CALCLUATE STRESS . . . . . . . . . . . . =         6
+
+T O T A L   S O L U T I O N   T I M E  . . . . . . . . =         7
