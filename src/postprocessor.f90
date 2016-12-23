@@ -59,7 +59,6 @@ subroutine PostProcessor (ElementType, Dimen, PositionData, &
             coeff(:,:) = 0
             Nval = NodeRelationFlag(L,ref1) * NGauss
             if ( Nval .NE. 0) then
-                ind0 = 1
                 if (Nval .GE. 25) then                                  !Chooose whether to use quadratic or linear interplotation
                     Ncoeff = 7
                 else if (Nval .GE. 6) then
@@ -125,7 +124,6 @@ subroutine PostProcessor (ElementType, Dimen, PositionData, &
             coeff(:,:) = 0
             Nval = NodeRelationFlag(L,ref1) * NGauss
             if (Nval .NE. 0) then
-                ind0 = 1
                 if (Nval .GE. 12) then
                     Ncoeff = 4
                 else if (Nval .GE. 4) then
@@ -195,7 +193,6 @@ subroutine PostProcessor (ElementType, Dimen, PositionData, &
             coeff(:,:) = 0
             Nval = NodeRelationFlag(L,ref1) * NGauss
             if (Nval .NE. 0) then
-                ind0 = 1
                 do ind2 = 1, NodeRelationFlag(L,ref1)                   !Must Run Serial!
                     N = NodeRelationFlag (L, ind2)
                     ind1 = (N-1)*NGauss+1
@@ -338,6 +335,7 @@ case (3)                                                            !Called in s
                 end if
             end do
         end do
+        
         do j = 1,NUMNP
             do k = 1,6
                 if (isnan(Stress(k,j))) Stress(k,j) = 0.
