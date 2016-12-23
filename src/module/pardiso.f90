@@ -120,7 +120,11 @@ iparm(8) = 2 ! max numbers of iterative refinement steps
 phase = 13 ! only solving
 CALL pardiso (pt, maxfct, mnum, mtype, phase, neq, K, rowIndex, columns, &
               idum, nrhs, iparm, msglvl, V, x, error)
-
+IF (error /= 0) THEN
+    WRITE(IOUT,*) 'The following ERROR on release stage was detected: ', error
+    read(*,*)
+    STOP 
+ENDIF
 V = x
 1000 CONTINUE
 !.. Termination and release of memory
@@ -128,9 +132,8 @@ phase = -1 ! release internal memory
 CALL pardiso (pt, maxfct, mnum, mtype, phase, neq, ddum, idum, idum, &
               idum, nrhs, iparm, msglvl, ddum, ddum, error1)
 IF (error1 /= 0) THEN
-   WRITE(IOUT,*) 'The following ERROR on release stage was detected: ', error1, error
-   STOP 1
+   WRITE(IOUT,*) 'The following ERROR on release stage was detected: ', error1
+   STOP
 ENDIF
 
-IF (error /= 0) STOP 1
 end subroutine pardiso_solver

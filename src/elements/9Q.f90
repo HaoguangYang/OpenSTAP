@@ -310,7 +310,7 @@ SUBROUTINE ELEMENT_9Q_MAIN (ID,X,Y,Z,U,MHT,E,POISSON,LM,XY,MATP)
   ELSE 
      STOP "*** ERROR *** Invalid IND value."
   END IF
-
+  deallocate(GP,W)
 END SUBROUTINE ELEMENT_9Q_MAIN
     
 FUNCTION NmatElast9Q(eta,psi)
