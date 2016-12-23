@@ -22,7 +22,7 @@ subroutine PostProcessor (ElementType, Dimen, PositionData, &
     implicit none
     
     integer :: Dimen, NGauss, ElementType, ref1, ref2, NStress
-    integer :: NodeRelationFlag(NUMNP,NPAR(5)*2+12), Ncoeff, Nval, N, i, j, k, L, &
+    integer :: NodeRelationFlag(NUMNP,NPAR(5)*2+12), Ncoeff, Nval, N, i, j, L, &
                ind0, ind1, ind2, Node(NPAR(2),NPAR(5))
     real(8) :: coeff(10,6), Stress(6,NUMNP), PositionData(Dimen*NPAR(5), NPAR(2)), U(NEQ), &
                GaussianCollection(Dimen, NPAR(2)*NGauss), StressCollection(6,NPAR(2)*NGauss)
@@ -71,7 +71,7 @@ subroutine PostProcessor (ElementType, Dimen, PositionData, &
                     N = NodeRelationFlag (L, ind2)
                     ind1 = (N-1)*NGauss+1
                     do j = 1, NGauss
-                        ind0 = (ind2-1)*NGauss+j
+                        ind0 = (ind2-1)*NGauss+j                        !Local (patch) gaussian point index
                         if (Ncoeff .GT. 0) then
                             x = GaussianCollection (1, ind1+mod(ind0-1,NGauss))
                             y = GaussianCollection (2, ind1+mod(ind0-1,NGauss))
@@ -250,9 +250,9 @@ subroutine VTKgenerate (Flag)
     use globals
     use memallocate
     implicit none
-    integer :: i,j,k,Flag, Dat(NEL+100)
+    integer :: i,j,k,l,Flag, Dat(NEL+100)
     character(len=25) :: string
-    real(8) :: Dat1(6), Stress(7,NUMNP)                             !Stress component at xx, yy, zz, xy, yz, zx, von-Mises
+    real(8), allocatable :: Dat1(:), Stress(:,:)
     
 select case (Flag)
 case (1)                                                            !Called in solution phase IND=1
@@ -291,6 +291,8 @@ case (2)                                                            !Called in e
      end select
      
 case (3)                                                            !Called in stap.f90, STAP at solution phase IND=3
+    allocate (Dat1(6), Stress(7,NUMNP))                             !Stress component at xx, yy, zz, xy, yz, zx, von-Mises
+    Stress(:,:) = 0D0                                               !Freshly allocate and reinitialize to prevent NaN issue
     write (VTKFile,*) "CELLS ", NEL, NCONECT                        !Sum up all elements to generate a global picture
     rewind (VTKNodeTmp)
     do i = 1 , NEL
@@ -337,14 +339,12 @@ case (3)                                                            !Called in s
         end do
         
         do j = 1,NUMNP
-            do k = 1,6
-                if (isnan(Stress(k,j))) Stress(k,j) = 0.
-            end do
             write (VTKFile,*) Stress(1:6, j)
         end do
         write (VTKFile,*) string(1:18), 1, NUMNP, "double"
         write (VTKFile,*) Stress(7,1:NUMNP)
     end do
+    deallocate(Dat1, Stress)
 end select
     
     !do i = 1, NUMEG                                            ----|
