@@ -299,7 +299,7 @@ FUNCTION NmatElast3T(ETA,EPSILON)
   N2 = (x3*y1-x1*y3)+(y3-y1)*EPSILON+(x1-x3)*ETA
   N3 = (x1*y2-x2*y1)+(y1-y2)*EPSILON+(x2-x1)*ETA
   
-  NmatElast3T = (/N1,N2,N3/)
+  NmatElast3T(1,:) = (/N1, N2, N3/)
   
 END FUNCTION NmatElast3T
   
