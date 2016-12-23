@@ -152,7 +152,6 @@ subroutine TetFour (ID,X,Y,Z,U,MHT,E, PoissonRatio, Density, LM, PositionData, M
         return
     
     CASE (2)
-!>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>WORKING PROGRESS
         MaterialComp = -1
         do N = 1, NumberOfElements
             S(:,:) = 0
@@ -256,14 +255,11 @@ subroutine TetN (NMatrix, ElementShapeNodes, Transformed)
     
     select case (ElementShapeNodes)
     case (4)
-        N(1) = (1-Transformed(1))*(1-Transformed(2))*(1-Transformed(3))/8
-        N(2) = (1+Transformed(1))*(1-Transformed(2))*(1-Transformed(3))/8
-        N(3) = (1+Transformed(1))*(1+Transformed(2))*(1-Transformed(3))/8
-        N(4) = (1-Transformed(1))*(1+Transformed(2))*(1-Transformed(3))/8
-        N(5) = (1-Transformed(1))*(1-Transformed(2))*(1+Transformed(3))/8
-        N(6) = (1+Transformed(1))*(1-Transformed(2))*(1+Transformed(3))/8
-        N(7) = (1+Transformed(1))*(1+Transformed(2))*(1+Transformed(3))/8
-        N(8) = (1-Transformed(1))*(1+Transformed(2))*(1+Transformed(3))/8
+        N(1) = Transformed(1)
+        N(2) = Transformed(2)
+        N(3) = Transformed(3)
+        N(4) = 1-sum(Transformed(1:3),DIM=1)
+        
         NMatrix = reshape((/((/N(i), 0D0, 0D0, 0D0, N(i), 0D0, 0D0, 0D0, N(i)/),i=1,ElementShapeNodes)/), &
                           shape(NMatrix))
     end select
@@ -286,23 +282,21 @@ subroutine TetB (BMatrix, DetJ, ElementShapeNodes, Original)
     
     select case (ElementShapeNodes)
     case (4)
-        GradN   = 0.125*reshape((/-(1-eta)*(1-zta), -(1-xi)*(1-zta), -(1-xi)*(1-eta), &
-                                   (1-eta)*(1-zta), -(1+xi)*(1-zta), -(1+xi)*(1-eta), &
-                                   (1+eta)*(1-zta),  (1+xi)*(1-zta), -(1+xi)*(1+eta), &
-                                  -(1+eta)*(1-zta),  (1-xi)*(1-zta), -(1-xi)*(1+eta), &
-                                  -(1-eta)*(1+zta), -(1-xi)*(1+zta),  (1-xi)*(1-eta), &
-                                   (1-eta)*(1+zta), -(1+xi)*(1+zta),  (1+xi)*(1-eta), &
-                                   (1+eta)*(1+zta),  (1+xi)*(1+zta),  (1+xi)*(1+eta), &
-                                  -(1+eta)*(1+zta),  (1-xi)*(1+zta),  (1-xi)*(1+eta)/), &
-                                shape(GradN))
-        J       = matmul(GradN, Original)
+        J       = (/Original(1:3,1)-Original(4,1), Original(1:3,2)-Original(4,2), Original(1:3,3)-Original(4,3)/)
         DetJ    = Det(J, 3)
-        call InvMat3(J, InvMatJ, OK_Flag)
-        if (OK_Flag .EQV. .FALSE.) STOP "***ERROR*** Derivative Of Shape Function Is SINGULAR"
-        DerivN  = matmul(InvMatJ,GradN)
-        Bx(:)   = DerivN(1,:)
-        By(:)   = DerivN(2,:)
-        Bz(:)   = DerivN(3,:)
+        !Sub-array of the N matrix to generate B matrix
+        Bx(1) =  Det(reshape((/Original((/2,3,4/),(/2,3/)), 1D0, 1D0, 1D0/), (/3,3/)), 3)
+        Bx(2) = -Det(reshape((/Original((/1,3,4/),(/2,3/)), 1D0, 1D0, 1D0/), (/3,3/)), 3)
+        Bx(3) =  Det(reshape((/Original((/1,2,4/),(/2,3/)), 1D0, 1D0, 1D0/), (/3,3/)), 3)
+        Bx(4) = -Det(reshape((/Original((/1,2,3/),(/2,3/)), 1D0, 1D0, 1D0/), (/3,3/)), 3)
+        By(1) = -Det(reshape((/Original((/2,3,4/),(/1,3/)), 1D0, 1D0, 1D0/), (/3,3/)), 3)
+        By(2) =  Det(reshape((/Original((/1,3,4/),(/1,3/)), 1D0, 1D0, 1D0/), (/3,3/)), 3)
+        By(3) = -Det(reshape((/Original((/1,2,4/),(/1,3/)), 1D0, 1D0, 1D0/), (/3,3/)), 3)
+        By(4) =  Det(reshape((/Original((/1,2,3/),(/1,3/)), 1D0, 1D0, 1D0/), (/3,3/)), 3)
+        Bz(1) =  Det(reshape((/Original((/2,3,4/),(/1,2/)), 1D0, 1D0, 1D0/), (/3,3/)), 3)
+        Bz(2) = -Det(reshape((/Original((/1,3,4/),(/1,2/)), 1D0, 1D0, 1D0/), (/3,3/)), 3)
+        Bz(3) =  Det(reshape((/Original((/1,2,4/),(/1,2/)), 1D0, 1D0, 1D0/), (/3,3/)), 3)
+        Bz(4) = -Det(reshape((/Original((/1,2,3/),(/1,2/)), 1D0, 1D0, 1D0/), (/3,3/)), 3)
         BMatrix = reshape((/((/Bx(i), 0D0, 0D0, By(i), 0D0, Bz(i), &
                              0D0, By(i), 0D0, Bx(i), Bz(i), 0D0, &
                              0D0, 0D0, Bz(i), 0D0, By(i), Bx(i)/), &

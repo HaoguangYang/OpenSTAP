@@ -285,7 +285,7 @@ FUNCTION NmatElast3T(ETA,EPSILON)
   IMPLICIT NONE
   REAL(8):: EPSILON,ETA
   REAL(8):: X1,X2,X3,Y1,Y2,Y3
-  REAL(8):: NmatElast3T(1,3),N(1,3)
+  REAL(8):: NmatElast3T(1,3)
   REAL(8):: N1,N2,N3
   
   X1=1.0
@@ -299,8 +299,7 @@ FUNCTION NmatElast3T(ETA,EPSILON)
   N2 = (x3*y1-x1*y3)+(y3-y1)*EPSILON+(x1-x3)*ETA
   N3 = (x1*y2-x2*y1)+(y1-y2)*EPSILON+(x2-x1)*ETA
   
-  N(1,:) = (/N1,N2,N3/)
-  NmatElast3T=N
+  NmatElast3T = (/N1,N2,N3/)
   
 END FUNCTION NmatElast3T
   
