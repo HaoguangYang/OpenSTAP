@@ -15,7 +15,7 @@ subroutine FourTet
     use memallocate
     
     implicit none
-    integer :: NumberOfElements, NumberOfMaterials, ElementGroupSize, NGauss=4
+    integer :: NumberOfElements, NumberOfMaterials, ElementGroupSize
     integer :: N(11) !Pointers
     
     NPAR(5) = 4
@@ -85,7 +85,11 @@ subroutine TetFour (ID,X,Y,Z,U,MHT,E, PoissonRatio, Density, LM, PositionData, M
                 StressCollection(6,NPAR(2)*4), M(3*NPAR(5),3*NPAR(5)), Rho
     real(8) ::  Young, v, S(3*NPAR(5),3*NPAR(5)), GaussianPtsPosit(3,4), Strain(6,4), Stress(6,4), &
                 Density, Gravity, NMatrix(3,3*NPAR(5)), NormalVec(3), Point(3*NPAR(5),3*NPAR(5))
-    real(8), parameter :: Weight(4) = (/ /), GaussianPts(4,3) = (/ /)
+    real(8), dimension(4), parameter :: Weight = (/1D0/24, 1D0/24, 1D0/24, 1D0/24/)
+    real(8), dimension(4,3), parameter :: GaussianPts = reshape( &
+                                (/(5D0+3*sqrt(5D0))/20, (5D0+-sqrt(5D0))/20, (5D0+-sqrt(5D0))/20, (5D0+-sqrt(5D0))/20, &
+                                  (5D0+-sqrt(5D0))/20, (5D0+3*sqrt(5D0))/20, (5D0+-sqrt(5D0))/20, (5D0+-sqrt(5D0))/20, &
+                                  (5D0+-sqrt(5D0))/20, (5D0+-sqrt(5D0))/20, (5D0+3*sqrt(5D0))/20, (5D0+-sqrt(5D0))/20/), (/4,3/))
                 
     ElementType         = NPAR(1)
     NumberOfElements    = NPAR(2)
@@ -120,8 +124,6 @@ subroutine TetFour (ID,X,Y,Z,U,MHT,E, PoissonRatio, Density, LM, PositionData, M
                       ' ELEMENT        |--------- NODES ---------|       MATERIAL',/,   &
                       ' NUMBER-N        1       2       3       4       SET NUMBER')")
         N=0
-        
-        CALL GaussianMask(GaussianPts, W, QuadratureOrder)
         
         DO WHILE (N .NE. NumberOfElements)
             READ (IIN,'(7I10)') N,Node(N,1:NPAR(5)),MaterialType          ! Read in element information
@@ -163,26 +165,22 @@ subroutine TetFour (ID,X,Y,Z,U,MHT,E, PoissonRatio, Density, LM, PositionData, M
                 MaterialComp = MaterialType
             end if
             
-            !DetJ = reshape(Jacobian((n-1)*QuadratureOrder**3+1 : n*QuadratureOrder**3), &
+            !DetJ = reshape(Jacobian((n-1)*NGauss+1 : n*NGauss), &
             !               (/QuadratureOrder, QuadratureOrder, QuadratureOrder/))
             DetJ(:, :, :)=0
-            do i = 1, QuadratureOrder
-                do j = 1, QuadratureOrder
-                    do k = 1, QuadratureOrder
-                        Transformed   = (/GaussianPts(i), GaussianPts(j), GaussianPts(k)/)
-                        CALL HexB(BMatrix, DetJ(i,j,k), ElementShapeNodes, Transformed, &
-                                  (/PositionData(1:ElementShapeNodes*3-1:3,N), &
-                                    PositionData(2:ElementShapeNodes*3  :3,N), &
-                                    PositionData(3:ElementShapeNodes*3+1:3,N)/))
-                        Point   = matmul(matmul(transpose(BMatrix),DMatrix),BMatrix)
-                        S = S + (Weight(i,j,k)*DetJ(i,j,k))*Point
-                        IF (DYNANALYSIS .EQV. .TRUE.) then
-                            call HexN (NMatrix, ElementShapeNodes, Transformed)             !Initialize N Matrix for mass assembly
-                            Point = Rho*matmul(transpose(NMatrix),NMatrix)
-                            M = M + (Weight(i,j,k)*DetJ(i,j,k))*Point
-                        END IF
-                    end do
-                end do
+            do i = 1, NGauss
+                CALL TetB(BMatrix, DetJ(i), ElementShapeNodes,        &
+                         (/PositionData(1:ElementShapeNodes*3-1:3,N), &
+                           PositionData(2:ElementShapeNodes*3  :3,N), &
+                           PositionData(3:ElementShapeNodes*3+1:3,N)/))
+                Point = matmul(matmul(transpose(BMatrix),DMatrix),BMatrix)
+                S = S + (Weight(i)*DetJ(i))*Point
+                IF (DYNANALYSIS .EQV. .TRUE.) then
+                    Transformed = GaussianPts(i,:)
+                    call TetN (NMatrix, ElementShapeNodes, Transformed)             !Initialize N Matrix for mass assembly
+                    Point = Rho*matmul(transpose(NMatrix),NMatrix)
+                    M = M + (Weight(i,j,k)*DetJ(i,j,k))*Point
+                END IF
             end do
             
             !write(*,*) "S",S
@@ -199,7 +197,6 @@ subroutine TetFour (ID,X,Y,Z,U,MHT,E, PoissonRatio, Density, LM, PositionData, M
     CASE (3)
         
         IPRINT=0
-        call GaussianMask(GaussianPts, W, QuadratureOrder)
         DO N=1,NumberOfElements
             IPRINT=IPRINT + 1
             IF (IPRINT.GT.50) IPRINT=1
@@ -219,36 +216,29 @@ subroutine TetFour (ID,X,Y,Z,U,MHT,E, PoissonRatio, Density, LM, PositionData, M
                 if (LM(i,N) .NE. 0) ElementDisp(i)  =  U(LM(i,N))
             end do
             
-            ind0 = 1
-            do i = 1,QuadratureOrder
-                do j = 1,QuadratureOrder
-                    do k = 1,QuadratureOrder
-                        Transformed   = (/GaussianPts(i), GaussianPts(j), GaussianPts(k)/)
-                        call HexN (NMatrix, ElementShapeNodes, Transformed)
-                        GaussianPtsPosit(:,ind0) = matmul(reshape(PositionData(:,N), (/3,ElementShapeNodes/)), &
-                                                         NMatrix(1, 1:3*ElementShapeNodes:3))
-                        CALL HexB (BMatrix, DetJ(i,j,k), ElementShapeNodes, Transformed, &
-                                  (/PositionData(1:ElementShapeNodes*3-1:3,N), &
-                                    PositionData(2:ElementShapeNodes*3  :3,N), &
-                                    PositionData(3:ElementShapeNodes*3+1:3,N)/))
-                        Strain(:,ind0) = matmul(BMatrix, ElementDisp)             
-                        Stress(:,ind0) = matmul(DMatrix, Strain(:,ind0))
-                        
-                        ind0 = ind0 + 1
-                    end do
-                end do
+            do i = 1,NGauss
+                Transformed = GaussianPts(i,:)
+                call TetN (NMatrix, ElementShapeNodes, Transformed)
+                GaussianPtsPosit(:,i) = matmul(reshape(PositionData(:,N), (/3,ElementShapeNodes/)), &
+                                               NMatrix(1, 1:3*ElementShapeNodes:3))
+                CALL TetB (BMatrix, DetJ(i,j,k), ElementShapeNodes,     &
+                           (/PositionData(1:ElementShapeNodes*3-1:3,N), &
+                             PositionData(2:ElementShapeNodes*3  :3,N), &
+                             PositionData(3:ElementShapeNodes*3+1:3,N)/))
+                Strain(:,i) = matmul(BMatrix, ElementDisp)             
+                Stress(:,i) = matmul(DMatrix, Strain(:,i))
             end do
             
             write (IOUT,"(I6,3(3X, F10.4),6(4X, E13.6),/,7(6X, 3(3X, F10.4),6(4X, E13.6),/))") &
-                               N, (GaussianPtsPosit(:,I), Stress(:,I), I=1,QuadratureOrder**3)
-            ind1 = (N-1)*QuadratureOrder**3+1
-            ind2 = N*QuadratureOrder**3
+                                              N, (GaussianPtsPosit(:,I), Stress(:,I), I=1,NGauss)
+            ind1 = (N-1)*NGauss+1
+            ind2 = N*NGauss
             GaussianCollection (:,ind1:ind2) = GaussianPtsPosit
             StressCollection (:,ind1:ind2) = Stress
         END DO
 
         call PostProcessor(ElementType, 3, PositionData, &
-                           Node, QuadratureOrder**3, GaussianCollection, StressCollection, U)
+                           Node, NGauss, GaussianCollection, StressCollection, U)
                            
                 
     END SELECT
@@ -259,13 +249,13 @@ end subroutine HexEight
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !!              Calculate Shape Function Matrix             !!
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-subroutine HexN (NMatrix, ElementShapeNodes, Transformed)
+subroutine TetN (NMatrix, ElementShapeNodes, Transformed)
     implicit none
     integer ::  ElementShapeNodes, i
     real(8) ::  NMatrix(3, 3*ElementShapeNodes), Transformed(3), N(ElementShapeNodes)
     
     select case (ElementShapeNodes)
-    case (8)
+    case (4)
         N(1) = (1-Transformed(1))*(1-Transformed(2))*(1-Transformed(3))/8
         N(2) = (1+Transformed(1))*(1-Transformed(2))*(1-Transformed(3))/8
         N(3) = (1+Transformed(1))*(1+Transformed(2))*(1-Transformed(3))/8
@@ -277,28 +267,25 @@ subroutine HexN (NMatrix, ElementShapeNodes, Transformed)
         NMatrix = reshape((/((/N(i), 0D0, 0D0, 0D0, N(i), 0D0, 0D0, 0D0, N(i)/),i=1,ElementShapeNodes)/), &
                           shape(NMatrix))
     end select
-end subroutine HexN
+end subroutine TetN
 
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !!       Calculate Gradiient of Shape Function Matrix       !!
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-subroutine HexB (BMatrix, DetJ, ElementShapeNodes, Transformed, Original)
+subroutine TetB (BMatrix, DetJ, ElementShapeNodes, Original)
     USE MathKernel
     implicit none
     integer, intent(in) ::  ElementShapeNodes
-    real(8) ::  BMatrix(6, 3*ElementShapeNodes), DetJ, Transformed(3), Original(ElementShapeNodes, 3)
+    real(8) ::  BMatrix(6, 3*ElementShapeNodes), DetJ, Original(ElementShapeNodes, 3)
     real(8) ::  GradN(3,ElementShapeNodes), J(3,3), InvMatJ(3,3), DerivN(3,ElementShapeNodes)
-    real(8) ::  Bx(ElementShapeNodes), By(ElementShapeNodes), Bz(ElementShapeNodes), xi, eta, zta
+    real(8) ::  Bx(ElementShapeNodes), By(ElementShapeNodes), Bz(ElementShapeNodes)
     integer ::  i
     logical ::  OK_Flag
     
     select case (ElementShapeNodes)
-    case (8)
-        xi      = Transformed(1)
-        eta     = Transformed(2)
-        zta     = Transformed(3)
+    case (4)
         GradN   = 0.125*reshape((/-(1-eta)*(1-zta), -(1-xi)*(1-zta), -(1-xi)*(1-eta), &
                                    (1-eta)*(1-zta), -(1+xi)*(1-zta), -(1+xi)*(1-eta), &
                                    (1+eta)*(1-zta),  (1+xi)*(1-zta), -(1+xi)*(1+eta), &
@@ -321,5 +308,5 @@ subroutine HexB (BMatrix, DetJ, ElementShapeNodes, Transformed, Original)
                              0D0, 0D0, Bz(i), 0D0, By(i), Bx(i)/), &
                              i = 1, ElementShapeNodes)/), Shape(BMatrix))
     end select
-end subroutine HexB
+end subroutine TetB
 
