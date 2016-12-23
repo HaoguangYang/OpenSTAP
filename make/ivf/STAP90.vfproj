@@ -61,7 +61,8 @@
 		<File RelativePath="..\..\src\elements\shell.f90"/>
 		<File RelativePath="..\..\src\elements\shell8Q.f90"/>
 		<File RelativePath="..\..\src\elements\TIMOSHENKO.f90"/>
-		<File RelativePath="..\..\src\elements\truss.f90"/></Filter>
+		<File RelativePath="..\..\src\elements\truss.f90"/>
+		<File RelativePath="..\..\src\plasticity\PlasticIterate.f90"/></Filter>
 		<Filter Name="Modal">
 		<File RelativePath="..\..\src\modal\jacobi.f90"/>
 		<File RelativePath="..\..\src\modal\LANCZOS.f90"/>

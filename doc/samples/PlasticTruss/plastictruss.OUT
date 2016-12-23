@@ -59,7 +59,7 @@
   SET       YOUNG'S     CROSS-SECTIONAL     YIELD-STRESS     PLASTIC-MODULES
  NUMBER     MODULUS          AREA
                E              A             SIGMA-Y               K
-    1     0.10000E+12    0.100000E-05     0.10000E+08     0.10000E+11
+    1     0.10000E+12    0.100000E-05     0.10000E+10     0.10000E+11
 
 
  E L E M E N T   I N F O R M A T I O N

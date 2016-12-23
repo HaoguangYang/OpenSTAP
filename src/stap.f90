@@ -213,10 +213,25 @@ IF (DYNANALYSIS .EQV. .TRUE.) call prepare_MassMatrix
             CALL STRESS (A(NP(11)))
             CALL SECOND (TIM(7))
      END DO
+     
+!!!!!!!!!!!!!!!!!PLASTIC ONLY!!!!!!!!!!!!
+     IF ( (HED .EQ. 'PLASTIC') .AND. ( .NOT. PLASTICTRIAL ) .AND. (PLASTICITERATION) ) THEN
+        GOTO 1000 
+     ENDIF
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+     
      CALL VTKgenerate (IND)
      
   END IF
 
+ !!!!!!!!!!!!!!FOR PLASTIC TRUSS ONLY!!!!!!!!!!!!!!!!!!!
+
+1000 IF ( (HED .EQ. 'PLASTIC') .AND. ( .NOT. PLASTICTRIAL ) .AND. (PLASTICITERATION) ) THEN
+        CALL PLASTICITERATE 
+     ENDIF
+  
+ !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! 
+  
 ! Print solution times
 
   TT=0
@@ -389,4 +404,9 @@ SUBROUTINE CLOSEFILES()
   close(VTKTmpFile, status='delete')
   close(VTKNodeTmp, status='delete')
   close(VTKElTypTmp, status='delete')
+  
+  !FOR PLASTIC TRUSS ONLY
+  CLOSE(PRESENTDISPLACEMENT, STATUS = 'DELETE')
+  CLOSE(DELTALOAD, STATUS = 'DELETE')
+  
 END SUBROUTINE CLOSEFILES

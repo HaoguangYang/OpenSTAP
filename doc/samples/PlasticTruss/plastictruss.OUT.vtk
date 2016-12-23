@@ -1,0 +1,8 @@
+# vtk DataFile Version 3.0
+ PLASTIC                                                                        
+  
+ASCII
+DATASET UNSTRUCTURED_GRID
+ POINTS           2 double
+  0.000000000000000E+000  0.000000000000000E+000  0.000000000000000E+000
+   1.00000000000000       0.000000000000000E+000  0.000000000000000E+000
