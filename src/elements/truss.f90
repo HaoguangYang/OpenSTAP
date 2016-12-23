@@ -219,12 +219,10 @@ SUBROUTINE RUSS (ID,X,Y,Z,U,MHT,E,AREA,LM,XYZ,MATP,Node)
         GaussianCollection(:,N) = 0.5*(XYZ(4:6,N)+XYZ(1:3,N))
         StressCollection(1,N) = STR
      END DO
-!>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>WORKING PROGRESS
      StressCollection(2,:) = 0D0
      call PostProcessor(NPAR(1), 1, XYZ, &
                         Node, 1, GaussianCollection, StressCollection, U)
-!>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>AT POINT 513 & 1370 WHERE TRUSSES MERGE, DO NOT USE LEAST SQUARE!
-!>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>WOULD BE BETTER IF USE DIM==1.
+                      ! AT POINT 513 & 1370 WHERE TRUSSES MERGE, DO NOT USE LEAST SQUARE!
   ELSE 
      STOP "*** ERROR *** Invalid IND value."
   END IF

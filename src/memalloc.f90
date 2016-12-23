@@ -21,7 +21,7 @@
 
 module memAllocate
 
-   integer, parameter :: MTOT = 400000000  ! Speed storage available for execution
+   integer, parameter :: MTOT = 300000000  ! Speed storage available for execution
    integer, parameter :: ITWO = 2      ! Double precision indicator
                                         !   1 - Single precision arithmetic
                                         !   2 - Double precision arithmetic
@@ -30,7 +30,8 @@ module memAllocate
    integer :: IA(MTOT)
 
    equivalence (A,IA), (A,DA)  ! A, DA, and IA share the same storage units
-
+   real(8), allocatable :: stff(:)
+   integer, allocatable :: columns(:)
    integer, parameter :: amax = 20    ! Maximum number of arrays allowed
 
    integer :: np(amax) = 0    ! Pointer to each array

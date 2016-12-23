@@ -105,7 +105,7 @@ SUBROUTINE ELEMENT_3T_MAIN (ID,X,Y,Z,U,MHT,E,POISSON,LM,XYZ,MATP,Node)
   REAL(8),ALLOCATABLE:: GP1(:),GP2(:),W(:)
   REAL(8) :: NMAT(1,3),BMAT(3,6),C(3,2)
   REAL(8) :: KE(6,6),DETJ,D(3,3),XY(3,2), StressCollection(3,NPAR(2)*3), GaussianCollection(2,NPAR(2)*3)
-  REAL(8),ALLOCATABLE:: STRESS_XX(:,:),STRESS_YY(:,:),STRESS_XY(:,:),STRESS(:,:)
+  REAL(8),ALLOCATABLE:: STRESS(:,:)
   COMMON DETJ
   
   !定义gauss积分常数

@@ -68,6 +68,7 @@ module GLOBALS
    logical :: PARDISODOOR
    logical :: LOADANALYSIS
    logical :: DYNANALYSIS
+   logical :: HUGE = .FALSE.
    
    !FOR PLASTIC TRUSS ONLY
    !CONTROL MESSAGE
