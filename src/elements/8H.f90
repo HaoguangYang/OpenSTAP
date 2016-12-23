@@ -51,14 +51,14 @@ subroutine EightHex
     N(7) = N(6) + NumberOfElements
     N(8) = N(7) + NPAR(5)*NPAR(2)
     
-    MIDEST = N(9)
+    MIDEST = N(8)
     
     if (IND .EQ. 1) then
         call MemAlloc(11,"ELEGP",MIDEST,1)
     end if
     NFIRST = NP(11)
     N(:) = N(:) + NFIRST
-    NLAST  = N(9)
+    NLAST  = N(8)
     
     call HexEight (IA(NP(1)),DA(NP(2)),DA(NP(3)),DA(NP(4)),DA(NP(4)),IA(NP(5)),   &
                   A(N(1)),A(N(2)),A(N(3)),A(N(4)),A(N(5)),A(N(6)),A(N(7)))

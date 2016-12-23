@@ -21,7 +21,7 @@
 
 module memAllocate
 
-   integer, parameter :: MTOT = 300000000  ! Speed storage available for execution
+   integer, parameter :: MTOT = 400000000  ! Speed storage available for execution
    integer, parameter :: ITWO = 2      ! Double precision indicator
                                         !   1 - Single precision arithmetic
                                         !   2 - Double precision arithmetic
