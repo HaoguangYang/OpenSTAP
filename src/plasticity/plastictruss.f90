@@ -236,8 +236,6 @@ SUBROUTINE PLASTICRUSS (ID,X,Y,Z,U,MHT,E,AREA,YIELDSTRESS,PLASTICK,HISTORY,LM,XY
         IF (PLASTICTRIAL) THEN
             IF (STR .GE. YIELDSTRESS(MTYPE)) THEN
                 PLASTICITERATION=.TRUE.
-                HISTORY(N)=1
-                
                 IF (STR .GT. MAXSTR) THEN
                 MAXSTR=STR
                 ENDIF
