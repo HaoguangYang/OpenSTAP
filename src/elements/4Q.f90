@@ -104,7 +104,7 @@ SUBROUTINE ELEMENT_4Q_MAIN (ID,X,Y,Z,U,MHT,E,POISSON,LM,XYZ,MATP,Node)
   INTEGER :: NPAR1, NUME, NUMMAT, ND, Node(NPAR(2),NPAR(5)), L, N, I, J
   INTEGER :: MTYPE, IPRINT
   REAL(8) :: GP(2),W(2),NMAT(2,8),BMAT(3,8),C(4,2),NA(1,4)
-  REAL(8) :: KE(8,8),DETJ,D(3,3)
+  REAL(8) :: KE(8,8),DETJ,D(3,3), M(8,8), Rho, Density(NPAR(3))
   REAL(8) :: X_GUASS(4,2),XY(1,2), GaussianCollection(2,NPAR(2)*4)
   REAL(8) :: STRESS_XX(NPAR(2),4),STRESS_YY(NPAR(2),4),STRESS_XY(NPAR(2),4),STRESS(3,1)
   COMMON DETJ
@@ -212,7 +212,12 @@ SUBROUTINE ELEMENT_4Q_MAIN (ID,X,Y,Z,U,MHT,E,POISSON,LM,XYZ,MATP,Node)
             END DO
          END DO       
 
-        CALL ADDBAN (DA(NP(3)),IA(NP(2)),KE,LM(1,N),ND)
+        !CALL ADDBAN (DA(NP(3)),IA(NP(2)),KE,LM(1,N),ND)
+        if(pardisodoor) then
+            call pardiso_addban(DA(NP(3)),IA(NP(2)),IA(NP(5)),KE,LM(1,N),ND)
+        else
+            CALL ADDBAN (DA(NP(3)),IA(NP(2)),KE,LM(1,N),ND)
+        end if
 
      END DO
         !write (*,*) "--------------------K--------------------"

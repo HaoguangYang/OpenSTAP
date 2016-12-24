@@ -85,7 +85,7 @@ SUBROUTINE SHELL4Q (ID,X,Y,Z,U,MHT,E,POSSION,LM,XYZ,MATP, THICK, Node)
   INTEGER :: MTYPE, IPRINT, Node(NPAR(2),NPAR(5))
 
   REAL(8) :: Cb(3, 3),Cc(3, 3), Cs, Etemp, Ptemp, detJ, N1, N2, N3, N4
-  REAL(8) :: GAUSS(2), W(2)
+  REAL(8) :: GAUSS(2), W(2), Mass(20,20), Rho, Density(NPAR(3)), Ma(3,20), Mb(3,20)
   REAL(8) :: G1, G2, GN(2,4), Ja(2,2), Ja_inv(2,2), Bk(3,20),By(2,20),Bm(3,20), S(20,20), BB(2,4), NShape(1,4), NN0(1,4)
   REAL(8) :: X_Y(4, 2), XY_G(1,2), STR1(3), STR2(2), GaussianCollection(3,NPAR(2)*4), StressCollection(6,NPAR(2)*4)
   real(8) :: x_test(20)
@@ -203,7 +203,8 @@ SUBROUTINE SHELL4Q (ID,X,Y,Z,U,MHT,E,POSSION,LM,XYZ,MATP, THICK, Node)
         
         Cs = Etemp/(2*(1+Ptemp))*THICK(N)*5/6
 ! Gauss 积分常数
-        S = 0
+        S(:,:) = 0
+        Mass(:,:) = 0
         DO L=1,2
             DO M=1,2
                 G1 = GAUSS(L)
@@ -252,17 +253,28 @@ SUBROUTINE SHELL4Q (ID,X,Y,Z,U,MHT,E,POSSION,LM,XYZ,MATP, THICK, Node)
 ! 这里不要忘了还要乘上z方向积分
                S = S + (matmul(matmul(transpose(Bk), Cb), Bk) + Cs*matmul(transpose(By), By)+ &
                     matmul(matmul(transpose(Bm), Cc), Bm))*abs(detJ)
-         
-                              
-                   
-        
+               if (DYNANALYSIS) then
+                    Ma = 0
+                    DO K = 1,4
+                        Ma(1,5*K-4) = NN0(1,K)
+                    END DO
                 
+                    Mb = 0
+                    DO K = 1,4
+                        Mb(2,5*K-3) = NN0(1,K)
+                        Mb(3,5*K-2) = NN0(1,K)
+                    END DO
+                    Mass = Mass + (matmul(transpose(Ma), Ma))*abs(detJ)*THICK(N)+ &
+                                  (matmul(transpose(Mb), Mb))*abs(detJ)*THICK(N)**3
+                end if
             END DO
         END DO
         if(pardisodoor) then
             call pardiso_addban(DA(NP(3)),IA(NP(2)),IA(NP(5)),S,LM(1,N),ND)
+            if (DYNANALYSIS) CALL pardiso_addban(DA(NP(10)),IA(NP(9)), IA(NP(8)),Mass,LM(:,N),ND)
         else
             CALL ADDBAN (DA(NP(3)),IA(NP(2)),S,LM(1,N),ND)
+            IF (DYNANALYSIS) CALL ADDBAN (DA(NP(10)),IA(NP(2)),Mass,LM(:,N),ND)
         end if
      END DO
 

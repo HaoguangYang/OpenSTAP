@@ -72,7 +72,7 @@ SUBROUTINE RUSS (ID,X,Y,Z,U,MHT,E,AREA,LM,XYZ,MATP,Node)
   IMPLICIT NONE
   INTEGER :: ID(6,NUMNP),LM(6,NPAR(2)),MATP(NPAR(2)),MHT(NEQ)
   REAL(8) :: X(NUMNP),Y(NUMNP),Z(NUMNP),E(NPAR(3)),AREA(NPAR(3)),  &
-             XYZ(6,NPAR(2)),U(NEQ)
+             XYZ(6,NPAR(2)),U(NEQ), M(6,6), Rho, Density(NPAR(3))
   REAL(8) :: S(6,6),ST(6),D(3), StressCollection(6,NPAR(2)), GaussianCollection(3,NPAR(2))
 
   INTEGER :: NPAR1, NUME, NUMMAT, ND, I, J, L, N, Node(NPAR(2),NPAR(5))

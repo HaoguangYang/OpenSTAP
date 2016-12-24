@@ -25,7 +25,7 @@
 				<Tool Name="VFPostBuildEventTool"/>
 				<Tool Name="VFManifestTool" SuppressStartupBanner="true"/></Configuration>
 		<Configuration Name="Debug|x64">
-				<Tool Name="VFFortranCompilerTool" SuppressStartupBanner="true" DebugInformationFormat="debugEnabled" Optimization="optimizeDisabled" Traceback="true" BoundsCheck="true" RuntimeLibrary="rtMultiThreadedDebug" UseMkl="mklParallel" Interfaces="true"/>
+				<Tool Name="VFFortranCompilerTool" SuppressStartupBanner="true" DebugInformationFormat="debugEnabled" MultiProcessorCompilation="true" Optimization="optimizeDisabled" Traceback="true" BoundsCheck="true" RuntimeLibrary="rtMultiThreadedDebug" UseMkl="mklParallel" Interfaces="true"/>
 				<Tool Name="VFLinkerTool" LinkIncremental="linkIncrementalNo" SuppressStartupBanner="true" GenerateDebugInformation="true" SubSystem="subSystemConsole" StackReserveSize="2000000000" LargeAddressAware="addrAwareLarge"/>
 				<Tool Name="VFResourceCompilerTool"/>
 				<Tool Name="VFMidlTool" SuppressStartupBanner="true" TargetEnvironment="midlTargetAMD64"/>
@@ -52,13 +52,15 @@
 		<File RelativePath="..\..\src\elements\27H.f90"/>
 		<File RelativePath="..\..\src\elements\3T.f90"/>
 		<File RelativePath="..\..\src\elements\4Q.f90"/>
+		<File RelativePath="..\..\src\elements\4Tet.f90"/>
 		<File RelativePath="..\..\src\elements\8H.f90"/>
 		<File RelativePath="..\..\src\elements\9Q.f90"/>
 		<File RelativePath="..\..\src\elements\BEAM.f90"/>
-		<File RelativePath="..\..\src\plasticity\PlasticIterate.f90"/>
+		<File RelativePath="..\..\src\elements\INFINITE4Q.f90"/>
 		<File RelativePath="..\..\src\plasticity\plastictruss.f90"/>
 		<File RelativePath="..\..\src\elements\plate.f90"/>
 		<File RelativePath="..\..\src\elements\plate8Q.f90"/>
+		<File RelativePath="..\..\src\elements\PURE8Q.f90"/>
 		<File RelativePath="..\..\src\elements\shell.f90"/>
 		<File RelativePath="..\..\src\elements\shell8Q.f90"/>
 		<File RelativePath="..\..\src\elements\TIMOSHENKO.f90"/>
@@ -84,6 +86,7 @@
 		<File RelativePath="..\..\src\globals.f90"/>
 		<File RelativePath="..\..\src\memalloc.f90"/>
 		<File RelativePath="..\..\src\modalanlsis.f90"/>
+		<File RelativePath="..\..\src\plasticity\PlasticIterate.f90"/>
 		<File RelativePath="..\..\src\postprocessor.f90"/>
 		<File RelativePath="..\..\src\stap.f90"/></Filter></Filter>
 		<File RelativePath="..\Readme.txt"/></Files>

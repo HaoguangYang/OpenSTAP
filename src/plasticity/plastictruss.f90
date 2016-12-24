@@ -79,7 +79,7 @@ SUBROUTINE PLASTICRUSS (ID,X,Y,Z,U,MHT,E,AREA,YIELDSTRESS,PLASTICK,HISTORY,LM,XY
   INTEGER :: ID(6,NUMNP),LM(6,NPAR(2)),MATP(NPAR(2)),MHT(NEQ),HISTORY(NPAR(2))
   REAL(8) :: X(NUMNP),Y(NUMNP),Z(NUMNP),E(NPAR(3)),AREA(NPAR(3)),  &
              XYZ(6,NPAR(2)),U(NEQ),YIELDSTRESS(NPAR(3)),PLASTICK(NPAR(3))
-  REAL(8) :: S(6,6),ST(6),D(3)! StressCollection(6,NPAR(2)), GaussianCollection(3,NPAR(2))
+  REAL(8) :: S(6,6),ST(6),D(3),M(6,6), Rho, Density(NPAR(3))! StressCollection(6,NPAR(2)), GaussianCollection(3,NPAR(2))
 
   INTEGER :: NPAR1, NUME, NUMMAT, ND, I, J, L, N, Node(NPAR(2),NPAR(5))
   INTEGER :: MTYPE, IPRINT
@@ -194,11 +194,11 @@ SUBROUTINE PLASTICRUSS (ID,X,Y,Z,U,MHT,E,AREA,YIELDSTRESS,PLASTICK,HISTORY,LM,XY
             ENDDO
         ENDDO
 
-!        if(pardisodoor) then
-!            call pardiso_addban(DA(NP(3)),IA(NP(2)),IA(NP(5)),S,LM(1,N),ND)
-!        else
+        if(pardisodoor) then
+            call pardiso_addban(DA(NP(3)),IA(NP(2)),IA(NP(5)),S,LM(1,N),ND)
+        else
             CALL ADDBAN (DA(NP(3)),IA(NP(2)),S,LM(1,N),ND)
-!        end if
+        end if
 
      END DO
 

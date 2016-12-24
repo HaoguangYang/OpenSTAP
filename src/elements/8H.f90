@@ -84,7 +84,7 @@ subroutine HexEight (ID,X,Y,Z,U,MHT,E, PoissonRatio, Density, LM, PositionData, 
                 Transformed(3), W(2), Weight(2,2,2), GaussianPts(2), GaussianCollection(3, NPAR(2)*2**3), &
                 StressCollection(6,NPAR(2)*2**3), M(3*NPAR(5),3*NPAR(5)), Rho
     real(8) ::  Young, v, S(3*NPAR(5),3*NPAR(5)), GaussianPtsPosit(3,2**3), Strain(6,2**3), Stress(6,2**3), &
-                Density, Gravity, NMatrix(3,3*NPAR(5)), NormalVec(3), Point(3*NPAR(5),3*NPAR(5))
+                Density(NPAR(3)), NMatrix(3,3*NPAR(5)), NormalVec(3), Point(3*NPAR(5),3*NPAR(5))
                 
     ElementType         = NPAR(1)
     NumberOfElements    = NPAR(2)
@@ -107,14 +107,21 @@ subroutine HexEight (ID,X,Y,Z,U,MHT,E, PoissonRatio, Density, LM, PositionData, 
                    ' AND CROSS-SECTIONAL  CONSTANTS ',         &
                    4 (' .'),'( NPAR(3) ) . . =',I10,/)") NumberOfMaterials
         
-        WRITE (IOUT,"('  SET       YOUNG''S    POISSON',/,  & 
-                            ' NUMBER     MODULUS      RATIO',/,  &
-                   15 X,'E', 12 X, 'v')")
+        WRITE (IOUT,"('  SET       YOUNG''S    POISSON     DENSITY',/,  & 
+                      ' NUMBER     MODULUS      RATIO',/,  &
+                   15 X,'E', 12 X,               'v',12X,     '¦Ñ')")
 
-        DO I=1,NumberOfMaterials
-            READ (IIN,'(I10,2F10.0)') N,E(N), PoissonRatio(N)      ! Read material information for 3D Homogeneous
-            WRITE (IOUT,"(I10,4X,E12.5,2X,E14.6)") N,E(N), PoissonRatio(N)
-        END DO
+        if (DYNANALYSIS) then
+            DO I=1,NumberOfMaterials
+            READ (IIN,'(I10,3F10.0)') N,E(N), PoissonRatio(N), Density(N)      ! Read material information for 3D Homogeneous
+            WRITE (IOUT,"(I10,4X,E12.5,2(2X,E14.6))") N,E(N), PoissonRatio(N), Density(N)
+            END DO
+        else
+            DO I=1,NumberOfMaterials
+                READ (IIN,'(I10,2F10.0)') N,E(N), PoissonRatio(N)      ! Read material information for 3D Homogeneous
+                WRITE (IOUT,"(I10,4X,E12.5,2X,E14.6)") N,E(N), PoissonRatio(N)
+            END DO
+        end if
         WRITE (IOUT,"(//,' E L E M E N T   I N F O R M A T I O N',//,  &
                       ' ELEMENT        |------------------------- NODES -------------------------|       MATERIAL',/,   &
                       ' NUMBER-N        1       2       3       4       5       6       7       8       SET NUMBER')")
@@ -196,10 +203,10 @@ subroutine HexEight (ID,X,Y,Z,U,MHT,E, PoissonRatio, Density, LM, PositionData, 
             
             if(pardisodoor) then
                 call pardiso_addban(DA(NP(3)),IA(NP(2)),IA(NP(5)),S,LM(:,N),ND)
-                if (DYNANALYSIS) CALL pardiso_addban(DA(NP(10)),IA(NP(9)), IA(NP(8)),S,LM(:,N),ND)
+                if (DYNANALYSIS) CALL pardiso_addban(DA(NP(10)),IA(NP(9)), IA(NP(8)),M,LM(:,N),ND)
             else
-                CALL ADDBAN (DA(NP(3)),IA(NP(2)),S,LM(:,N),ND)
-                IF (DYNANALYSIS) CALL ADDBAN (DA(NP(10)),IA(NP(2)),M,LM(:,N),ND)
+                CALL ADDBAN (DA(NP(3)),IA(NP(2)),S,LM(:,N),ND)                              !Assemble Stiffness Matrix
+                IF (DYNANALYSIS) CALL ADDBAN (DA(NP(10)),IA(NP(2)),M,LM(:,N),ND)            !Assemble Mass Matrix
             end if
 
             

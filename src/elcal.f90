@@ -90,11 +90,17 @@ SUBROUTINE ELEMNT
      CALL HexTriQuad
   case (12)
      CALL TIMOSHENKO
+  case (13)
+     CALL FourTet
+  case (14)
+     CALL INFINITE4Q
+  case (15)
+     CALL PURE8Q
   case (0)
      CALL PLASTICTRUSS
 !    Other element types would be called here, identifying each
 !    element type by a different NPAR(1) parameter
-  case (13:)
+  case (16:)
      stop "ELEMENT TYPE STILL UNDER DEVELOPMENT..."
   END SELECT
 

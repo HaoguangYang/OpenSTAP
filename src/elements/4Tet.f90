@@ -81,7 +81,7 @@ subroutine TetFour (ID,X,Y,Z,U,MHT,E, PoissonRatio, Density, LM, PositionData, M
     real(8) ::  X(NUMNP), Y(NUMNP), Z(NUMNP), U(NEQ), &
                 DetJ(4), E(NPAR(3)), PoissonRatio(NPAR(3)), ElementDisp(12)
     real(8) ::  BMatrix(6, 3*NPAR(5)), PositionData(3*NPAR(5), NPAR(2)), DMatrix(6,6), &
-                Transformed(3), W(2), GaussianPts(2), GaussianCollection(3, NPAR(2)*4), &
+                Transformed(3), GaussianCollection(3, NPAR(2)*4), &
                 StressCollection(6,NPAR(2)*4), M(3*NPAR(5),3*NPAR(5)), Rho
     real(8) ::  Young, v, S(3*NPAR(5),3*NPAR(5)), GaussianPtsPosit(3,4), Strain(6,4), Stress(6,4), &
                 Density, Gravity, NMatrix(3,3*NPAR(5)), NormalVec(3), Point(3*NPAR(5),3*NPAR(5))
@@ -166,7 +166,7 @@ subroutine TetFour (ID,X,Y,Z,U,MHT,E, PoissonRatio, Density, LM, PositionData, M
             
             !DetJ = reshape(Jacobian((n-1)*NGauss+1 : n*NGauss), &
             !               (/QuadratureOrder, QuadratureOrder, QuadratureOrder/))
-            DetJ(:, :, :)=0
+            DetJ(:)=0
             do i = 1, NGauss
                 CALL TetB(BMatrix, DetJ(i), ElementShapeNodes,        &
                          (/PositionData(1:ElementShapeNodes*3-1:3,N), &
@@ -178,7 +178,7 @@ subroutine TetFour (ID,X,Y,Z,U,MHT,E, PoissonRatio, Density, LM, PositionData, M
                     Transformed = GaussianPts(i,:)
                     call TetN (NMatrix, ElementShapeNodes, Transformed)             !Initialize N Matrix for mass assembly
                     Point = Rho*matmul(transpose(NMatrix),NMatrix)
-                    M = M + (Weight(i,j,k)*DetJ(i,j,k))*Point
+                    M = M + (Weight(i)*DetJ(i))*Point
                 END IF
             end do
             
@@ -220,7 +220,7 @@ subroutine TetFour (ID,X,Y,Z,U,MHT,E, PoissonRatio, Density, LM, PositionData, M
                 call TetN (NMatrix, ElementShapeNodes, Transformed)
                 GaussianPtsPosit(:,i) = matmul(reshape(PositionData(:,N), (/3,ElementShapeNodes/)), &
                                                NMatrix(1, 1:3*ElementShapeNodes:3))
-                CALL TetB (BMatrix, DetJ(i,j,k), ElementShapeNodes,     &
+                CALL TetB (BMatrix, DetJ(i), ElementShapeNodes,     &
                            (/PositionData(1:ElementShapeNodes*3-1:3,N), &
                              PositionData(2:ElementShapeNodes*3  :3,N), &
                              PositionData(3:ElementShapeNodes*3+1:3,N)/))
@@ -242,8 +242,7 @@ subroutine TetFour (ID,X,Y,Z,U,MHT,E, PoissonRatio, Density, LM, PositionData, M
                 
     END SELECT
 
-end subroutine HexEight
-
+end subroutine TetFour
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !!              Calculate Shape Function Matrix             !!
@@ -282,7 +281,7 @@ subroutine TetB (BMatrix, DetJ, ElementShapeNodes, Original)
     
     select case (ElementShapeNodes)
     case (4)
-        J       = (/Original(1:3,1)-Original(4,1), Original(1:3,2)-Original(4,2), Original(1:3,3)-Original(4,3)/)
+        J       = reshape((/Original(1:3,1)-Original(4,1), Original(1:3,2)-Original(4,2), Original(1:3,3)-Original(4,3)/),(/3,3/))
         DetJ    = Det(J, 3)
         !Sub-array of the N matrix to generate B matrix
         Bx(1) =  Det(reshape((/Original((/2,3,4/),(/2,3/)), 1D0, 1D0, 1D0/), (/3,3/)), 3)
