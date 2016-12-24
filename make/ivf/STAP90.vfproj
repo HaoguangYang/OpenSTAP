@@ -55,6 +55,8 @@
 		<File RelativePath="..\..\src\elements\8H.f90"/>
 		<File RelativePath="..\..\src\elements\9Q.f90"/>
 		<File RelativePath="..\..\src\elements\BEAM.f90"/>
+		<File RelativePath="..\..\src\plasticity\PlasticIterate.f90"/>
+		<File RelativePath="..\..\src\plasticity\plastictruss.f90"/>
 		<File RelativePath="..\..\src\elements\plate.f90"/>
 		<File RelativePath="..\..\src\elements\plate8Q.f90"/>
 		<File RelativePath="..\..\src\elements\shell.f90"/>
@@ -70,6 +72,7 @@
 		<File RelativePath="..\..\src\module\list.f90"/>
 		<File RelativePath="..\..\src\module\mathkernel.f90"/>
 		<File RelativePath="..\..\src\module\mkl_pardiso.f90"/>
+		<File RelativePath="..\..\src\module\mkl_solvers_ee.fi"/>
 		<File RelativePath="..\..\src\module\node.f90"/>
 		<File RelativePath="..\..\src\module\pardiso.f90"/>
 		<File RelativePath="..\..\src\module\solver_mode.f90"/>

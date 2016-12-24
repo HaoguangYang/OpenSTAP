@@ -148,6 +148,8 @@ SUBROUTINE TIMOELE (ID,X,Y,Z,U,MHT,E,G,AREA,I_X,I_Y,I_Z,J_X,J_Y,J_Z,LM,XYZ,MATP,
 
         WRITE (IOUT,"(I10,6X,I10,4X,I10,7X,I10)") N,Node(N,1:NPAR(5)),MTYPE
 
+        write (VTKNodeTmp) NPAR(5), Node(N,:)-1
+
      END DO
 
      RETURN
@@ -419,7 +421,6 @@ SUBROUTINE TIMOELE (ID,X,Y,Z,U,MHT,E,G,AREA,I_X,I_Y,I_Z,J_X,J_Y,J_Z,LM,XYZ,MATP,
         ENDDO
         
        !PRINT THE RESULTS FOR POSTPROCESSING
-       
 
        WRITE (IOUT,"(1X,I10,1X,12(E12.6,1X))") N,(FORCE(I),I=1,12)
        GaussianCollection(:,N) = 0.5*(XYZ(4:6,N)+XYZ(1:3,N))

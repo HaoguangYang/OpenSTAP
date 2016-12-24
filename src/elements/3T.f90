@@ -105,7 +105,7 @@ SUBROUTINE ELEMENT_3T_MAIN (ID,X,Y,Z,U,MHT,E,POISSON,LM,XYZ,MATP,Node)
   REAL(8),ALLOCATABLE:: GP1(:),GP2(:),W(:)
   REAL(8) :: NMAT(1,3),BMAT(3,6),C(3,2)
   REAL(8) :: KE(6,6),DETJ,D(3,3),XY(3,2), StressCollection(3,NPAR(2)*3), GaussianCollection(2,NPAR(2)*3)
-  REAL(8),ALLOCATABLE:: STRESS_XX(:,:),STRESS_YY(:,:),STRESS_XY(:,:),STRESS(:,:)
+  REAL(8),ALLOCATABLE:: STRESS(:,:)
   COMMON DETJ
   
   !定义gauss积分常数
@@ -289,7 +289,7 @@ FUNCTION NmatElast3T(ETA,EPSILON)
   IMPLICIT NONE
   REAL(8):: EPSILON,ETA
   REAL(8):: X1,X2,X3,Y1,Y2,Y3
-  REAL(8):: NmatElast3T(1,3),N(1,3)
+  REAL(8):: NmatElast3T(1,3)
   REAL(8):: N1,N2,N3
   
   X1=1.0
@@ -303,8 +303,7 @@ FUNCTION NmatElast3T(ETA,EPSILON)
   N2 = (x3*y1-x1*y3)+(y3-y1)*EPSILON+(x1-x3)*ETA
   N3 = (x1*y2-x2*y1)+(y1-y2)*EPSILON+(x2-x1)*ETA
   
-  N(1,:) = (/N1,N2,N3/)
-  NmatElast3T=N
+  NmatElast3T(1,:) = (/N1, N2, N3/)
   
 END FUNCTION NmatElast3T
   

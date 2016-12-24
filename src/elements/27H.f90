@@ -278,7 +278,8 @@ subroutine HexN27 (NMatrix, ElementShapeNodes, Transformed)
     real(8) ::  NMatrix(3, 3*ElementShapeNodes), Transformed(3), N(ElementShapeNodes)
     
     select case (ElementShapeNodes)
-    case (8)
+    case (27)
+    !>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>WORKING PROGRESS
         N(1) = (1-Transformed(1))*(1-Transformed(2))*(1-Transformed(3))/8
         N(2) = (1+Transformed(1))*(1-Transformed(2))*(1-Transformed(3))/8
         N(3) = (1+Transformed(1))*(1+Transformed(2))*(1-Transformed(3))/8
@@ -308,7 +309,8 @@ subroutine HexB27 (BMatrix, DetJ, ElementShapeNodes, Transformed, Original)
     logical ::  OK_Flag
     
     select case (ElementShapeNodes)
-    case (8)
+    case (27)
+    !>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>WORKING PROGRESS
         xi      = Transformed(1)
         eta     = Transformed(2)
         zta     = Transformed(3)

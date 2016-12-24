@@ -15,7 +15,7 @@ subroutine EightHex
     use memallocate
     
     implicit none
-    integer :: NumberOfElements, NumberOfMaterials, ElementGroupSize, QuadratureOrder=2
+    integer :: NumberOfElements, NumberOfMaterials, ElementGroupSize
     integer :: N(11) !Pointers
     
     NPAR(5) = 8
@@ -31,47 +31,43 @@ subroutine EightHex
 ! N101: E(NumberOfMaterials)
 ! N102: v(NumberOfMaterials)
 ! N103: Density(NumberOfMaterials)
-! N104: Gravity(NumberOfMaterials)
 ! N105: LM(3*NPAR(5),NumberOfElements)
 ! N106: PositionData(3*NPAR(5),NumberOfElements)
 ! N107: MaterialData(NumberOfElements)
-! N108: BMat (NumberOfElements*18*NPAR(5)*8)
-! N109: Jacobian(NumberOfElements*QuadratureOrder^3)
+! N108: Node Connection Matrix
 
     N(1) = 0
     N(2) = N(1)+NumberOfMaterials*ITWO
     N(3) = N(2)+NumberOfMaterials*ITWO
     
-    if (NPAR(4) .GT. 0) then
+    if (DYNANALYSIS) then
         N(4) = N(3)+NumberOfMaterials*ITWO
-        N(5) = N(4)+NumberOfMaterials*ITWO
     else
         N(4) = N(3)
-        N(5) = N(4)
     end if
     
-    N(6) = N(5) + 3*NPAR(5)*NumberOfElements
-    N(7) = N(6) + 3*NPAR(5)*NumberOfElements*ITWO
-    N(8) = N(7) + NumberOfElements
-    N(9) = N(8) + NPAR(5)*NPAR(2)
+    N(5) = N(4) + 3*NPAR(5)*NumberOfElements
+    N(6) = N(5) + 3*NPAR(5)*NumberOfElements*ITWO
+    N(7) = N(6) + NumberOfElements
+    N(8) = N(7) + NPAR(5)*NPAR(2)
     
-    MIDEST = N(9)
+    MIDEST = N(8)
     
     if (IND .EQ. 1) then
         call MemAlloc(11,"ELEGP",MIDEST,1)
     end if
     NFIRST = NP(11)
     N(:) = N(:) + NFIRST
-    NLAST  = N(9)
+    NLAST  = N(8)
     
     call HexEight (IA(NP(1)),DA(NP(2)),DA(NP(3)),DA(NP(4)),DA(NP(4)),IA(NP(5)),   &
-                  A(N(1)),A(N(2)),A(N(3)),A(N(4)),A(N(5)),A(N(6)),A(N(7)),A(N(8)))
+                  A(N(1)),A(N(2)),A(N(3)),A(N(4)),A(N(5)),A(N(6)),A(N(7)))
     
     !Reuse DA(NP(4)) at Solution Phase 3 as displacement U
     return
 end subroutine EightHex
 
-subroutine HexEight (ID,X,Y,Z,U,MHT,E, PoissonRatio, Density, Gravity, LM, PositionData, MaterialData, Node)
+subroutine HexEight (ID,X,Y,Z,U,MHT,E, PoissonRatio, Density, LM, PositionData, MaterialData, Node)
     use globals
     use MemAllocate
     use MathKernel

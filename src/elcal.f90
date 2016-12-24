@@ -90,6 +90,8 @@ SUBROUTINE ELEMNT
      CALL HexTriQuad
   case (12)
      CALL TIMOSHENKO
+  case (0)
+     CALL PLASTICTRUSS
 !    Other element types would be called here, identifying each
 !    element type by a different NPAR(1) parameter
   case (13:)
