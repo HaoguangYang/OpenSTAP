@@ -227,7 +227,7 @@ IF (DYNANALYSIS .EQV. .TRUE.) call prepare_MassMatrix
  !!!!!!!!!!!!!!FOR PLASTIC TRUSS ONLY!!!!!!!!!!!!!!!!!!!
 
 1000 IF ( (HED .EQ. 'PLASTIC') .AND. ( .NOT. PLASTICTRIAL ) .AND. (PLASTICITERATION) ) THEN
-        CALL PLASTICITERATE 
+        CALL PLASTIC
      ENDIF
   
  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! 

@@ -1,7 +1,9 @@
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-!             PLASTIC TRUSS SYSTEM                  !
-!                LIU CHANGWU                        !
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!    
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!                               弹塑性杆分析模块                              !  
+!                                 作者：刘畅武                                !
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!  
 SUBROUTINE PLASTICTRUSS
 ! . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 ! .                                                                   .
@@ -14,7 +16,7 @@ SUBROUTINE PLASTICTRUSS
   USE MEMALLOCATE
 
   IMPLICIT NONE
-  INTEGER :: NUME, NUMMAT, MM, N(10)
+  INTEGER :: NUME, NUMMAT, MM, N(10),I
 
   NUME = NPAR(2)
   NUMMAT = NPAR(3)
@@ -51,6 +53,13 @@ SUBROUTINE PLASTICTRUSS
 
   CALL PLASTICRUSS (IA(NP(1)),DA(NP(2)),DA(NP(3)),DA(NP(4)),DA(NP(4)),IA(NP(5)),   &
         A(N(1)),A(N(2)),A(N(3)),A(N(4)),A(N(5)),A(N(6)),A(N(7)),A(N(8)),A(N(9)),A(N(10)))
+  
+  IF (IND .EQ. 3) THEN
+      
+      REWIND IELMNT
+      WRITE (IELMNT) MIDEST,NPAR,(A(I),I=NFIRST,NLAST)
+      
+  ENDIF
 
   RETURN
 
@@ -260,8 +269,10 @@ SUBROUTINE PLASTICRUSS (ID,X,Y,Z,U,MHT,E,AREA,YIELDSTRESS,PLASTICK,HISTORY,LM,XY
                 HISTORY(N)=0
             ENDIF
         ENDIF
-        
-        
+            
+          !将杆更新后的状态写入历史文件记录
+   
+         
 
         P=STR*AREA(MTYPE)
         

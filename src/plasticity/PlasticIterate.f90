@@ -1,3 +1,24 @@
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!                               弹塑性杆分析模块                              !  
+!                                 作者：刘畅武                                !
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+SUBROUTINE PLASTIC 
+  USE GLOBALS
+  USE memAllocate
+  
+  IMPLICIT NONE
+  INTEGER :: I
+  
+  DO I=1,FLOOR(ITERATENUM)
+      CALL PLASTICITERATE
+  ENDDO
+  
+  CALL FINALWRITE(IA(NP(1)))
+  
+ENDSUBROUTINE PLASTIC
+
 SUBROUTINE PLASTICITERATE
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !        PLASTIC ITERATION                   !
@@ -143,17 +164,73 @@ SUBROUTINE WRITEDISPLACEMENT (DISP)
   USE GLOBALS, ONLY : PRESENTDISPLACEMENT,NEQ
 
   IMPLICIT NONE
-  REAL(8) :: DISP(NEQ),DISP0(NEQ)
+  REAL(8) :: DISP(NEQ),DISP0(NEQ),DISP2(NEQ)
   INTEGER :: I
 
   REWIND PRESENTDISPLACEMENT
   READ(PRESENTDISPLACEMENT) DISP0
   
-  DISP=DISP+DISP0
+  DISP2=DISP+DISP0
   
   REWIND PRESENTDISPLACEMENT
-  WRITE(PRESENTDISPLACEMENT) DISP
+  WRITE(PRESENTDISPLACEMENT) DISP2
   
   RETURN
 
 END SUBROUTINE WRITEDISPLACEMENT   
+    
+SUBROUTINE FINALWRITE(ID)
+  USE GLOBALS
+  USE memAllocate
+  
+  IMPLICIT NONE
+  INTEGER:: ID(6,NUMNP),I,IC,II,KK
+  REAL(8):: DISP(NEQ),ELESTRESS(NPAR(2)),D(6)
+ 
+  !输出最终位移
+  REWIND PRESENTDISPLACEMENT
+  READ(PRESENTDISPLACEMENT) (DISP(I),I=1,NEQ)
+  
+  
+  WRITE (IOUT,"(//,' D I S P L A C E M E N T S',//,'  NODE ',3X,   &
+                    'X-DISPLACEMENT  Y-DISPLACEMENT  Z-DISPLACEMENT  X-ROTATION  Y-ROTATION  Z-ROTATION')")
+
+  IC=4
+
+ ! write(String, "('Displacement_Load_Case',I2.2)") CURLCASE
+  !write (VTKTmpFile) String, 3, NUMNP
+  
+  DO II=1,NUMNP
+     IC=IC + 1
+     IF (IC.GE.56) THEN
+        WRITE (IOUT,"(//,' D I S P L A C E M E N T S',//,'  NODE ',3X,   &
+                          'X-DISPLACEMENT   Y-DISPLACEMENT  Z-DISPLACEMENT  X-ROTATION  Y-ROTATION  Z-ROTATION')")
+        IC=4
+     END IF
+
+     DO I=1,6
+        D(I)=0.
+     END DO
+
+     DO I=1,6
+        KK=ID(I,II)
+        IF (KK.NE.0) D(I)=DISP(KK)
+     END DO
+
+     WRITE (IOUT,'(1X,I10,5X,6E14.6)') II,D
+  !   write (VTKTmpFile) D(1:3)                                    !Displacements
+
+  END DO
+  
+  !输出最终应力
+   REWIND PRESENTSTRESS
+   READ(PRESENTSTRESS) (ELESTRESS(I),I=1,NPAR(2))
+   
+   WRITE (IOUT,"(//,' ELASTIC TRIAL SOLUTION  F O R  ',  &
+                                           'E L E M E N T  G R O U P ',I4,//,   &
+                                           '  ELEMENT',12X,'STRESS',/,'  NUMBER')") NG
+   DO I=1,NPAR(2)
+     WRITE(IOUT,"(1X,I5,11X,E13.6)") I,ELESTRESS(I)  
+   ENDDO
+  
+ENDSUBROUTINE FINALWRITE
