@@ -109,7 +109,7 @@ subroutine HexEight (ID,X,Y,Z,U,MHT,E, PoissonRatio, Density, LM, PositionData, 
         
         WRITE (IOUT,"('  SET       YOUNG''S    POISSON     DENSITY',/,  & 
                       ' NUMBER     MODULUS      RATIO',/,  &
-                   15 X,'E', 12 X,               'v',12X,     '¦Ñ')")
+                   15 X,'E', 14 X,               'v',14X,     '¦Ñ')")
 
         if (DYNANALYSIS) then
             DO I=1,NumberOfMaterials

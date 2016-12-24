@@ -30,7 +30,7 @@ USE GLOBALS
 USE memAllocate
 
 IMPLICIT NONE
-INTEGER NUME, NUMMAT, MM, N(7)
+INTEGER NUME, NUMMAT, MM, N(8)
 
 NUME = NPAR(2)
 NUMMAT = NPAR(3)
@@ -45,30 +45,35 @@ NPAR(5) = 3
   N(1)=0
   N(2)=N(1)+NUMMAT*ITWO
   N(3)=N(2)+NUMMAT*ITWO
-  N(4)=N(3)+6*NUME
-  N(5)=N(4)+9*NUME*ITWO
-  N(6)=N(5)+NUME
-  N(7)=N(6)+NPAR(5)*NPAR(2)
+  if (DYNANALYSIS) then
+        N(4) = N(3)+NPAR(3)*ITWO
+  else
+        N(4) = N(3)
+  end if
+  N(5)=N(4)+6*NUME
+  N(6)=N(5)+9*NUME*ITWO
+  N(7)=N(6)+NUME
+  N(8)=N(7)+NPAR(5)*NPAR(2)
   
 
-  MIDEST=N(7)
+  MIDEST=N(8)
   if (IND .EQ. 1) then
         ! Allocate storage for element group data
         call MemAlloc(11,"ELEGP",MIDEST,1)
   end if
   NFIRST = NP(11)   ! Pointer to the first entry in the element group data array in the unit of single precision (corresponding to A)
   N(:) = N(:) + NFIRST
-  NLAST=N(7)
+  NLAST=N(8)
 
   CALL ELEMENT_3T_MAIN (IA(NP(1)),DA(NP(2)),DA(NP(3)),DA(NP(4)),DA(NP(4)),IA(NP(5)),   &
-       A(N(1)),A(N(2)),A(N(3)),A(N(4)),A(N(5)),A(N(6)))
+       A(N(1)),A(N(2)),A(N(3)),A(N(4)),A(N(5)),A(N(6)),A(N(7)))
 
   RETURN
 
 END SUBROUTINE ELEMENT_3T
 
 
-SUBROUTINE ELEMENT_3T_MAIN (ID,X,Y,Z,U,MHT,E,POISSON,LM,XYZ,MATP,Node)
+SUBROUTINE ELEMENT_3T_MAIN (ID,X,Y,Z,U,MHT,E,POISSON,DENSITY,LM,XYZ,MATP,Node)
 ! . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 ! .                                                                   .
 ! .   TRUSS element subroutine                                        .
@@ -150,7 +155,7 @@ SUBROUTINE ELEMENT_3T_MAIN (ID,X,Y,Z,U,MHT,E,POISSON,LM,XYZ,MATP,Node)
 
      WRITE (IOUT,"('  SET       YOUNG''S        POISSON     DENSITY',/,  &
                    ' NUMBER     MODULUS',9X,    'RATIO',/,  &
-                   15 X,'E',12X,'v',12X,                      '¦Ñ')")
+                   15 X,'E',14X,'v',14X,                      '¦Ñ')")
 
      if (DYNANALYSIS) then
         DO I=1,NUMMAT

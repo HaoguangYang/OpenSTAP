@@ -22,17 +22,18 @@ SUBROUTINE SHELL
   USE MEMALLOCATE
 
   IMPLICIT NONE
-  INTEGER :: NUME, NUMMAT, MM, N(8)
+  INTEGER :: NUME, NUMMAT, MM, N(9)
 
   NUME = NPAR(2)
   NUMMAT = NPAR(3)
   NPAR(5) = 4
 
-! 此处材料要求每一种提供E, Possion
+! 此处材料要求每一种提供E, POISSON
 
 ! Calculate the pointer to the arrays in the element group data
 ! N101: E(NUMMAT)
-! N102: POSSION(NUMMAT)
+! N102: POISSON(NUMMAT)
+! N(3): Density
 ! N103: LM(20,NUME)
 ! N104: XYZ(12,NUME)
 ! N105: MTAP(NUME)
@@ -41,30 +42,35 @@ SUBROUTINE SHELL
   N(1)=0
   N(2)=N(1)+NUMMAT*ITWO
   N(3)=N(2)+NUMMAT*ITWO
-  N(4)=N(3)+20*NUME
-  N(5)=N(4)+12*NUME*ITWO
-  N(6)=N(5)+NUME
-  N(7)=N(6)+NUME*ITWO
-  N(8)=N(7)+NPAR(5)*NPAR(2)
+  if (DYNANALYSIS) then
+        N(4) = N(3)+NPAR(3)*ITWO
+  else
+        N(4) = N(3)
+  end if
+  N(5)=N(4)+20*NUME
+  N(6)=N(5)+12*NUME*ITWO
+  N(7)=N(6)+NUME
+  N(8)=N(7)+NUME*ITWO
+  N(9)=N(8)+NPAR(5)*NPAR(2)
   
-  MIDEST=N(8)
+  MIDEST=N(9)
   if (IND .EQ. 1) then
         ! Allocate storage for element group data
         call MemAlloc(11,"ELEGP",MIDEST,1)
   end if
   NFIRST = NP(11)   ! Pointer to the first entry in the element group data array in the unit of single precision (corresponding to A)
   N(:) = N(:) + NFIRST
-  NLAST=N(8)
+  NLAST=N(9)
 
   CALL SHELL4Q (IA(NP(1)),DA(NP(2)),DA(NP(3)),DA(NP(4)),DA(NP(4)),IA(NP(5)),   &
-       A(N(1)),A(N(2)),A(N(3)),A(N(4)),A(N(5)),A(N(6)),A(N(7)))
+       A(N(1)),A(N(2)),A(N(3)),A(N(4)),A(N(5)),A(N(6)),A(N(7)), A(N(8)))
 
   RETURN
 
 END SUBROUTINE SHELL
 
 
-SUBROUTINE SHELL4Q (ID,X,Y,Z,U,MHT,E,POSSION,LM,XYZ,MATP, THICK, Node)
+SUBROUTINE SHELL4Q (ID,X,Y,Z,U,MHT,E,POISSON,LM,XYZ,MATP, THICK, Node)
 ! . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 ! .                                                                   .
 ! .   TRUSS element subroutine                                        .
@@ -77,7 +83,7 @@ SUBROUTINE SHELL4Q (ID,X,Y,Z,U,MHT,E,POSSION,LM,XYZ,MATP, THICK, Node)
 
   IMPLICIT NONE
   INTEGER :: ID(6,NUMNP),LM(20,NPAR(2)),MATP(NPAR(2)),MHT(NEQ)
-  REAL(8) :: X(NUMNP),Y(NUMNP),Z(NUMNP),E(NPAR(3)),POSSION(NPAR(3)),  &
+  REAL(8) :: X(NUMNP),Y(NUMNP),Z(NUMNP),E(NPAR(3)),POISSON(NPAR(3)),  &
              XYZ(12,NPAR(2)),THICK(NPAR(2)),U(NEQ)
   
   REAL(8) :: DE(20,1)
@@ -112,13 +118,20 @@ SUBROUTINE SHELL4Q (ID,X,Y,Z,U,MHT,E,POSSION,LM,XYZ,MATP, THICK, Node)
                    ' AND CROSS-SECTIONAL  CONSTANTS ',         &
                    4 (' .'),'( NPAR(3) ) . . =',I10,/)") NUMMAT
 
-     WRITE (IOUT,"('  SET       YOUNG''S     CROSS-SECTIONAL',/,  &
-                   ' NUMBER     MODULUS',10X,'AREA')")
+     WRITE (IOUT,"('  SET       YOUNG''S     CROSS-SECTIONAL  DENSITY',/,  &
+                   ' NUMBER     MODULUS',10X,    'AREA')")
 
-     DO K =1,NUMMAT
-        READ (IIN,'(I10,2F10.0)') N,E(N),POSSION(N)  ! Read material information
-        WRITE (IOUT,"(I10,4X,E12.5,2X,E14.6)") N,E(N),POSSION(N)
-     END DO
+     if (DYNANALYSIS) then
+        DO K=1,NUMMAT
+            READ (IIN,'(I10,3F10.0)') N,E(N), POISSON(N), Density(N)      ! Read Density
+            WRITE (IOUT,"(I10,4X,E12.5,2(2X,E14.6))") N,E(N), POISSON(N), Density(N)
+        END DO
+     else
+        DO K =1,NUMMAT
+            READ (IIN,'(I10,2F10.0)') N,E(N),POISSON(N)  ! Read material information
+            WRITE (IOUT,"(I10,4X,E12.5,2X,E14.6)") N,E(N),POISSON(N)
+        END DO
+     end if
 
      WRITE (IOUT,"(//,' E L E M E N T   I N F O R M A T I O N',//,  &
                       ' ELEMENT     NODE     NODE     NODE     NODE       MATERIAL',/,   &
@@ -182,7 +195,7 @@ SUBROUTINE SHELL4Q (ID,X,Y,Z,U,MHT,E,POSSION,LM,XYZ,MATP, THICK, Node)
      DO N=1,NUME
         MTYPE=MATP(N)
         Etemp = E(MTYPE)
-        Ptemp = POSSION(MTYPE)
+        Ptemp = POISSON(MTYPE)
         DO L = 1,4
             X_Y(L,1) = XYZ(3*L-2, N)
             X_Y(L,2) = XYZ(3*L-1, N)
@@ -288,7 +301,7 @@ SUBROUTINE SHELL4Q (ID,X,Y,Z,U,MHT,E,POSSION,LM,XYZ,MATP, THICK, Node)
         WRITE (IOUT,"('ELEMENT', I3)") N
         MTYPE=MATP(N)
         Etemp = E(MTYPE)
-        Ptemp = POSSION(MTYPE)
+        Ptemp = POISSON(MTYPE)
         DO L = 1,4
             X_Y(L,1) = XYZ(3*L-2, N)
             X_Y(L,2) = XYZ(3*L-1, N)
