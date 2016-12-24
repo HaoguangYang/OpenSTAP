@@ -22,7 +22,7 @@ SUBROUTINE TRUSS
   USE MEMALLOCATE
 
   IMPLICIT NONE
-  INTEGER :: NUME, NUMMAT, MM, N(7)
+  INTEGER :: NUME, NUMMAT, MM, N(8)
 
   NUME = NPAR(2)
   NUMMAT = NPAR(3)
@@ -37,19 +37,24 @@ SUBROUTINE TRUSS
   N(1)=0
   N(2)=N(1)+NUMMAT*ITWO
   N(3)=N(2)+NUMMAT*ITWO
-  N(4)=N(3)+6*NUME
-  N(5)=N(4)+6*NUME*ITWO
-  N(6)=N(5)+NUME
-  N(7)=N(6)+NPAR(5)*NPAR(2)
+  if (DYNANALYSIS) then
+        N(4) = N(3)+NPAR(3)*ITWO
+  else
+        N(4) = N(3)
+  end if
+  N(5)=N(4)+6*NUME
+  N(6)=N(5)+6*NUME*ITWO
+  N(7)=N(6)+NUME
+  N(8)=N(7)+NPAR(5)*NPAR(2)
   
-  MIDEST=N(7)
+  MIDEST=N(8)
   if (IND .EQ. 1) then
         ! Allocate storage for element group data
         call MemAlloc(11,"ELEGP",MIDEST,1)
   end if
   NFIRST = NP(11)   ! Pointer to the first entry in the element group data array in the unit of single precision (corresponding to A)
   N(:) = N(:) + NFIRST
-  NLAST=N(7)
+  NLAST=N(8)
 
   CALL RUSS (IA(NP(1)),DA(NP(2)),DA(NP(3)),DA(NP(4)),DA(NP(4)),IA(NP(5)),   &
         A(N(1)),A(N(2)),A(N(3)),A(N(4)),A(N(5)),A(N(6)),A(N(7)))
@@ -59,7 +64,7 @@ SUBROUTINE TRUSS
 END SUBROUTINE TRUSS
 
 
-SUBROUTINE RUSS (ID,X,Y,Z,U,MHT,E,AREA,LM,XYZ,MATP,Node)
+SUBROUTINE RUSS (ID,X,Y,Z,U,MHT,E,AREA,Density,LM,XYZ,MATP,Node)
 ! . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 ! .                                                                   .
 ! .   TRUSS element subroutine                                        .
@@ -102,14 +107,21 @@ SUBROUTINE RUSS (ID,X,Y,Z,U,MHT,E,AREA,LM,XYZ,MATP,Node)
                    ' AND CROSS-SECTIONAL  CONSTANTS ',         &
                    4 (' .'),'( NPAR(3) ) . . =',I10,/)") NUMMAT
 
-     WRITE (IOUT,"('  SET       YOUNG''S     CROSS-SECTIONAL',/,  &
-                   ' NUMBER     MODULUS',10X,'AREA',/,  &
-                   15 X,'E',14X,'A')")
+     WRITE (IOUT,"('  SET       YOUNG''S     CROSS-SECTIONAL   DENSITY',/,  &
+                   ' NUMBER     MODULUS',10X,    'AREA',/,  &
+                   15 X,'E',14X,                  'A',14X,       '¦Ñ')")
 
-     DO I=1,NUMMAT
-        READ (IIN,'(I10,2F10.0)') N,E(N),AREA(N)  ! Read material information
-        WRITE (IOUT,"(I10,4X,E12.5,2X,E14.6)") N,E(N),AREA(N)
-     END DO
+     if (DYNANALYSIS) then
+        DO I=1,NUMMAT
+            READ (IIN,'(I10,3F10.0)') N,E(N), AREA(N), Density(N)      ! Read Density
+            WRITE (IOUT,"(I10,4X,E12.5,2(2X,E14.6))") N,E(N), AREA(N), Density(N)
+        END DO
+     else
+        DO I=1,NUMMAT
+            READ (IIN,'(I10,2F10.0)') N,E(N),AREA(N)  ! Read material information
+            WRITE (IOUT,"(I10,4X,E12.5,2X,E14.6)") N,E(N),AREA(N)
+        END DO
+     end if
 
      WRITE (IOUT,"(//,' E L E M E N T   I N F O R M A T I O N',//,  &
                       ' ELEMENT     NODE     NODE       MATERIAL',/,   &
@@ -170,11 +182,28 @@ SUBROUTINE RUSS (ID,X,Y,Z,U,MHT,E,AREA,LM,XYZ,MATP,Node)
               S(I,J)=ST(I)*YY
            END DO
         END DO
+        
+        if (DYNANALYSIS) then                           !Mass Matrix
+            XX = Density(MTYPE)*AREA(MTYPE)*XL/3        !Density*A*l/3
+            DO L=1,3
+                ST(L)=D(L)/XL2                          ![ 2  1 ]
+                ST(L+3)=ST(L)/2                         ![ 1  2 ]
+            END DO
+
+            DO J=1,ND
+                YY=ST(J)*XX
+                DO I=1,ND
+                    M(I,J)=ST(I)*YY
+                END DO
+            END DO
+        end if
 
         if(pardisodoor) then
             call pardiso_addban(DA(NP(3)),IA(NP(2)),IA(NP(5)),S,LM(1,N),ND)
+            if (DYNANALYSIS) CALL pardiso_addban(DA(NP(10)),IA(NP(9)), IA(NP(8)),M,LM(:,N),ND)
         else
             CALL ADDBAN (DA(NP(3)),IA(NP(2)),S,LM(1,N),ND)
+            IF (DYNANALYSIS) CALL ADDBAN (DA(NP(10)),IA(NP(2)),M,LM(:,N),ND)
         end if
 
      END DO

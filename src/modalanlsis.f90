@@ -1,10 +1,10 @@
-subroutine EIGENVAL(Stiff, Mass, MAXA, NN, NWK, NNM, NRoot)
-    USE GLOBALS, ONLY : IOUT, PARDISODOOR
+subroutine EIGENVAL(Stiff, Mass, MAXA, NN, NWK2, NNM, NRoot)
+    USE GLOBALS, ONLY : IOUT, PARDISODOOR, NWK
     use memallocate
     implicit none
-    real(8) :: Stiff(NWK), Mass(NWK)
+    real(8) :: Stiff(NWK2), Mass(NWK2)
     integer :: MAXA(NNM)            !NNM = NN+1
-    integer :: NN, NWK, NNM, NRoot
+    integer :: NN, NWK2, NNM, NRoot
     real(8), parameter :: RTol = 1.0D-6
     real(8), allocatable :: EignVec(:,:),EignVal(:)
     !LANCZOS variables
@@ -12,7 +12,7 @@ subroutine EIGENVAL(Stiff, Mass, MAXA, NN, NWK, NNM, NRoot)
     integer :: NC, NNC, NRestart
     logical :: IFSS, IFPR
     !dfeast_scsrgv variables
-    character(1) :: uplo
+    character :: uplo
     integer :: fpm(128), info, loop
     real(8) :: epsout, emin, emax
     real(8),allocatable :: res(:)
@@ -20,20 +20,20 @@ subroutine EIGENVAL(Stiff, Mass, MAXA, NN, NWK, NNM, NRoot)
     write(IOUT,*)'-------------------------------------------------------------------------------------'
     write(IOUT,*)'           E I G E N   V A L U E   C A L C U L A T I O N   R E S U L T S'
     
-    NC = minval((/2*NRoot, NRoot+8, NWK/))
+    NC = minval((/2*NRoot, NRoot+8, NWK2/))
     allocate (EignVec(NN,NC),EignVal(NC))
     if (.NOT. PARDISODOOR) then
         open(StiffTmp, FILE = "Stff.tmp", FORM = "UNFORMATTED", STATUS = "Replace")
         REWIND StiffTmp
-        WRITE (StiffTmp) Stiff(1:NWK)
+        WRITE (StiffTmp) Stiff(1:NWK2)
         NNC=NC*(NC+1)/2
         !THE PARAMETERS NC AND/OR NRestart MUST BE INCREASED IF A SOLUTION HAS NOT CONVERGED
-        call LANCZOS(Stiff, Mass, MAXA, EignVec, EignVal, NN, NNM, NWK, NWK, NRoot, RTol, NC, NNC, NRestart, IFSS, IFPR, StiffTmp, IOUT)
+        call LANCZOS(Stiff, Mass, MAXA, EignVec, EignVal, NN, NNM, NWK2, NWK2, NRoot, RTol, NC, NNC, NRestart, IFSS, IFPR, StiffTmp, IOUT)
         REWIND StiffTmp
         READ (StiffTmp) Stiff
         close(StiffTmp)
     else
-        uplo = 'U'
+        !uplo = 'U'
         allocate (res(NC))
         !IA(NP(9))      --  Mass Row Index
         !IA(NP(8))      --  Mass Column Indicator
@@ -41,8 +41,19 @@ subroutine EIGENVAL(Stiff, Mass, MAXA, NN, NWK, NNM, NRoot)
         !IA(NP(2))      --  Stiffness Row Index
         !DA(NP(10))     --  Mass Matrix
         !DA(NP(3))      --  Stiffness Matrix
+        emin = 1.
+        emax = 400.
+        call feastinit (fpm)
         call pardiso_crop(DA(NP(10)), IA(NP(9)), IA(NP(8)))
-        call dfeast_scsrgv(uplo, NN, Stiff, IA(NP(2)), IA(NP(5)), Mass, IA(NP(9)), IA(NP(8)), fpm, epsout, loop, emin, emax, NC, EignVal, EignVec, NRoot, res, info)
+        NWK2 = NWK                                          !Renew NWK
+        call pardiso_crop(DA(NP(3)), IA(NP(9)), IA(NP(8)))
+        call dfeast_scsrgv('u', NN, Stiff(1:NWK), IA(NP(2)), IA(NP(5)), Mass(1:NWK2), IA(NP(9)), IA(NP(8)), fpm, epsout, loop, &
+                           emin, emax, NC, EignVal, EignVec, NRoot, res, info)
+        write(*,*) "Eigen Values:",EignVal
+        write(*,*) "Eigen Vectors:",EignVec
+        write(IOUT,*) "Eigen Values:",EignVal
+        write(IOUT,*) "Eigen Vectors:",EignVec
+        write(IOUT,*) "Residual:",res
         deallocate (res)
     end if
     write(IOUT,*)'-------------------------------------------------------------------------------------'

@@ -78,6 +78,22 @@
 ! SET TOLERANCE FOR JACOBI
 !
     TOLJ = 1.D-12
+    !call random_seed()
+    !call random_number(Q)
+    !call random_number(R)
+!    call random_number(B)
+    !, AR, BR, VEC, TT, W, D, RTOLV, BUP, BLO, BUPC/))
+! .   Q(NN,NC) = working matrix
+! .   AR(NNC) = WORKING MATRIX STORING PROJECTION OF K
+! .   BR(NNC) = WORKING MATRIX STORING PROJECTION OF M
+! .   VEC(NC,NC) = WORKING MATRIX
+! .   TT(NN) = WORKING VECTOR
+! .   W(NN) = WORKING VECTOR
+! .   D(NC) = WORKING VECTOR
+! .   RTOLV(NC) = WORKING VECTOR
+! .   BUP(NC) = WORKING VECTOR
+! .   BLO(NC) = WORKING VECTOR
+! .   BUPC(NC) = WORKING VECTOR
 !    REWIND NSTIF
 !    WRITE (NSTIF) A
 !    
