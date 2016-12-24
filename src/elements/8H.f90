@@ -196,11 +196,13 @@ subroutine HexEight (ID,X,Y,Z,U,MHT,E, PoissonRatio, Density, LM, PositionData, 
             
             if(pardisodoor) then
                 call pardiso_addban(DA(NP(3)),IA(NP(2)),IA(NP(5)),S,LM(:,N),ND)
+                if (DYNANALYSIS) CALL pardiso_addban(DA(NP(10)),IA(NP(9)), IA(NP(8)),S,LM(:,N),ND)
             else
                 CALL ADDBAN (DA(NP(3)),IA(NP(2)),S,LM(:,N),ND)
+                IF (DYNANALYSIS) CALL ADDBAN (DA(NP(10)),IA(NP(2)),M,LM(:,N),ND)
             end if
 
-            IF (DYNANALYSIS .EQV. .TRUE.) CALL ADDBAN (DA(NP(5)),IA(NP(2)),M,LM(:,N),ND)
+            
         end do
         
     CASE (3)
