@@ -70,7 +70,7 @@ SUBROUTINE SHELL
 END SUBROUTINE SHELL
 
 
-SUBROUTINE SHELL4Q (ID,X,Y,Z,U,MHT,E,POISSON,LM,XYZ,MATP, THICK, Node)
+SUBROUTINE SHELL4Q (ID,X,Y,Z,U,MHT,E,POISSON,Density, LM,XYZ,MATP, THICK, Node)
 ! . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 ! .                                                                   .
 ! .   TRUSS element subroutine                                        .
