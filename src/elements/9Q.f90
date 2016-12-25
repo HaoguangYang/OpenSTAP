@@ -21,7 +21,7 @@
 SUBROUTINE ELEMENT_9Q
 ! . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 ! .                                                                   .
-! .   To set up storage and call the 4Q element subroutine            .
+! .   To set up storage and call the 9Q element subroutine            .
 ! .                                                                   .
 ! . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
@@ -102,7 +102,7 @@ SUBROUTINE ELEMENT_9Q_MAIN (ID,X,Y,Z,U,MHT,E,POISSON,LM,XY,MATP)
 
   INTEGER :: NPAR1, NUME, NUMMAT, ND, I1, I2, I3, I4, I5, I6, I7, I8, I9, L, N, I, J
   INTEGER :: MTYPE, IPRINT
-  INTEGER,PARAMETER :: GUASS_N=3
+  INTEGER,PARAMETER :: GUASS_N=4
   REAL(8) :: NMAT(1,9),BMAT(3,18),C(9,2),NA(1,9)
   REAL(8) :: KE(18,18),DETJ,D(3,3),M(18,18), Rho, Density(NPAR(3))
   REAL(8) :: X_GUASS(4,2),XY0(1,2)
@@ -123,9 +123,18 @@ SUBROUTINE ELEMENT_9Q_MAIN (ID,X,Y,Z,U,MHT,E,POISSON,LM,XY,MATP)
       GP(1)=-0.7745966692
       GP(2)=0.0
       GP(3)=0.7745966692
-      W(1)=5.0/9
-      W(2)=8.0/9
-      W(3)=5.0/9
+      W(1)=5.0/9.0
+      W(2)=8.0/9.0
+      W(3)=5.0/9.0
+  ELSE IF (GUASS_N == 4) THEN
+      GP(1) = -0.861136311594053
+      GP(2) = -0.339981043584586
+      GP(3) = 0.339981043584586
+      GP(4) = 0.861136311594053
+      W(1) = 0.347854845137454
+      W(2) = 0.652145154837454
+      W(3) = W(2)
+      W(4) = W(1)
   END IF 
 
 
@@ -247,7 +256,7 @@ SUBROUTINE ELEMENT_9Q_MAIN (ID,X,Y,Z,U,MHT,E,POISSON,LM,XY,MATP)
                 KE = KE + W(I)*W(J)*MATMUL(MATMUL(TRANSPOSE(BMAT),D),BMAT)*abs(DETJ)
                 
             END DO
-         END DO       
+        END DO 
 
         if(pardisodoor) then
             call pardiso_addban(DA(NP(3)),IA(NP(2)),IA(NP(5)),KE,LM(1,N),ND)
@@ -286,6 +295,7 @@ SUBROUTINE ELEMENT_9Q_MAIN (ID,X,Y,Z,U,MHT,E,POISSON,LM,XY,MATP)
                 DST(I,1)=U(LM(I,N))
             END IF
         END DO
+        
         
         DO I=1,GUASS_N
             DO J=1,GUASS_N
@@ -336,54 +346,16 @@ FUNCTION NmatElast9Q(eta,psi)
   END DO
   
   N1 = N00(1)*N11(1)
-  N2 = N00(2)*N11(1)
-  N3 = N00(3)*N11(1)
-  N4 = N00(3)*N11(2)
-  N5 = N00(3)*N11(3)
-  N6 = N00(2)*N11(3)
-  N7 = N00(1)*N11(3)
+  N2 = N00(3)*N11(1)
+  N3 = N00(3)*N11(3)
+  N4 = N00(1)*N11(3)
+  N5 = N00(2)*N11(1)
+  N6 = N00(3)*N11(2)
+  N7 = N00(2)*N11(3)
   N8 = N00(1)*N11(2)
   N9 = N00(2)*N11(2)
   
   NMAT(1,:) = (/  N1,N2,N3,N4,N5,N6,N7,N8,N9  /)
-
-!  N(1,1)=N1
-!  N(1,2)=ZERO
-!  N(1,3)=N2
-!  N(1,4)=ZERO
-!  N(1,5)=N3
-!  N(1,6)=ZERO
-!  N(1,7)=N4
-!  N(1,8)=ZERO
-!  N(1,9)=N5
-!  N(1,10)=ZERO
-!  N(1,11)=N6
-!  N(1,12)=ZERO
-!  N(1,13)=N7
-!  N(1,14)=ZERO
-!  N(1,15)=N8
-!  N(1,16)=ZERO
-!  N(1,17)=N9
-!  N(1,18)=ZERO
-  
-!  N(2,1)=ZERO
-!  N(2,2)=N1
-!  N(2,3)=ZERO
-!  N(2,4)=N2
-!  N(2,5)=ZERO
-!  N(2,6)=N3
-!  N(2,7)=ZERO
-!  N(2,8)=N4
-!  N(2,9)=ZERO
-!  N(2,10)=N5
-!  N(2,11)=ZERO
-!  N(2,12)=N6
-!  N(2,13)=ZERO
-!  N(2,14)=N7
-!  N(2,15)=ZERO
-!  N(2,16)=N8
-!  N(2,17)=ZERO
-!  N(2,18)=N9
   
   NmatElast9Q=NMAT
   
@@ -401,12 +373,13 @@ FUNCTION BmatElast9Q(eta,psi,C)
     REAL(8),PARAMETER:: ZERO=0.0
     COMMON DETJ
     
-    GN(1,:)=(/(psi-0.5)*0.5*eta*(eta-1.0),(1-eta*eta)*(psi-0.5),0.5*eta*(eta+1.0)*(psi-0.5), &
-             0.5*eta*(eta+1.0)*(-2.0*psi),0.5*eta*(eta+1.0)*(psi+0.5),(1.0-eta*eta)*(psi+0.5),0.5*eta*(eta-1.0)*(psi+0.5), &
-             0.5*eta*(eta-1.0)*(-2.0*psi),(1.0-eta*eta)*(-2.0*psi)/)
-    GN(2,:)=(/(eta-0.5)*0.5*psi*(psi-1.0),(-2.0*eta)*0.5*psi*(psi-1.0),(eta+0.5)*0.5*psi*(psi-1.0), &
-              (eta+0.5)*(1.0-psi*psi),(eta+0.5)*0.5*psi*(psi+1.0),(-2.0*eta)*0.5*psi*(psi+1.0),(eta-0.5)*0.5*psi*(psi+1.0), &
-              (eta-0.5)*(1.0-psi*psi),(-2.0*eta)*(1.0-psi*psi)/)
+    GN(1,:)=(/0.5*(2*eta-1)*0.5*psi*(psi-1) , 0.5*(2*eta+1)*0.5*psi*(psi-1) , 0.5*(2*eta+1)*0.5*psi*(psi+1), &
+            & 0.5*(2*eta-1)*0.5*psi*(psi+1) , (-2*eta)*0.5*psi*(psi-1) , 0.5*(2*eta+1)*(1-psi**2), &
+            & (-2*eta)*0.5*psi*(psi+1) , 0.5*(2*eta-1)*(1-psi**2) , (-2*eta)*(1-psi**2) /)
+    
+    GN(2,:)=(/0.5*eta*(eta-1)*0.5*(2*psi-1) , 0.5*eta*(eta+1)*0.5*(2*psi-1) , 0.5*eta*(eta+1)*0.5*(2*psi+1), &
+            & 0.5*eta*(eta-1)*0.5*(2*psi+1) , (1-eta**2)*0.5*(2*psi-1) , 0.5*eta*(eta+1)*(-2*psi), &
+            & (1-eta**2)*0.5*(2*psi+1) , 0.5*eta*(eta-1)*(-2*psi) , (1-eta**2)*(-2*psi) /)
     
     J = MATMUL(GN,C)
     DETJ = J(1,1)*J(2,2)-J(1,2)*J(2,1)

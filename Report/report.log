@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.16 (TeX Live 2015/W32TeX) (preloaded format=pdflatex 2016.12.9)  25 DEC 2016 11:16
+This is pdfTeX, Version 3.14159265-2.6-1.40.16 (TeX Live 2015/W32TeX) (preloaded format=pdflatex 2016.12.9)  25 DEC 2016 12:47
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -1121,10 +1121,10 @@ Overfull \hbox (21.07874pt too wide) in paragraph at lines 87--88
 <05.png, id=151, 2935.96875pt x 1249.66875pt>
 File: 05.png Graphic file (type png)
  <use 05.png>
-Package pdftex.def Info: 05.png used on input line 105.
+Package pdftex.def Info: 05.png used on input line 106.
 (pdftex.def)             Requested size: 345.0pt x 146.84563pt.
 
-Overfull \hbox (21.07874pt too wide) in paragraph at lines 105--106
+Overfull \hbox (21.07874pt too wide) in paragraph at lines 106--107
 [][] 
  []
 

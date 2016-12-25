@@ -11,17 +11,17 @@
 ! .                                                                       .
 ! . . . . . . . . . . . . . .  . . .  . . . . . . . . . . . . . . . . . . .
 !                                                                         -
-!        4Q element                                                       -
+!        Transition element                                                       -
 !        Qi He,(2016)                                                     -
 !        Tsinghua University                                              -
 !                                                                         -
 !                                                                         -
 !--------------------------------------------------------------------------
 
-SUBROUTINE ELEMENT_4Q
+SUBROUTINE ELEMENT_Transition
 ! . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 ! .                                                                   .
-! .   To set up storage and call the 4Q element subroutine            .
+! .   To set up storage and call the Transition element subroutine            .
 ! .                                                                   .
 ! . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
@@ -64,15 +64,15 @@ NPAR(5) = 4
   N(:) = N(:) + NFIRST
   NLAST=N(8)
 
-  CALL ELEMENT_4Q_MAIN (IA(NP(1)),DA(NP(2)),DA(NP(3)),DA(NP(4)),DA(NP(4)),IA(NP(5)),   &
+  CALL ELEMENT_Transition_MAIN (IA(NP(1)),DA(NP(2)),DA(NP(3)),DA(NP(4)),DA(NP(4)),IA(NP(5)),   &
        A(N(1)),A(N(2)),A(N(3)),A(N(4)),A(N(5)),A(N(6)),A(N(7)))
 
   RETURN
 
-END SUBROUTINE ELEMENT_4Q
+END SUBROUTINE ELEMENT_Transition
 
 
-SUBROUTINE ELEMENT_4Q_MAIN (ID,X,Y,Z,U,MHT,E,POISSON, Density,LM,XYZ,MATP,Node)
+SUBROUTINE ELEMENT_Transition_MAIN (ID,X,Y,Z,U,MHT,E,POISSON, Density,LM,XYZ,MATP,Node)
 ! . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 ! .                                                                   .
 ! .   TRUSS element subroutine                                        .
@@ -87,17 +87,17 @@ SUBROUTINE ELEMENT_4Q_MAIN (ID,X,Y,Z,U,MHT,E,POISSON, Density,LM,XYZ,MATP,Node)
 
   
   INTERFACE
-    FUNCTION NmatElast2D(eta,psi)
+    FUNCTION NmatElastTr(eta,psi)
         IMPLICIT NONE
         REAL(8):: eta
         REAL(8):: psi
-        REAL(8):: NmatElast2D(2,8)
+        REAL(8):: NmatElastTr(2,8)
     END FUNCTION
-    FUNCTION BmatElast2D(eta,psi,C)
+    FUNCTION BmatElastTr(eta,psi,C)
         IMPLICIT NONE
         REAL(8):: eta,psi
         REAL(8):: C(4,2)
-        REAL(8):: BmatElast2D(3,8)
+        REAL(8):: BmatElastTr(3,8)
     END FUNCTION
   END INTERFACE
   
@@ -133,7 +133,7 @@ SUBROUTINE ELEMENT_4Q_MAIN (ID,X,Y,Z,U,MHT,E,POISSON, Density,LM,XYZ,MATP,Node)
 
      WRITE (IOUT,"(' E L E M E N T   D E F I N I T I O N',//,  &
                    ' ELEMENT TYPE ',13(' .'),'( NPAR(1) ) . . =',I10,/,   &
-                   '     EQ.2, 4Q ELEMENTS',/,      &
+                   '     EQ.2, Transition ELEMENTS',/,      &
                    ' NUMBER OF ELEMENTS.',10(' .'),'( NPAR(2) ) . . =',I10,/)") NPAR1,NUME
 
      IF (NUMMAT.EQ.0) NUMMAT=1
@@ -216,11 +216,11 @@ SUBROUTINE ELEMENT_4Q_MAIN (ID,X,Y,Z,U,MHT,E,POISSON, Density,LM,XYZ,MATP,Node)
             DO J=1,2
                 ETA = GP(I)
                 EPSILON = GP(J)
-                BMAT = BmatElast2D(ETA,EPSILON,C)
+                BMAT = BmatElastTr(ETA,EPSILON,C)
                 
                 KE = KE + W(I)*W(J)*MATMUL(MATMUL(TRANSPOSE(BMAT),D),BMAT)*abs(DETJ)
                 if (DYNANALYSIS) THEN
-                    NMAT = NmatElast2D(ETA,EPSILON)
+                    NMAT = NmatElastTr(ETA,EPSILON)
                     M = M + W(i)*W(j)*abs(DetJ)*Rho*matmul(transpose(NMAT), NMAT)
                 end if
                 
@@ -274,7 +274,7 @@ SUBROUTINE ELEMENT_4Q_MAIN (ID,X,Y,Z,U,MHT,E,POISSON, Density,LM,XYZ,MATP,Node)
                 ETA = GP(I)
                 EPSILON = GP(J)
                 
-                NMAT = NmatElast2D(ETA,EPSILON)
+                NMAT = NmatElastTr(ETA,EPSILON)
                 
                 NA(1,:) = (/NMAT(1,1) , NMAT(1,3) , NMAT(1,5) , NMAT(1,7)/)
                 
@@ -283,7 +283,7 @@ SUBROUTINE ELEMENT_4Q_MAIN (ID,X,Y,Z,U,MHT,E,POISSON, Density,LM,XYZ,MATP,Node)
                 X_GUASS(2*I+J-2,2) = XY(1,2)
                 
 
-                BMAT = BmatElast2D(ETA,EPSILON,C)
+                BMAT = BmatElastTr(ETA,EPSILON,C)
                 STRESS = MATMUL(D,MATMUL(BMAT,DST))
                 
                 STRESS_XX(N,2*I+J-2) = STRESS(1,1)
@@ -306,13 +306,13 @@ SUBROUTINE ELEMENT_4Q_MAIN (ID,X,Y,Z,U,MHT,E,POISSON, Density,LM,XYZ,MATP,Node)
      STOP "*** ERROR *** Invalid IND value."
   END IF
 
-END SUBROUTINE ELEMENT_4Q_MAIN
+END SUBROUTINE ELEMENT_Transition_MAIN
     
-FUNCTION NmatElast2D(eta,psi)
+FUNCTION NmatElastTr(eta,psi)
   IMPLICIT NONE
   REAL(8):: eta
   REAL(8):: psi
-  REAL(8):: NmatElast2D(2,8),N(2,8)
+  REAL(8):: NmatElastTr(2,8),N(2,8)
   REAL(8):: N1,N2,N3,N4
   
   N1 = 0.25*(1.0-psi)*(1.0-eta)
@@ -337,18 +337,18 @@ FUNCTION NmatElast2D(eta,psi)
   N(2,7)=0.0
   N(2,8)=N4
   
-  NmatElast2D=N
+  NmatElastTr=N
   
-END FUNCTION NmatElast2D
+END FUNCTION NmatElastTr
   
-FUNCTION BmatElast2D(eta,psi,C)
+FUNCTION BmatElastTr(eta,psi,C)
     IMPLICIT NONE
     REAL(8):: eta,psi
     REAL(8):: C(4,2)
     REAL(8):: GN(2,4),J(2,2)
     REAL(8):: DETJ,INVJ(2,2)
     REAL(8):: BB(2,4),B1x,B2x,B3x,B4x,B1y,B2y,B3y,B4y
-    REAL(8):: B(3,8),BmatElast2D(3,8)
+    REAL(8):: B(3,8),BmatElastTr(3,8)
     REAL(8):: ZERO
     COMMON DETJ
     
@@ -377,6 +377,6 @@ FUNCTION BmatElast2D(eta,psi,C)
     B(2,:) = (/  ZERO   ,  B1y  ,  ZERO  ,   B2y   ,   ZERO   ,  B3y   ,  ZERO    ,  B4y/)
     B(3,:) = (/B1y  ,   B1x  ,  B2y  ,  B2x  ,   B3y   , B3x  ,  B4y  ,   B4x/)
     
-    BmatElast2D = B
-END FUNCTION BmatElast2D
+    BmatElastTr = B
+END FUNCTION BmatElastTr
 
