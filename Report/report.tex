@@ -551,7 +551,18 @@ $$u_B=u_A+\triangle u_{AB}$$
 N自由度无阻尼线性系统作微幅振动，最后可得到振动微分方程组：$\boldsymbol{M\ddot x+Kx=0}$。分析一个弹性体的模态，实质是求解广义特征值问题$\boldsymbol{K-\lambda M=0}$，再由$\boldsymbol{\omega =\lambda}^{1/2}$得到系统的特征频率。对于多自由度系统，往往只有最小的数个特征值，即对应的几个频率最低的模态对结构具有关键作用。搜索最小数个特征值的算法常见的有LANCZOS迭代法，子空间迭代法等。本程序针对Skyline存储方式试图采用LANCZOS迭代法对广义特征值问题进行求解，另外针对稀疏矩阵的CSR存储方法，也提供了基于Intel MKL的feast算法库的调用。
 \subsubsection{算法分析}
 \paragraph{}
-LANCZOS迭代法
+LANCZOS迭代法，其基本思路为利用里兹法求解特征值问题：
+\begin{enumerate}
+\item 选取与所有已求得的特征向量正交的初始迭代向量$\hat{x}_{1}$，并进行正则化：$x_{1}=\frac{\hat{x}_{1}}{\beta_{1}},\ \beta_{1}=(\hat{x}_{1}^{T}M\hat{x}_{1})^{1/2}$
+\item 选取一移轴量$\mu$，生成Lanczos基向量：
+
+
+$(K-\mu M)\widetilde{x}_{i}=Mx_{i-1},\ a_{i-1}=\widetilde{x}_{i}^{T}Mx_{i-1},\ \widetilde{x}_{i}'=\widetilde{x}_{i}-a_{i-1}x_{i-1}-\beta_{i-1}x_{i-2},$
+
+
+$\hat{x}_{i}=\hat{x}_{i}'-\sum_{k=1}^{i-1}(\hat{x}_{i}'^{T}Mx_{k})x_{k}-\sum_{j=1}^{n_{c}}(\hat{x}_{i}'^{T}M\phi_{j})\phi_{j},\ \beta_{i}=(\hat{x}_{i}^{T}M\hat{x}_{i})^{1/2},\ x_{i}=\frac{\hat{x}_{i}}{\beta_{i}}$
+
+\item 求解$Tz=\frac{1}{\lambda}z$，得到在本次迭代中收敛的特征值及对应的特征向量，如果收敛个数超过所需个数，则停止迭代，否则转1.\end{enumerate}
 
 
 \subsection{动力学响应分析}
