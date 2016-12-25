@@ -17,8 +17,9 @@
 import sys,os
 path = sys.path[0]
 #filename = input('Please input your filename:\n')
-filename = 'merge-3'
+filename = 'Merge-3'
 pardiso = input('Using pardiso? TRUE = 1; False = 0' + '\n')
+show = input('Show the answer? TRUE = 1; False = 0' + '\n')
 location = path[2:].replace('\\','/') + '/' + filename + '.inp'
 #location = '/Users/Administrator/Desktop/INP/8H_8.inp'
 read = open(location,'r')
@@ -225,7 +226,7 @@ for i in range(len(keyloc[2])):
                 element[i].append(material[j])        
 '''
 #-----------分离节点-------------
-'''
+
 for i in range(len(node[1])):
     if node[1][i] == [0,10,0]:
         node1 = i+1     #节点1
@@ -253,35 +254,36 @@ for i in range(len(keyloc[2])):
                 elif element[i][1][1][j][k]==node2:
                     element[i][1][1][j][k] = node2_2    
       
-'''
+
                 
 #-----------输出INSTANCE信息-------------
 #filename = input('Please input your filename(FOR INSTANCE):\n')
-filename = 'merge-1'
-location = path[2:].replace('\\','/') + '/' + filename + '.inp'
+location = path[2:].replace('\\','/') + '/' + 'Merge-1' + '.inp'
 read = open(location,'r')
 
 #读取文件
 readline = 1    #读入变量（成功读入则继续while语句）
-line = []       #文件内容
+line_i = []       #文件内容
 
 #读入文件到line
 while readline:
     readline=read.readline()
-    line.append(readline[:-1])  #删除最后的回车符号
+    line_i.append(readline[:-1])  #删除最后的回车符号
     i = i+1
 read.close
-line_len = len(line)            #INP文件全长度
+line_len = len(line_i)            #INP文件全长度
+#print(len(line))
 
+C3D8_pier = 0
 for i in range(line_len):
-    if line[i].find('** PART INSTANCE: Part-Pier-1')!=-1: 
+    if line_i[i].find('** PART INSTANCE: PART-PIER-1')!=-1: 
         j = 1
         continue
-    if j==1 and line[i].find('*Nset')!=-1:
-        C3D8_pier = int(line[i-1][:line[i-1].find(',')])
+    if j==1 and line_i[i].find('*Nset')!=-1:
+        C3D8_pier = int(line_i[i-1][:line_i[i-1].find(',')])
         break
 
-print(C3D8_pier)
+#print(C3D8_pier)
 
 #-----------输出材料对应单元信息-------------
 material_e = [['floor'],['Pier'],['SupportBeam'],['RiverBank'],['Cables']] 
@@ -313,7 +315,7 @@ material_e[0].append([500,200,1])
 material_e[2].append([2,0.1])
 material_e[4].append([0.25])
                 
-print(material_e)  
+#print(material_e)  
 
 
 #-----------输出LOAD信息 扩充ID到6维-------------
@@ -363,49 +365,49 @@ for i in range(len(keyloc[2])):
 #print(load)                    
                 
               
-#-----------输出PART信息--------
-
-print('···········第' + str(i+1) + '单元···········')
-print('-------------部件名称---------------')
-print(partname)
-print('\n')     #换行
-print('-------------节点编号---------------')
-print(node[0])
-print('\n')
-print('-------------节点坐标---------------')
-print(node[1])
-print('\n')
-print('-------------ID矩阵---------------')
-print(node_b)
-print('\n')
-
-for i in range(len(keyloc[2])):
-    
-    print('-------------单元类型---------------')
-    print(element[i][0])
+#-----------输出PART信息-------------
+if show == '1':
+    print('···········第' + str(i+1) + '单元···········')
+    print('-------------部件名称---------------')
+    print(partname)
+    print('\n')     #换行
+    print('-------------节点编号---------------')
+    print(node[0])
     print('\n')
-    print('-------------单元编号---------------')
-    print(element[i][1][0])
+    print('-------------节点坐标---------------')
+    print(node[1])
     print('\n')
-    print('-------------单元节点---------------')
-    print(element[i][1][1])
+    print('-------------ID矩阵---------------')
+    print(node_b)
     print('\n')
 
-for i in range(len(keyloc[4])):
-    
-    print('-------------材料类型---------------')
-    print(material[i][0])
-    print('\n')
-    print('-------------密度---------------')
-    print(material[i][1])
-    print('\n')
-    print('-------------弹性---------------')
-    print(material[i][2])
-    print('\n')
-    
-    
-print('·····························')
-print('\n'*5)
+    for i in range(len(keyloc[2])):
+        
+        print('-------------单元类型---------------')
+        print(element[i][0])
+        print('\n')
+        print('-------------单元编号---------------')
+        print(element[i][1][0])
+        print('\n')
+        print('-------------单元节点---------------')
+        print(element[i][1][1])
+        print('\n')
+
+    for i in range(len(keyloc[4])):
+        
+        print('-------------材料类型---------------')
+        print(material[i][0])
+        print('\n')
+        print('-------------密度---------------')
+        print(material[i][1])
+        print('\n')
+        print('-------------弹性---------------')
+        print(material[i][2])
+        print('\n')
+        
+        
+    print('·····························')
+    print('\n'*5)
 
 
 #-----------输出PART信息到文件-------------   
@@ -423,63 +425,63 @@ inp.write('%10d'*4%(len(node[0]),len(keyloc[2]),1,1) + '\n')
 
 #输入节点信息
 for i in range(len(node[0])):
-    inp.write('%10d'%(node[0][i]) + '%5d'*6%(node_b[i][0],node_b[i][1],node_b[i][2],node_b[i][3],node_b[i][4],node_b[i][5]))
+    inp.write('%10d'%(node[0][i]) + '%10d'*6%(node_b[i][0],node_b[i][1],node_b[i][2],node_b[i][3],node_b[i][4],node_b[i][5]))
     inp.write('%10.3f'*3%(node[1][i][0],node[1][i][1],node[1][i][2]))
-    inp.write('%5d'%0 + '\n')
+    inp.write('%10d'%0 + '\n')
     
 #输出稀疏存储信息
 #max_e
 #for i in range(len(material_e)):
 #    if 
-#inp.write('%5d'%())
+#inp.write('%10d'%())
 
 #输入荷载信息
-inp.write('%5d'*2%(1,len(node[0]))+'\n')
+inp.write('%10d'*2%(1,len(node[0]))+'\n')
 for i in range(len(node[0])):
-    inp.write('%10d'%(node[0][i]) + '%5d'%(3))
+    inp.write('%10d'%(node[0][i]) + '%10d'%(3))
     inp.write('%10.2e'%(-load[i+1]) + '\n')
 
 #输入单元信息
 for i in range(len(keyloc[2])):
 
     if element[i][0] == 'C3D8R':
-        inp.write('%5d'*3%(4,len(element[i][1][0]),2) + '\n')
-        inp.write('%5d'%1 + '%10.3e'%(material_e[1][1][2][0]) + '%10.3f'%(material_e[1][1][2][1]) + '\n')
-        inp.write('%5d'%2 + '%10.3e'%(material_e[3][1][2][0]) + '%10.3f'%(material_e[3][1][2][1]) + '\n')
+        inp.write('%10d'*3%(4,len(element[i][1][0]),2) + '\n')
+        inp.write('%10d'%1 + '%10.3e'%(25e9) + '%10.3f'%(0.3) + '\n')
+        inp.write('%10d'%2 + '%10.3e'%(60e9) + '%10.3f'%(0.27) + '\n')
         for j in range(len(element[i][1][0])):
             el_num = j+1
             el_node = element[i][1][1][j]
-            inp.write('%5d'*9%(el_num,el_node[0],el_node[1],el_node[2],el_node[3],el_node[4],el_node[5],el_node[6],el_node[7]))
+            inp.write('%10d'*9%(el_num,el_node[0],el_node[1],el_node[2],el_node[3],el_node[4],el_node[5],el_node[6],el_node[7]))
             if el_num < C3D8_pier :
-                inp.write('%5d'*2%(1,0) + '\n')
+                inp.write('%10d'*2%(1,0) + '\n')
             else:
-                inp.write('%5d'*2%(2,0) + '\n')
+                inp.write('%10d'*2%(2,0) + '\n')
     elif element[i][0] == 'S4R':
-        inp.write('%5d'*3%(7,len(element[i][1][0]),1) + '\n')
-        inp.write('%5d'%1 + '%10.3e'%(material_e[0][1][2][0]) + '%10.3f'%(material_e[0][1][2][1]) + '\n')
+        inp.write('%10d'*3%(7,len(element[i][1][0]),1) + '\n')
+        inp.write('%10d'%1 + '%10.3e'%(25e9) + '%10.3f'%(0.3) + '\n')
         for j in range(len(element[i][1][0])):
             el_num = j+1
             el_node = element[i][1][1][j]
-            inp.write('%5d'*5%(el_num,el_node[0],el_node[1],el_node[2],el_node[3]))
-            inp.write('%5d'%(1) + '%10.1e'%(1.0) + '%5d'%(0) + '\n')
+            inp.write('%10d'*5%(el_num,el_node[0],el_node[1],el_node[2],el_node[3]))
+            inp.write('%10d'%(1) + '%10.1e'%(1.0) + '%10d'%(0) + '\n')
     elif element[i][0] == 'B31':
-        inp.write('%5d'*3%(5,len(element[i][1][0]),1) + '\n')
-        inp.write('%5d'%1 + '%10.3e'%(material_e[2][1][2][0]) + '%10.3e'%(2.60030e10) + '%10.3f'%(0.76))
+        inp.write('%10d'*3%(5,len(element[i][1][0]),1) + '\n')
+        inp.write('%10d'%1 + '%10.3e'%(70e9) + '%10.3e'%(2.60030e10) + '%10.3f'%(0.76))
         inp.write('%10.3e'%(0.4853333) + '%10.3e'%(0.4853333) + '%10.3e'%(0.4853333))
         inp.write('%10.3e'%(0.9170666) + '%10.3e'%(0.9170666) + '%10.3e'%(0.9170666) + '\n')
         for j in range(len(element[i][1][0])):
             el_num = j+1
             el_node = element[i][1][1][j]
-            inp.write('%5d'*3%(el_num,el_node[0],el_node[1]))
-            inp.write('%5d'%(1) + '%5d'%(0) + '\n')
+            inp.write('%10d'*3%(el_num,el_node[0],el_node[1]))
+            inp.write('%10d'%(1) + '%10d'%(0) + '\n')
     elif element[i][0] == 'T3D2':
-        inp.write('%5d'*3%(1,len(element[i][1][0]),1) + '\n')
-        inp.write('%5d'%1 + '%10.3e'%(material_e[4][1][2][0]) + '%10.3f'%(0.25) + '\n')
+        inp.write('%10d'*3%(1,len(element[i][1][0]),1) + '\n')
+        inp.write('%10d'%1 + '%10.3e'%(117e9) + '%10.3f'%(0.266) + '\n')
         for j in range(len(element[i][1][0])):
             el_num = j+1
             el_node = element[i][1][1][j]
-            inp.write('%5d'*3%(el_num,el_node[0],el_node[1]))
-            inp.write('%5d'%(1) + '%5d'%(0) + '\n')
+            inp.write('%10d'*3%(el_num,el_node[0],el_node[1]))
+            inp.write('%10d'%(1) + '%10d'%(0) + '\n')
 
 #输出Pardiso
 if pardiso == '1':
@@ -487,19 +489,25 @@ if pardiso == '1':
     for i in range(len(material_e)):
         if max(material_e[i][2]) > max_element:
             max_element = max(material_e[i][2])
-    inp.write('%5d'%(max_element) + '\n')
+    inp.write('%10d'%(max_element) + '\n')
 
     for i in range(len(element)):
         for j in range(len(element[i][1][0])):
-            inp.write('%5d'%(len(element[i][1][1][0])) + '\n')
+            inp.write('%10d'%(len(element[i][1][1][0])) + '\n')
             for k in range(len(element[i][1][1][0])):
-                inp.write('%5d'%(element[i][1][1][j][k]))
+                inp.write('%10d'%(element[i][1][1][j][k]))
             inp.write('\n')
-        
+            
+    for i in range(len(element)):
+        for j in range(len(element[i][1][0])):
+            inp.write('%10d'%(len(element[i][1][1][0])) + '\n')
+            for k in range(len(element[i][1][1][0])):
+                inp.write('%10d'%(element[i][1][1][j][k]))
+            inp.write('\n')
+    
 inp.write('stop')
             
 inp.close()    
-    
     
     
     

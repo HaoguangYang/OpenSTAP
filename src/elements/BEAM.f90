@@ -11,7 +11,7 @@ SUBROUTINE BEAM
   USE MEMALLOCATE
 
   IMPLICIT NONE
-  INTEGER :: NUME, NUMMAT, MM, N(14)
+  INTEGER :: NUME, NUMMAT, MM, N(15)
 
   NUME = NPAR(2)
   NUMMAT = NPAR(3)
@@ -35,35 +35,40 @@ SUBROUTINE BEAM
   N(2)=N(1)+NUMMAT*ITWO
   N(3)=N(2)+NUMMAT*ITWO
   N(4)=N(3)+NUMMAT*ITWO
-  N(5)=N(4)+NUMMAT*ITWO
+  if (DYNANALYSIS) then
+        N(5) = N(4)+NPAR(3)*ITWO
+  else
+        N(5) = N(4)
+  end if
   N(6)=N(5)+NUMMAT*ITWO
   N(7)=N(6)+NUMMAT*ITWO
   N(8)=N(7)+NUMMAT*ITWO
   N(9)=N(8)+NUMMAT*ITWO
   N(10)=N(9)+NUMMAT*ITWO
-  N(11)=N(10)+12*NUME
-  N(12)=N(11)+6*NUME*ITWO
-  N(13)=N(12)+NUME
-  N(14)=N(13)+NPAR(5)*NPAR(2)
+  N(11)=N(10)+NUMMAT*ITWO
+  N(12)=N(11)+12*NUME
+  N(13)=N(12)+6*NUME*ITWO
+  N(14)=N(13)+NUME
+  N(15)=N(14)+NPAR(5)*NPAR(2)
   
-  MIDEST=N(14)
+  MIDEST=N(15)
   if (IND .EQ. 1) then
         ! Allocate storage for element group data
         call MemAlloc(11,"ELEGP",MIDEST,1)
   end if
   NFIRST = NP(11)   ! Pointer to the first entry in the element group data array in the unit of single precision (corresponding to A)
   N(:) = N(:) + NFIRST
-  NLAST=N(14)
+  NLAST=N(15)
 
   CALL BEAMELE (IA(NP(1)),DA(NP(2)),DA(NP(3)),DA(NP(4)),DA(NP(4)),IA(NP(5)),   &
-       A(N(1)),A(N(2)),A(N(3)),A(N(4)),A(N(5)),A(N(6)),A(N(7)),A(N(8)),A(N(9)),A(N(10)),A(N(11)),A(N(12)),A(N(13)))
+       A(N(1)),A(N(2)),A(N(3)),A(N(4)),A(N(5)),A(N(6)),A(N(7)),A(N(8)),A(N(9)),A(N(10)),A(N(11)),A(N(12)),A(N(13)), A(N(14)))
 
   RETURN
 
 END SUBROUTINE BEAM
 
 
-SUBROUTINE BEAMELE (ID,X,Y,Z,U,MHT,E,G,AREA,I_X,I_Y,I_Z,J_X,J_Y,J_Z,LM,XYZ,MATP,Node)
+SUBROUTINE BEAMELE (ID,X,Y,Z,U,MHT,E,G,AREA,Density,I_X,I_Y,I_Z,J_X,J_Y,J_Z,LM,XYZ,MATP,Node)
 ! . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 ! .                                                                   .
 ! .   BEAM ELEMENT subroutine                                        .
@@ -78,7 +83,7 @@ SUBROUTINE BEAMELE (ID,X,Y,Z,U,MHT,E,G,AREA,I_X,I_Y,I_Z,J_X,J_Y,J_Z,LM,XYZ,MATP,
   INTEGER :: ID(6,NUMNP),LM(12,NPAR(2)),MATP(NPAR(2)),MHT(NEQ)
   REAL(8) :: X(NUMNP),Y(NUMNP),Z(NUMNP),E(NPAR(3)),G(NPAR(3)),AREA(NPAR(3)),  &
              I_X(NPAR(3)),I_Y(NPAR(3)),I_Z(NPAR(3)),J_X(NPAR(3)),J_Y(NPAR(3)),J_Z(NPAR(3)),XYZ(6,NPAR(2)),U(NEQ)
-  REAL(8) :: S(12,12),D(3),UELE(12),FORCE(12),SIGMA   !UELE: THE DISPLACEMENT OF ELEMENT N; FORCE: THE INTERNAL FORCE AND MOMENT FOR ELEMENT N
+  REAL(8) :: S(12,12),D(3),UELE(12),FORCE(12),SIGMA, M(12,12), M1, Rho, Density(NPAR(3))   !UELE: THE DISPLACEMENT OF ELEMENT N; FORCE: THE INTERNAL FORCE AND MOMENT FOR ELEMENT N
 
   INTEGER :: NPAR1, NUME, NUMMAT, ND, I, J, L, N, Node(NPAR(2),NPAR(5))
   INTEGER :: MTYPE, IPRINT
@@ -108,15 +113,23 @@ SUBROUTINE BEAMELE (ID,X,Y,Z,U,MHT,E,G,AREA,I_X,I_Y,I_Z,J_X,J_Y,J_Z,LM,XYZ,MATP,
                    ' AND CROSS-SECTIONAL  CONSTANTS ',         &
                    4 (' .'),'( NPAR(3) ) . . =',I10,/)") NUMMAT
 
-     WRITE (IOUT,"('  SET       YOUNG''S     SHEARING     AREA     I_X     I_Y     I_Z     J_X     J_Y     J_Z',/,  &
+     WRITE (IOUT,"('  SET       YOUNG''S     SHEARING     AREA     I_X     I_Y     I_Z     J_X     J_Y     J_Z     DENSITY',/,  &
                    ' NUMBER     MODULUS',10X,'MODULUS',/,  &
-                   15 X,'E',14X,'A')")
-
-     DO I=1,NUMMAT
+                   15 X,'E',14X,'E_t',11X,'A',59X,'¦Ñ')")
+    
+     if (DYNANALYSIS) then
+        DO I=1,NUMMAT
+        READ (IIN,'(I10,10F10.0)') N,E(N),G(N),AREA(N),I_X(N),I_Y(N),I_Z(N),J_X(N),J_Y(N),J_Z(N), Density(N)  ! Read material information
+        WRITE (IOUT,"(I10,1X,E12.5,1X,E12.5,1X,E12.5,1X,E12.5,1X,E12.5,1X, E12.5,1X,E12.5, 1X,E12.5,1X,E12.5, 1X, E12.5)") &
+        N,E(N),G(N),AREA(N),I_X(N),I_Y(N),I_Z(N),J_X(N),J_Y(N),J_Z(N), Density(N)
+        END DO
+     ELSE
+        DO I=1,NUMMAT
         READ (IIN,'(I10,9F10.0)') N,E(N),G(N),AREA(N),I_X(N),I_Y(N),I_Z(N),J_X(N),J_Y(N),J_Z(N)  ! Read material information
         WRITE (IOUT,"(I10,1X,E12.5,1X,E12.5,1X,E12.5,1X,E12.5,1X,E12.5,1X, E12.5,1X,E12.5, 1X,E12.5,1X,E12.5)") &
         N,E(N),G(N),AREA(N),I_X(N),I_Y(N),I_Z(N),J_X(N),J_Y(N),J_Z(N)
-     END DO
+        END DO
+     END IF
 
      WRITE (IOUT,"(//,' E L E M E N T   I N F O R M A T I O N',//,  &
                       ' ELEMENT     NODE     NODE       MATERIAL',/,   &
@@ -257,15 +270,55 @@ SUBROUTINE BEAMELE (ID,X,Y,Z,U,MHT,E,G,AREA,I_X,I_Y,I_Z,J_X,J_Y,J_Z,LM,XYZ,MATP,
         ENDDO
 
         S=MATMUL(TRANSPOSE(T),MATMUL(S,T))
+        if (DYNANALYSIS) THEN
+            M(:,:) = 0D0
+            M1 = Density(MTYPE)*AREA(MTYPE)*XL
+            M(1,1) = 140.
+            M(1,7) = 70.
+            M(2,2) = 156.
+            M(2,6) = 22*XL
+            M(2,8) = 54.
+            M(2,12) = -13*XL
+            M(3,3) = 156.
+            M(3,5) = -22*XL
+            M(3,9) = 54.
+            M(3,11) = 13*XL
+            M(4,4) = 140.
+            M(4,10) = 70.
+            M(5,5) = 4*XL**2
+            M(5,9) = -13*XL
+            M(5,11) = -3*XL**2
+            M(6,6) = 4*XL**2
+            M(6,8) = 13*XL
+            M(6,12) = -3*XL**2
+            M(7,7) = 140.
+            M(8,8) = 156.
+            M(8,12) = -22*XL
+            M(9,9) = 156.
+            M(9,11) = 22*XL
+            M(10,10) = 140.
+            M(11,11) = 4*XL**2
+            M(12,12) = 4*XL**2
+            DO I=1,11
+                M(I,I+1:12)=M(I+1:12,I)
+            ENDDO
+            M(:,:) = M1/420*M(:,:)
+        end if
         
         if(pardisodoor) then
+<<<<<<< HEAD
             if(huge) then
                 call pardiso_addban(stff,IA(NP(2)),columns,S,LM(1,N),ND)
             else
                 call pardiso_addban(DA(NP(3)),IA(NP(2)),IA(NP(5)),S,LM(1,N),ND)
             end if
+=======
+            call pardiso_addban(DA(NP(3)),IA(NP(2)),IA(NP(5)),S,LM(1,N),ND)
+            if (DYNANALYSIS) CALL pardiso_addban(DA(NP(10)),IA(NP(9)), IA(NP(8)),M,LM(:,N),ND)
+>>>>>>> c85d1edd52a173423583b01cc6524492827c80cd
         else
             CALL ADDBAN (DA(NP(3)),IA(NP(2)),S,LM(1,N),ND)
+            IF (DYNANALYSIS) CALL ADDBAN (DA(NP(10)),IA(NP(2)),M,LM(:,N),ND)
         end if
 
      END DO

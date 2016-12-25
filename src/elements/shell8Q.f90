@@ -79,7 +79,7 @@ SUBROUTINE SHELL8 (ID,X,Y,Z,U,MHT,E,POSSION,LM,XYZ,MATP, THICK, Node)
   INTEGER :: MTYPE, IPRINT, Node(NPAR(2),NPAR(5))
 
   REAL(8) :: Cb(3, 3), Cs, Etemp, Ptemp, detJ, Cm(3, 3), StressCollection(6, NPAR(2)*9)
-  REAL(8) :: GAUSS(3), GAUSS_COF(3)
+  REAL(8) :: GAUSS(3), GAUSS_COF(3), Mass(40,40), Rho, Density(NPAR(3))
   REAL(8) :: G1, G2, GN(2,4), GN8(2,8), Ja(2,2), Ja_inv(2,2), Bk(3,40),By(2,40), S(40,40), BB(2,8), NN0(1,8)
   REAL(8) :: X_Y(4, 2), STR1(3), STR2(2), Bm(3,40), GaussianCollection(3, NPAR(2)*9)
   NPAR1  = NPAR(1)
@@ -244,8 +244,12 @@ SUBROUTINE SHELL8 (ID,X,Y,Z,U,MHT,E,POSSION,LM,XYZ,MATP, THICK, Node)
                     matmul(matmul(transpose(Bm), Cm), Bm))*abs(detJ)*GAUSS_COF(L)*GAUSS_COF(M)
             END DO
         END DO
-        CALL ADDBAN (DA(NP(3)),IA(NP(2)),S,LM(1,N),ND)  ! 这里要输出的S就是制作好了的local stiffness matrix
-        
+        !CALL ADDBAN (DA(NP(3)),IA(NP(2)),S,LM(1,N),ND)  ! 这里要输出的S就是制作好了的local stiffness matrix
+        if(pardisodoor) then
+            call pardiso_addban(DA(NP(3)),IA(NP(2)),IA(NP(5)),S,LM(1,N),ND)
+        else
+            CALL ADDBAN (DA(NP(3)),IA(NP(2)),S,LM(1,N),ND)
+        end if
      END DO
 
      RETURN

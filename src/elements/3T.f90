@@ -30,7 +30,7 @@ USE GLOBALS
 USE memAllocate
 
 IMPLICIT NONE
-INTEGER NUME, NUMMAT, MM, N(7)
+INTEGER NUME, NUMMAT, MM, N(8)
 
 NUME = NPAR(2)
 NUMMAT = NPAR(3)
@@ -45,30 +45,35 @@ NPAR(5) = 3
   N(1)=0
   N(2)=N(1)+NUMMAT*ITWO
   N(3)=N(2)+NUMMAT*ITWO
-  N(4)=N(3)+6*NUME
-  N(5)=N(4)+9*NUME*ITWO
-  N(6)=N(5)+NUME
-  N(7)=N(6)+NPAR(5)*NPAR(2)
+  if (DYNANALYSIS) then
+        N(4) = N(3)+NPAR(3)*ITWO
+  else
+        N(4) = N(3)
+  end if
+  N(5)=N(4)+6*NUME
+  N(6)=N(5)+9*NUME*ITWO
+  N(7)=N(6)+NUME
+  N(8)=N(7)+NPAR(5)*NPAR(2)
   
 
-  MIDEST=N(7)
+  MIDEST=N(8)
   if (IND .EQ. 1) then
         ! Allocate storage for element group data
         call MemAlloc(11,"ELEGP",MIDEST,1)
   end if
   NFIRST = NP(11)   ! Pointer to the first entry in the element group data array in the unit of single precision (corresponding to A)
   N(:) = N(:) + NFIRST
-  NLAST=N(7)
+  NLAST=N(8)
 
   CALL ELEMENT_3T_MAIN (IA(NP(1)),DA(NP(2)),DA(NP(3)),DA(NP(4)),DA(NP(4)),IA(NP(5)),   &
-       A(N(1)),A(N(2)),A(N(3)),A(N(4)),A(N(5)),A(N(6)))
+       A(N(1)),A(N(2)),A(N(3)),A(N(4)),A(N(5)),A(N(6)),A(N(7)))
 
   RETURN
 
 END SUBROUTINE ELEMENT_3T
 
 
-SUBROUTINE ELEMENT_3T_MAIN (ID,X,Y,Z,U,MHT,E,POISSON,LM,XYZ,MATP,Node)
+SUBROUTINE ELEMENT_3T_MAIN (ID,X,Y,Z,U,MHT,E,POISSON,DENSITY,LM,XYZ,MATP,Node)
 ! . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 ! .                                                                   .
 ! .   TRUSS element subroutine                                        .
@@ -103,7 +108,7 @@ SUBROUTINE ELEMENT_3T_MAIN (ID,X,Y,Z,U,MHT,E,POISSON,LM,XYZ,MATP,Node)
   INTEGER :: MTYPE, IPRINT
   INTEGER,PARAMETER:: GUASS_N=3
   REAL(8),ALLOCATABLE:: GP1(:),GP2(:),W(:)
-  REAL(8) :: NMAT(1,3),BMAT(3,6),C(3,2)
+  REAL(8) :: NMAT(1,3),BMAT(3,6),C(3,2), M(6,6), Rho, Density(NPAR(3))
   REAL(8) :: KE(6,6),DETJ,D(3,3),XY(3,2), StressCollection(3,NPAR(2)*3), GaussianCollection(2,NPAR(2)*3)
   REAL(8),ALLOCATABLE:: STRESS(:,:)
   COMMON DETJ
@@ -148,14 +153,21 @@ SUBROUTINE ELEMENT_3T_MAIN (ID,X,Y,Z,U,MHT,E,POISSON,LM,XYZ,MATP,Node)
                    ' AND CROSS-SECTIONAL  CONSTANTS ',         &
                    4 (' .'),'( NPAR(3) ) . . =',I10,/)") NUMMAT
 
-     WRITE (IOUT,"('  SET       YOUNG''S        POISSON',/,  &
-                   ' NUMBER     MODULUS',9X,'RATIO',/,  &
-                   15 X,'E',14X,'A')")
+     WRITE (IOUT,"('  SET       YOUNG''S        POISSON     DENSITY',/,  &
+                   ' NUMBER     MODULUS',9X,    'RATIO',/,  &
+                   15 X,'E',14X,'v',14X,                      '¦Ñ')")
 
-     DO I=1,NUMMAT
-        READ (IIN,'(I10,2F10.0)') N,E(N),POISSON(N)  ! Read material information
-        WRITE (IOUT,"(I10,4X,E12.5,2X,E14.6)") N,E(N),POISSON(N)
-     END DO
+     if (DYNANALYSIS) then
+        DO I=1,NUMMAT
+            READ (IIN,'(I10,3F10.0)') N,E(N), POISSON(N), Density(N)      ! Read Density
+            WRITE (IOUT,"(I10,4X,E12.5,2(2X,E14.6))") N,E(N), POISSON(N), Density(N)
+        END DO
+     else
+        DO I=1,NUMMAT
+            READ (IIN,'(I10,2F10.0)') N,E(N),POISSON(N)  ! Read material information
+            WRITE (IOUT,"(I10,4X,E12.5,2X,E14.6)") N,E(N),POISSON(N)
+        END DO
+     end if
 
      WRITE (IOUT,"(//,' E L E M E N T   I N F O R M A T I O N',//,  &
                       ' ELEMENT    |-------- NODE ---------|      MATERIAL',/,   &
@@ -210,15 +222,27 @@ SUBROUTINE ELEMENT_3T_MAIN (ID,X,Y,Z,U,MHT,E,POISSON,LM,XYZ,MATP,Node)
         
         BMAT = BmatElast3T(C(:,1),C(:,2))
         KE = 1.0/2*MATMUL(MATMUL(TRANSPOSE(BMAT),D),BMAT)*DETJ
-        
+        if (DYNANALYSIS) &
+        M = Density(MTYPE)*0.5*DETJ/3*reshape((/0.5, 0., 0.25, 0., 0.25, 0., &
+                                                0., 0.5, 0., 0.25, 0., 0.25, &
+                                                0.25, 0., 0.5, 0., 0.25, 0., &
+                                                0., 0.25, 0., 0.5, 0., 0.25, &
+                                                0.25, 0., 0.25, 0., 0.5, 0., &
+                                                0., 0.25, 0., 0.25, 0., 0.5/), (/6,6/))
         if(pardisodoor) then
+<<<<<<< HEAD
             if(huge) then
                 call pardiso_addban(stff,IA(NP(2)),columns,KE,LM(1,N),ND)
             else
                 call pardiso_addban(DA(NP(3)),IA(NP(2)),IA(NP(5)),KE,LM(1,N),ND)
             end if
+=======
+            call pardiso_addban(DA(NP(3)),IA(NP(2)),IA(NP(5)),KE,LM(1,N),ND)
+            if (DYNANALYSIS) CALL pardiso_addban(DA(NP(10)),IA(NP(9)), IA(NP(8)),M,LM(:,N),ND)
+>>>>>>> c85d1edd52a173423583b01cc6524492827c80cd
         else
             CALL ADDBAN (DA(NP(3)),IA(NP(2)),KE,LM(1,N),ND)
+            IF (DYNANALYSIS) CALL ADDBAN (DA(NP(10)),IA(NP(2)),M,LM(:,N),ND)
         end if
         
      END DO
