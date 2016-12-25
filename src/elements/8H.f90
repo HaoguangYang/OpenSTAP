@@ -16,7 +16,7 @@ subroutine EightHex
     
     implicit none
     integer :: NumberOfElements, NumberOfMaterials, ElementGroupSize
-    integer :: N(11) !Pointers
+    integer :: N(8) !Pointers
     
     NPAR(5) = 8
     NPAR(4) = 0

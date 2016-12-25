@@ -16,7 +16,7 @@ subroutine FourTet
     
     implicit none
     integer :: NumberOfElements, NumberOfMaterials, ElementGroupSize
-    integer :: N(11) !Pointers
+    integer :: N(8) !Pointers
     
     NPAR(5) = 4
     NPAR(4) = 0
@@ -46,22 +46,22 @@ subroutine FourTet
         N(4) = N(3)
     end if
     
-    N(6) = N(5) + 3*NPAR(5)*NumberOfElements
-    N(7) = N(6) + 3*NPAR(5)*NumberOfElements*ITWO
-    N(8) = N(7) + NumberOfElements
-    N(9) = N(8) + NPAR(5)*NPAR(2)
+    N(5) = N(4) + 3*NPAR(5)*NumberOfElements
+    N(6) = N(5) + 3*NPAR(5)*NumberOfElements*ITWO
+    N(7) = N(6) + NumberOfElements
+    N(8) = N(7) + NPAR(5)*NPAR(2)
     
-    MIDEST = N(9)
+    MIDEST = N(8)
     
     if (IND .EQ. 1) then
         call MemAlloc(11,"ELEGP",MIDEST,1)
     end if
     NFIRST = NP(11)
     N(:) = N(:) + NFIRST
-    NLAST  = N(9)
+    NLAST  = N(8)
     
     call TetFour (IA(NP(1)),DA(NP(2)),DA(NP(3)),DA(NP(4)),DA(NP(4)),IA(NP(5)),   &
-                  A(N(1)),A(N(2)),A(N(3)),A(N(4)),A(N(5)),A(N(6)),A(N(7)),A(N(8)))
+                  A(N(1)),A(N(2)),A(N(3)),A(N(4)),A(N(5)),A(N(6)),A(N(7)))
     
     !Reuse DA(NP(4)) at Solution Phase 3 as displacement U
     return
@@ -94,7 +94,7 @@ subroutine TetFour (ID,X,Y,Z,U,MHT,E, PoissonRatio, Density, LM, PositionData, M
     ElementType         = NPAR(1)
     NumberOfElements    = NPAR(2)
     NumberOfMaterials   = NPAR(3)
-    ElementShapeNodes   = NPAR(5)                           !NPAR(5)=8
+    ElementShapeNodes   = NPAR(5)                           !NPAR(5)=4
     ND = 12
     
     SELECT CASE (IND)
@@ -150,7 +150,7 @@ subroutine TetFour (ID,X,Y,Z,U,MHT,E, PoissonRatio, Density, LM, PositionData, M
             
         enddo
         return
-    
+        
     CASE (2)
         MaterialComp = -1
         do N = 1, NumberOfElements
@@ -172,8 +172,8 @@ subroutine TetFour (ID,X,Y,Z,U,MHT,E, PoissonRatio, Density, LM, PositionData, M
                          (/PositionData(1:ElementShapeNodes*3-1:3,N), &
                            PositionData(2:ElementShapeNodes*3  :3,N), &
                            PositionData(3:ElementShapeNodes*3+1:3,N)/))
-                Point = matmul(matmul(transpose(BMatrix),DMatrix),BMatrix)
-                S = S + (Weight(i)*DetJ(i))*Point
+                Point = -matmul(matmul(transpose(BMatrix),DMatrix),BMatrix)
+                S = S + (Weight(i)*DetJ(i))*Point/6
                 IF (DYNANALYSIS .EQV. .TRUE.) then
                     Transformed = GaussianPts(i,:)
                     call TetN (NMatrix, ElementShapeNodes, Transformed)             !Initialize N Matrix for mass assembly
@@ -299,7 +299,7 @@ subroutine TetB (BMatrix, DetJ, ElementShapeNodes, Original)
         BMatrix = reshape((/((/Bx(i), 0D0, 0D0, By(i), 0D0, Bz(i), &
                              0D0, By(i), 0D0, Bx(i), Bz(i), 0D0, &
                              0D0, 0D0, Bz(i), 0D0, By(i), Bx(i)/), &
-                             i = 1, ElementShapeNodes)/), Shape(BMatrix))
+                             i = 1, ElementShapeNodes)/), Shape(BMatrix))/DetJ
     end select
 end subroutine TetB
 
