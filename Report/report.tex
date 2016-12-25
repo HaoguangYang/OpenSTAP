@@ -292,7 +292,53 @@ u_{x}=0.001x,\ u_{y}=0.002y,\ u_{z}=0.003z
 
 
 \subsection{Beam}
-
+\subsubsection{Basic principles}
+\paragraph{}
+For a beam element, the equation for a single beam element is quite simple, for the reason that the calculation of the element stiffness matrix doesn't require numerical integral.It can be done manually.
+The stiffness matrix for a beam element is as follow.
+\begin{center}
+\includegraphics[width=1.0\textwidth]{beam1.png}
+\end{center}
+\begin{center}
+\includegraphics[width=1.0\textwidth]{beam2.png}
+\end{center}
+In all, we can get the equation for the element itself.
+\begin{equation}
+{\bf K^{(e)}d^{(e)}=F^{(e)}}
+\end{equation}
+The process of assembly and solution of the linear equation is just the same as the former elements.
+\paragraph{ATTENTION} The stiffness matrix for beams point to arbitrary directions needs the translation matrix to do the coordinates translation.
+\begin{equation}
+{\bf K^{(e)\prime}=T^{T}K^{(e)}T}
+\end{equation}
+\subsubsection{Programming procedures}
+\paragraph{}
+The most difficult part for the programming is the generation of the ID array without interfering with other elements. The structure of the STAP90 program is very terrible for this kind of modification, given the reason that the original program read the element controlling messages after the nodes, making it complex for the dealt for nodes. The only choice left for me is whether changing the whole blueprint for the entire STAP 90 program or just writing the individual input or output subroutine for  the beam. In terms of the deadline requirements, I choose the lateral,leaving the former mission to the following weeks. As you can see in the source files, the input and output subroutine for the beam is in the 'BEAM.f90'.
+\subsubsection{Input file format}
+\paragraph{}For controlling messages of nodals:
+\begin{center}
+\includegraphics[width=1.0\textwidth]{beam3.png}
+\end{center}
+\paragraph{}For information about the loads:
+\begin{center}
+\includegraphics[width=1.0\textwidth]{beam4.png}
+\end{center}
+\paragraph{}For information about the materials:
+\begin{center}
+\includegraphics[width=1.0\textwidth]{beam5.png}
+\end{center}
+\paragraph{}For information about the element connectivity:
+\begin{center}
+\includegraphics[width=1.0\textwidth]{beam6.png}
+\end{center}
+\subsubsection{The rate of convergence}
+For the beam, the FEM guarantees the continuity and the completeness. The completeness will be verified in the patchtest.For continuity, the method for the approximation of the function is 3-order Hermite interpolation, maintaining the continuity for both the displacement and the angle.It is obvious that the FEM will give the exact answer at nodes if we give concentration forces or momentum at the nodes.For the distribution forces, the FEM will not give the exact results. The reason for this is that the order of the moment is at least 2 for the distribution forces. The results will be better and will converge to the exact solution with the mesh refined to infinite decimal.The convergence rate for the displacement is at the order of 2, while the rate for the energy norm is at the order of 1.
+\subsubsection{Patchtest and the results}
+I use an example for the patchtest.The situation of the load and the structure is as follow.
+\begin{center}
+\includegraphics[width=1.0\textwidth]{beam7.png}
+\end{center}
+The input files and the results for the patchtest in the folder for the beam.
 \subsection{Shell}
 
 \subsection{半带宽优化}
