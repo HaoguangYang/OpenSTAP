@@ -417,7 +417,40 @@ Stap90的实现位于$solvermode.f90$文件中的bdopt函数，C++的实现位�
 铁木辛柯梁的刚度阵如下图。其中剪切部分有一个截面修正因子，这里和课上讲的修整因子成倒数关系。
 取
 $$k=\frac{10(1+\nu)}{12+11\nu}$$
-
+\begin{center}
+\includegraphics[width=1.0\textwidth]{timoshenko1.png}
+\end{center}
+载荷以及右端力向量如图。
+\begin{center}
+\includegraphics[width=1.0\textwidth]{beam2.png}
+\end{center}
+\subsubsection{输入输出}
+\paragraph{}For controlling messages of nodals:
+\begin{center}
+\includegraphics[width=1.0\textwidth]{beam3.png}
+\end{center}
+\paragraph{}For information about the loads:
+\begin{center}
+\includegraphics[width=1.0\textwidth]{beam4.png}
+\end{center}
+\paragraph{}For information about the materials:
+\begin{center}
+\includegraphics[width=1.0\textwidth]{beam5.png}
+\end{center}
+\paragraph{}For information about the element connectivity:
+\begin{center}
+\includegraphics[width=1.0\textwidth]{beam6.png}
+\end{center}
+\subsubsection{分片试验结果收敛性分析}
+需要注意的是，铁木辛柯梁对一般截面并没有精确解，但是对于圆截面还是可以分析收敛性。误差的能量范数是一阶收敛的。并且减缩积分能获得更精确的结果。
+最重要的是，通过铁木辛柯梁，我对有限元中减缩积分的方法有了新的理解。
+铁木辛柯梁只是一种梁模型，通过铁木辛柯梁和欧拉梁的编写，我发现只要给定一种弯曲模型，就可以很轻松地算出这种模型的有限元刚度阵，进而进行计算。
+\begin{center}
+\includegraphics[width=1.0\textwidth]{timoshenko2.png}
+\end{center}
+\begin{center}
+\includegraphics[width=1.0\textwidth]{timoshenko3.png}
+\end{center}
 \subsection{Plate}
 
 \subsection{无限单元}
