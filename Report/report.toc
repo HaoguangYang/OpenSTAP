@@ -1,28 +1,46 @@
 \contentsline {section}{\numberline {0.1}总述}{5}
 \contentsline {subsection}{\numberline {0.1.1}项目描述}{5}
-\contentsline {subsection}{\numberline {0.1.2}Abaqus结果}{8}
-\contentsline {section}{\numberline {0.2}桥梁功能实现方案}{9}
-\contentsline {subsection}{\numberline {0.2.1}前处理}{9}
-\contentsline {subsection}{\numberline {0.2.2}SPR}{9}
+\contentsline {subsection}{\numberline {0.1.2}Abaqus结果}{7}
+\contentsline {section}{\numberline {0.2}桥梁功能实现方案}{7}
+\contentsline {subsection}{\numberline {0.2.1}前处理}{7}
+\contentsline {subsection}{\numberline {0.2.2}SPR}{7}
 \contentsline {subsection}{\numberline {0.2.3}后处理}{9}
-\contentsline {subsection}{\numberline {0.2.4}8H}{9}
-\contentsline {subsection}{\numberline {0.2.5}Beam}{9}
-\contentsline {subsection}{\numberline {0.2.6}Shell}{9}
-\contentsline {subsection}{\numberline {0.2.7}半带宽优化}{9}
-\contentsline {subsection}{\numberline {0.2.8}稀疏存储求解器}{9}
-\contentsline {section}{\numberline {0.3}其他单元}{9}
-\contentsline {subsection}{\numberline {0.3.1}3T}{9}
-\contentsline {subsection}{\numberline {0.3.2}4Q}{9}
-\contentsline {subsection}{\numberline {0.3.3}6T}{9}
-\contentsline {subsection}{\numberline {0.3.4}8Q}{9}
-\contentsline {subsection}{\numberline {0.3.5}9Q}{9}
-\contentsline {subsection}{\numberline {0.3.6}4T}{9}
-\contentsline {subsection}{\numberline {0.3.7}铁木辛柯梁}{9}
-\contentsline {subsection}{\numberline {0.3.8}Plate}{9}
-\contentsline {subsection}{\numberline {0.3.9}无限单元}{9}
-\contentsline {subsection}{\numberline {0.3.10}超级单元}{9}
-\contentsline {subsection}{\numberline {0.3.11}过渡单元}{9}
-\contentsline {section}{\numberline {0.4}高级功能}{9}
-\contentsline {subsection}{\numberline {0.4.1}弹塑性杆分析}{9}
-\contentsline {subsection}{\numberline {0.4.2}模态分析}{9}
-\contentsline {subsection}{\numberline {0.4.3}动力学响应分析}{9}
+\contentsline {subsection}{\numberline {0.2.4}8H}{10}
+\contentsline {subsection}{\numberline {0.2.5}Beam}{12}
+\contentsline {subsubsection}{Basic principles}{12}
+\contentsline {paragraph}{}{12}
+\contentsline {paragraph}{ATTENTION}{13}
+\contentsline {subsubsection}{Programming procedures}{13}
+\contentsline {paragraph}{}{13}
+\contentsline {subsubsection}{Input file format}{14}
+\contentsline {paragraph}{}{14}
+\contentsline {paragraph}{}{14}
+\contentsline {paragraph}{}{14}
+\contentsline {paragraph}{}{15}
+\contentsline {subsubsection}{The rate of convergence}{15}
+\contentsline {subsubsection}{Patchtest and the results}{16}
+\contentsline {subsection}{\numberline {0.2.6}Shell}{17}
+\contentsline {subsection}{\numberline {0.2.7}半带宽优化}{17}
+\contentsline {subsection}{\numberline {0.2.8}稀疏存储求解器}{17}
+\contentsline {section}{\numberline {0.3}其他单元}{17}
+\contentsline {subsection}{\numberline {0.3.1}3T}{17}
+\contentsline {subsection}{\numberline {0.3.2}4Q}{17}
+\contentsline {subsection}{\numberline {0.3.3}6T}{17}
+\contentsline {subsection}{\numberline {0.3.4}8Q}{17}
+\contentsline {subsection}{\numberline {0.3.5}9Q}{17}
+\contentsline {subsection}{\numberline {0.3.6}4T}{17}
+\contentsline {subsection}{\numberline {0.3.7}铁木辛柯梁}{17}
+\contentsline {subsection}{\numberline {0.3.8}Plate}{17}
+\contentsline {subsection}{\numberline {0.3.9}无限单元}{17}
+\contentsline {subsection}{\numberline {0.3.10}超级单元}{17}
+\contentsline {subsection}{\numberline {0.3.11}过渡单元}{17}
+\contentsline {section}{\numberline {0.4}高级功能}{17}
+\contentsline {subsection}{\numberline {0.4.1}弹塑性杆分析}{17}
+\contentsline {subsubsection}{基本原理}{17}
+\contentsline {paragraph}{}{17}
+\contentsline {subsubsection}{编程思路}{18}
+\contentsline {paragraph}{}{18}
+\contentsline {subsubsection}{输入和输出结果}{19}
+\contentsline {paragraph}{}{19}
+\contentsline {subsection}{\numberline {0.4.2}模态分析}{21}
+\contentsline {subsection}{\numberline {0.4.3}动力学响应分析}{21}

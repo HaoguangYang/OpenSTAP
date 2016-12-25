@@ -14110,11 +14110,11 @@
 
  S O L U T I O N   T I M E   L O G   I N   S E C
 
-     TIME FOR INPUT PHASE  . . . . . . . . . . . . . . =         8
+     TIME FOR INPUT PHASE  . . . . . . . . . . . . . . =        10
      TIME FOR PREPARATION OF MATRIX FORMAT . . . . . . =         0
      TIME FOR ASSEMBLING . . . . . . . . . . . . . . . =         0
      TIME FOR FACTORIZATION OF STIFFNESS MATRIX  . . . =         0
      TIME FOR LOAD CASE SOLUTIONS  . . . . . . . . . . =         0
-     TIME FOR CALCLUATE STRESS . . . . . . . . . . . . =         4
+     TIME FOR CALCLUATE STRESS . . . . . . . . . . . . =         0
 
-T O T A L   S O L U T I O N   T I M E  . . . . . . . . =         4
+T O T A L   S O L U T I O N   T I M E  . . . . . . . . =         0
