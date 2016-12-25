@@ -201,6 +201,9 @@ subroutine HexTwn (ID,X,Y,Z,U,MHT,E, PoissonRatio, Density, Gravity, LM, Positio
             !write(*,*) "S",S
             
 <<<<<<< HEAD
+
+=======
+<<<<<<< HEAD
             if(pardisodoor) then
                 IF (DYNANALYSIS) call pardiso_addban(DA(NP(10)),IA(NP(2)),IA(NP(5)),S,LM(:,N),ND)
             else
@@ -208,6 +211,7 @@ subroutine HexTwn (ID,X,Y,Z,U,MHT,E, PoissonRatio, Density, Gravity, LM, Positio
                 IF (DYNANALYSIS) CALL ADDBAN (DA(NP(10)),IA(NP(2)),M,LM(:,N),ND)
             end if
 =======
+>>>>>>> dedcc6447c9449ac1dd2040a1e7b5f4a73482371
             !CALL ADDBAN (DA(NP(3)),IA(NP(2)),S,LM(:,N),ND)
             if(pardisodoor) then
                 call pardiso_addban(DA(NP(3)),IA(NP(2)),IA(NP(5)),S,LM(1,N),ND)
@@ -217,7 +221,11 @@ subroutine HexTwn (ID,X,Y,Z,U,MHT,E, PoissonRatio, Density, Gravity, LM, Positio
                 IF (DYNANALYSIS .EQV. .TRUE.) CALL ADDBAN (DA(NP(5)),IA(NP(2)),M,LM(:,N),ND)
             end if
             
+<<<<<<< HEAD
+
+=======
 >>>>>>> c85d1edd52a173423583b01cc6524492827c80cd
+>>>>>>> dedcc6447c9449ac1dd2040a1e7b5f4a73482371
             
         end do
         

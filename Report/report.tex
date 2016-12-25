@@ -117,6 +117,62 @@
 \section{桥梁功能实现方案}
 \subsection{前处理}
 
+前处理使用python与abaqus二次开发进行对INP文件的预处理，将其变成stap90能读入的标准文件。
+
+\subsubsection{读入文件格式}
+\textbf{功能开关}: 本小组采用的标准文件读入格式在规定的stap90固定格式基础上添加：
+\begin{center}
+\includegraphics[width=\textwidth]{pre01.png}
+\end{center}
+
+对应的数字分别是以下功能开关：
+
+BANDWIDTHOPT,PARDISODOOR,LOADANALYSIS,DYNANALYSIS,
+
+\textbf{Pardiso}: 同时，我们需要在后面添加Pardiso所需的单元节点号（重复一遍）
+\begin{center}
+\includegraphics[width=\textwidth]{pre02.png}
+\end{center}
+
+\textbf{I10}: 为了求解大规模问题，我们将所有I5输入改为I10输入
+
+\subsubsection{Python与abaqus二次开发}
+以下三个步骤：
+\begin{center}
+\begin{tabular}{ll}
+Mesh on part -- Mesh on instance\\
+Merge Nodes\\
+Renumber Nodes\\
+\end{tabular}
+\end{center}
+
+前两者通过python完成，后一步直接可在abaqus操作：
+
+1. mdb.models['Model-1'].setValues(noPartsInputFile=ON)
+
+2. mdb.models['Model-1'].rootAssembly.InstanceFromBooleanMerge\\(name='PartMerge',instances=('Part-1-1','Part-2-1','Part-3-2','Part-3-2-lin-1-2'domain=MESH,mergeNodes=ALL)\\
+(注：具体的models和name需要改成自己相对应的名字)
+
+在abaqus也可操作merge命令
+
+\begin{center}
+\includegraphics[width=\textwidth]{pre03.png}
+\end{center}
+
+3. 在abaqus中选择mesh，左栏功能最下面一个有对mesh操作的选项，选择renumber（注意需在mesh on part形式下，这就需要先按前两步生成所有instance变成一个part的操作）
+\begin{center}
+\includegraphics[width=\textwidth]{pre04.png}
+\end{center}
+
+前面三步分别生成merge-1文件，与merge-3文件，PreINP.py需要在相同的路径下找到这两个文件。
+
+\subsubsection{PreINP.py实现}
+基本原理就是，通过查找关键字来定位，其中具体的操作见PreINP.py源代码
+
+\begin{center}
+\includegraphics[width=\textwidth]{pre05.png}
+\end{center}
+
 %-----------------------------------------------------SPR----------------------------------------------%
 \subsection{SPR}
 
@@ -399,18 +455,80 @@ Stap90的实现位于$solvermode.f90$文件中的bdopt函数，C++的实现位�
 \section{其他单元}
 \subsection{3T}
 
+\includegraphics[width=\textwidth]{Example_3T.png}
+
+\newpage
+Answer in Matlab\\
+
+\includegraphics[width=\textwidth]{3T01.png}
+
+Answer in Stap90\\
+
+\includegraphics[width=\textwidth]{3T02.png}
+
+\subsection{PatchTest3T}
+\includegraphics[width=0.8\textwidth]{PatchTest_3T.jpg}
+
+We constrain the node 1 in xy direction and node 2 in y direction. With the pressure added on the top surface of plate, we get the constant stress that
+$$s_{xx} = 0$$
+$$s_{yy} = -20$$
+$$s_{xy} = 0$$
+
+Answer in Stap90\\
+
+\includegraphics[width=\textwidth]{4Q03.png}
+
 \subsection{4Q}
 
-\subsection{6T}
+\includegraphics[width=\textwidth]{Example_4Q.png}
+
+\newpage
+Answer in Matlab
+
+\includegraphics[width=\textwidth]{4Q01.png}
+
+Answer in Stap90
+
+\includegraphics[width=\textwidth]{4Q02.png}
+
+\subsection{PatchTest4Q}
+\includegraphics[width=0.8\textwidth]{Patch_4Q.jpg}
+
+We constrain the node 1 in xy direction and node 2 in y direction. With the pressure added on the top surface of plate, we get the constant stress that
+$$s_{xx} = 0$$
+$$s_{yy} = -20$$
+$$s_{xy} = 0$$
+
+Answer in Stap90\\
+
+\includegraphics[width=\textwidth]{4Q03.png}
 
 \subsection{8Q}
 
 \subsection{9Q}
 
+9Q的原理与4Q类似，均是用$Kd=f$进行求解，只是其组装单元刚度阵所使用的形函数不同
+
+\begin{center}
+\includegraphics[width=\textwidth]{9Q01.jpg} % Include the image placeholder.png
+\end{center}
+
+PatchTest所使用的构型仍为4Q使用的Patchtest方案，即约束左下角两个自由度的位移，以及右下角Y自由度的位移，在顶部施加向下为20N/m的均布力。
+
+其结果如下：
+\begin{center}
+\includegraphics[width=\textwidth]{9Q02.png} % Include the image placeholder.png
+\end{center}
+\begin{center}
+\includegraphics[width=\textwidth]{9Q03.png} % Include the image placeholder.png
+\end{center}
+
 \subsection{4T}
 \paragraph{}
 类似于3T单元，在三维Simplex坐标系中，可以用相对体积来作为高斯点的确定依据。指定四个节点的编号顺序为，当右手四指绕底面三顶点方向旋转时，拇指指向第四顶点方向。有：
 
+<<<<<<< HEAD
+=======
 \[
 N_{i}=\frac{1}{6V}(a_{i}+b_{i}x+c_{i}y+d_{i}z)
 \]
@@ -449,6 +567,7 @@ x_{4} & y_{4} & z_{4}
 类似于8H单元，作B矩阵为$B=\nabla_{s}N$, 其每项元素均为由节点坐标决定的常数。
 
 对单元刚度阵进行组装，最后解总刚度阵方程，思路同8H。分片测试采用立方体，分割为四个顶点对应的四面体和中心一个正四面体共5个单元，执行C类分片测试，结果通过，输入输出文件如Samples文件夹内所示。
+>>>>>>> dedcc6447c9449ac1dd2040a1e7b5f4a73482371
 \subsection{铁木辛柯梁}
 \subsubsection{基本原理}
 与欧拉梁不同的是，铁木辛柯梁在转角和挠度上同时插值，这样就考虑了剪切的影响。
@@ -494,11 +613,171 @@ $$k=\frac{10(1+\nu)}{12+11\nu}$$
 \end{center}
 \subsection{Plate}
 
+    \subsection{Formula Derivation}
+    In the stap90, I create two kinds of plate elements, both of which are for thick plate.
+
+    The difference between them is the number of the nodes in each element. The first type has only 4 nodes
+    each element, the same as 4Q, while the other has 8. I would explain the reason below.
+    \subsubsection{Plate4Q}
+    
+     The Plate4Q element is almost the same as 4Q. We use isoparametric element by represent both
+     the transformation of coordination and the w, $\beta_x$, $\beta_y$ with the same bunch of bilinear
+     shape function.
+
+     The only disparity is the formula of strain and stress, as shown below.
+     
+     As for strain:
+     \begin{equation}
+     \left( \begin{array} {c}
+        \epsilon_{xx} \\
+        \epsilon_{yy} \\
+        \gamma_xy \end{array}\right) = -z
+     \left( \begin{array} {c}
+        \frac{\partial \beta_x}{\partial x} \\
+        \frac{\partial \beta_y}{\partial y} \\
+        \frac{\partial \beta_x}{\partial y}+\frac{\partial \beta_y}{\partial x} \end{array}\right)
+     \end{equation}
+          \begin{equation}
+     \left( \begin{array} {c}
+        \gamma_{xz} \\
+        \gamma_{yz} \end{array}\right) =
+     \left( \begin{array} {c}
+        \frac{\partial w}{\partial x} - \gamma_x\\
+        \frac{\partial \beta_y}{\partial y} - \gamma_y \end{array}\right)
+     \end{equation}
+     
+     And for stress:
+     \begin{equation}
+     \left( \begin{array} {c}
+        \tau_{xx} \\
+        \tau_{yy} \\
+        \tau_xy \end{array}\right) = -z \frac{E}{1-\nu^2}
+     \left( \begin{array} {ccc}
+        1 & \nu & 0 \\
+        \nu & 1 & 0\\
+        0 & 0 & \frac{1-\nu}{2} \end{array}\right)
+     \left( \begin{array} {c}
+        \epsilon_{xx} \\
+        \epsilon_{yy} \\
+        \gamma_xy \end{array}\right)
+     \end{equation}
+     \begin{equation}
+     \left( \begin{array} {c}
+        \tau_{xz} \\
+        \tau_{yz} \end{array}\right) = \frac{E}{2(1+\nu)}
+     \left( \begin{array} {c}
+        \gamma_{xz} \\
+        \gamma_{yz} \end{array}\right)
+     \end{equation}
+     
+     The last thing we need is the formula for total energy:
+     \begin{equation}
+     \begin{split}
+        \Pi = &\frac{1}{2}\int_A\int^{h/2}_{-h/2}
+        \left( \begin{array} {ccc}
+        \epsilon_{xx} & \epsilon_{yy} & \gamma_xy \end{array}\right)
+             \left( \begin{array} {c}
+        \tau_{xx} \\
+        \tau_{yy} \\
+        \tau_xy \end{array}\right)dzdA \\ &+ 
+        \frac{k}{2}\int_A\int^{h/2}_{-h/2}
+                \left( \begin{array} {cc}
+        \epsilon_{xz} & \epsilon_{yz}\end{array}\right)
+        \left( \begin{array} {c}
+        \tau_{xz} \\
+        \tau_{yz} \end{array}\right)dzdA
+     \end{split}
+     \end{equation}
+     Then we could use the variational principle to gain the specific formula of each term in the equation below.
+     \begin{equation}
+        (K_\kappa + K_\gamma)d = f
+     \end{equation}
+     However, I soon find out that this element could not pass any kinds of patch test, since it has represent bending. Therefore, I choose to modify the element to 8 nodes.
+     \subsubsection{Plate8Q}
+     The increase of the number of nodes barely change anything. The only alternation is using the serendipity shape function for 8 nodes instead of the bilinear one of 4 nodes.
+     \subsection{Convergence Analysis}
+     The convergence of the two elements are the same as 4Q and 8Q. 
+     
+     Both could exactly reconstruct linear field. And the plate8Q element could only reconstruct a quadratic field only is the coordination transformation is linear. 
+     \subsection{Patch Test}
+     After discussion, our group decides to use a simple quadratic w field to do the patch test.
+     
+     As we have no idea the deformation formula for a plate, we simplified it to a beam by restricting the $\beta_y$ for every node and fixed one end of the board to make it a cantilever.
+     
+     From the formula of a cantilever in the situation that only a torque acts on the free end.
+     \begin{equation}
+        \begin{split}
+            w &= \frac{Mx^2}{2EI} \\
+            \beta_x &= \frac{Mx}{EI} \\
+        \end{split}
+     \end{equation}
+     In the patch test, we set the length of the board as 40m, the width as 2m, and the thickness as 0.1m, E as $10^10$, $\nu$ as 0, and the total M in one end as 80 N.M.
+     
+     Therefore, 
+     \begin{equation}
+        I = 2\times\int^{0.05}_{-0.05} z^2dz = \frac{1}{6000}
+     \end{equation}
+     Put those numbers back to (7), we have,
+     \begin{equation}
+        \begin{split}
+            w &= 2.4\times10^{-5} x^2 \\
+            \beta_x &= 4.8\times10^{-5} x \\
+        \end{split}     
+     \end{equation}
+     And the result from the two kinds of elements are:
+     
+     The 4 nodes element:
+        \begin{center}
+            \includegraphics[width=12.30cm,height=5.41cm]{plate4Q.pdf}
+        \end{center}
+    
+    The 8 nodes elements:
+        \begin{center}
+            \includegraphics[width=12.15cm,height=5.13cm]{plate8Q.pdf}
+        \end{center}
+    The nodes are indexed in the following way.
+        \begin{center}
+            \includegraphics[width=7.84cm,height=3.60cm]{index.pdf}
+       \end{center}
+    As we could see, since the 4 nodes element could not represent bending, the result of it was poor, while the 8 nodes element successfully passed the patch test. 
+    \subsection{Application}
+    I use the Abaqus to check the 2 element.
+    
+    The problem is that two concentrate force act on the corner of a square board.
+        \begin{center}
+            \includegraphics[width=12cm,height=6cm]{abaqus.pdf}
+        \end{center}
+    The maxima of displacement is 1.05E-6
+    
+    In the plate4Q element, I use 16 elements. The answer is shown below.
+        \begin{center}
+            \includegraphics[width=8.55cm,height=6.41cm]{plate8Q_appl.pdf}
+        \end{center}
+    In the plate8Q element, I use 4 elements. The answer is shown below.
+        \begin{center}
+            \includegraphics[width=7.23cm,height=7.15cm]{plate4Q_appl.pdf}
+        \end{center}
+    Since the elements are still few, it is nice to have the same scale. And the plate8Q is better.
+
 \subsection{无限单元}
 
 \subsection{超级单元}
 
 \subsection{过渡单元}
+
+此处的过渡单元为5节点，过渡4Q与9Q单元，使其衔接起来
+
+PatchTest所使用的构型仍为4Q使用的Patchtest方案，即约束左下角两个自由度的位移，以及右下角Y自由度的位移，在顶部施加向下为20N/m的均布力。
+
+其结果如下：
+\begin{center}
+\includegraphics[width=\textwidth]{9Q02.png} % Include the image placeholder.png
+\end{center}
+\begin{center}
+\includegraphics[width=\textwidth]{9Q03.png} % Include the image placeholder.png
+\end{center}
+
+使用连接算例如图：
 
 %-------------------------这里是其他功能的描述-------------------------------------
 %----------------------------------------------------------------------------------

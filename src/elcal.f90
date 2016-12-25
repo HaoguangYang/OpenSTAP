@@ -96,13 +96,11 @@ SUBROUTINE ELEMNT
      CALL INFINITE4Q
   case (15)
      CALL PURE8Q
-  case (16)
-     CALL ELEMENT_Transition
   case (0)
      CALL PLASTICTRUSS
 !    Other element types would be called here, identifying each
 !    element type by a different NPAR(1) parameter
-  case (17:)
+  case (16:)
      stop "ELEMENT TYPE STILL UNDER DEVELOPMENT..."
   END SELECT
 
