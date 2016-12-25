@@ -548,7 +548,7 @@ $$u_B=u_A+\triangle u_{AB}$$
 \subsection{模态分析}
 \subsubsection{背景}
 \paragraph{}
-N自由度无阻尼线性系统作微幅振动，最后可得到振动微分方程组：$\boldsymbol{M\ddot x+Kx=0}$。分析一个弹性体的模态，实质是求解广义特征值问题$\boldsymbol{K-\lambda M=0}$，再由$\boldsymbol{\omega =\lambda}^{1/2}$得到系统的特征频率。对于多自由度系统，往往只有最小的数个特征值，即对应的几个频率最低的模态对结构具有关键作用。搜索最小数个特征值的算法常见的有LANCZOS迭代法，子空间迭代法等。本程序针对Skyline存储方式试图采用LANCZOS迭代法对广义特征值问题进行求解，另外针对稀疏矩阵的CSR存储方法，也提供了基于Intel MKL的feast算法库的调用。
+N自由度无阻尼线性系统作微幅振动，最后可得到振动微分方程组：$\boldsymbol{M\ddot x+Kx=0}$。分析一个弹性体的模态，实质是求解广义特征值问题$\boldsymbol{K-\lambda M=0}$，再由$\boldsymbol{\omega =\lambda}^{1/2}$得到系统的特征频率。对于多自由度系统，往往只有最小的数个特征值，即对应的几个频率最低的模态对结构具有关键作用。搜索最小数个特征值的算法常见的有LANCZOS迭代法，子空间迭代法等。本程序针对刚度阵、质量矩阵采用Skyline存储方式试图采用LANCZOS迭代法对广义特征值问题进行求解，另外针对稀疏矩阵的CSR存储方法，也提供了基于Intel MKL的feast算法库的调用。测试计算采用杆单元，但对大多数单元都加入了组装质量阵的模块，理论上可以进行模态分析。测试结果如Samples/Modal文件夹中所示。
 \subsubsection{算法分析}
 \paragraph{}
 LANCZOS迭代法，其基本思路为利用里兹法求解特征值问题：
