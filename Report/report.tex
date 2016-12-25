@@ -16,8 +16,9 @@
 \section{总述}
 \subsection{项目描述}
 桥模型由桥墩（pier），桥面（floor）,支撑梁（support beam），河堤（river bank）和钢缆（cables）五部分组成，其中桥墩和河堤用实体单元建模，桥面用板单元建模，支撑梁用梁单元建模，钢缆用杆单元建模，如图1 所示。\\
-
-\includegraphics[width=0.8\textwidth]{01.png} % Include the image placeholder.png
+\begin{center}
+\includegraphics[width=0.6\textwidth]{01.png} % Include the image placeholder.png
+\end{center}
 
 \textbf{桥墩}：
 
@@ -34,8 +35,9 @@
 \end{tabular}
 \end{center}
 
-
-\includegraphics[width=0.8\textwidth]{02.png}
+\begin{center}
+\includegraphics[width=0.6\textwidth]{02.png}
+\end{center}
 
 \textbf{桥面}：
 
@@ -51,8 +53,9 @@
 密度&：2320\\
 \end{tabular}
 \end{center}
-
-\includegraphics[width=0.8\textwidth]{03.png}
+\begin{center}
+\includegraphics[width=0.6\textwidth]{03.png}
+\end{center}
 
 \textbf{河堤}：
 
@@ -83,8 +86,9 @@
 密度&：2710\\
 \end{tabular}
 \end{center}
-
-\includegraphics[width=0.8\textwidth]{04.png}
+\begin{center}
+\includegraphics[width=0.6\textwidth]{04.png}
+\end{center}
 
 \textbf{钢缆}：
 
@@ -102,7 +106,9 @@
 \end{center}
 
 \subsection{Abaqus结果}
-\includegraphics[width=0.8\textwidth]{05.png}
+\begin{center}
+\includegraphics[width=0.6\textwidth]{05.png}
+\end{center}
 
 
 %-------------------------这里是各个部分的描述-------------------------------------
@@ -152,23 +158,24 @@
 
 %---------------------------------------------------后处理--------------------------------------------------%
 \subsection{后处理}
-\item 本程序后处理采用ParaView完成，在程序内包含输出为VTK文件的子程序VTKgenerate
+本程序后处理采用ParaView完成，在程序内包含输出为VTK文件的子程序VTKgenerate
 
 在IND=0阶段，对VTK文件进行初始化，按VTK要求的格式写入文件头和各节点坐标。
 
 在程序执行过程中，会将需要后处理而且要从内存中清除的数据写入3个临时文件中。分别为：
 
 \begin{itemize}
-\item VTK.tmp：存储位移和应力恢复信息，在WRITED（位移）和PostProcessor（应力）子程序处写入；
-\item VTKNode.tmp：存储连接矩阵信息，在PostProcessor子程序处写入；
-\item VTKElTyp.tmp：存储单元类型信息，在ElCal子程序处写入。
+\item $VTK.tmp$：存储位移和应力恢复信息，在WRITED（位移）和PostProcessor（应力）子程序处写入；
+\item $VTKNode.tmp$：存储连接矩阵信息，在PostProcessor子程序处写入；
+\item $VTKElTyp.tmp$：存储单元类型信息，在ElCal子程序处写入。
 \end{itemize}
 
-最后在IND=3阶段读取临时文件中的信息，按顺序整合为单一.vtk格式的输出文件。网格形式为UNSTRUCTURED_GRID，格式为ASCII，所记录的数据类型为double，包含三个场量：位移场、应力场和Von Mises应力场。以下为通过ParaView渲染生成的桥梁变形及应力分布及局部细节（变形放大倍率100，,着色为Von Mises应力）：
-\includegraphics[width=0.8\textwidth]]{Bridge-3.png}
+最后在IND=3阶段读取临时文件中的信息，按顺序整合为单一vtk格式的输出文件。网格形式为UNSTRUCTURED GRID，格式为ASCII，所记录的数据类型为double，包含三个场量：位移场、应力场和Von Mises应力场。以下为通过ParaView渲染生成的桥梁变形及应力分布及局部细节（变形放大倍率100，着色为Von Mises应力）：
+\begin{center}
+\includegraphics[width=0.8\textwidth]{Bridge-3.png}
 
 \includegraphics[width=0.8\textwidth]{Bridge-3-part.png}
-
+\end{center}
 %-------------------------------------------------------8H--------------------------------------------------%
 \subsection{8H}
 
@@ -378,7 +385,47 @@ The input files and the results for the patchtest in the folder for the beam.
 \section{高级功能}
 \subsection{弹塑性杆分析}
 
-\subsection{模态分析}  
+
+
+
+
+\subsubsection{基本原理}
+\paragraph{}
+弹塑性杆是一种最简单的材料非线性问题。在这个功能中，我使用切线刚度法来进行求解。我把杆的塑性问题简化成弹性段和塑形段，其中每段近似成线性函数，并使用相应的弹性模量和塑形模量来表示两端线段的斜率。切线刚度法的基本思想就是：假使载荷为$P_A$时，相应的位移为$u_A$，切线刚度为$K_A$，那么对于下一次载荷增量产生的位移是，
+$$K_A\triangle u_{AB}=\triangle f_{AB}$$
+$$u_B=u_A+\triangle u_{AB}$$
+我们在使用切线刚度法进行计算时，都是从A点的应力状态出发，最后就得到载荷B情况下的各项参数，本方法的特点是，对于一次载荷分量，只需要求解一次即可。
+示意图如下。
+\begin{center}
+\includegraphics[width=0.6\textwidth]{plastic7.png}
+\end{center}
+该方法参考了1982年固体力学学报《弹塑性有限元一些解法的比较》，由中科院力学研究所吴永礼先生著。
+\subsubsection{编程思路}
+\paragraph{}
+首先进行弹性试探步的计算，确定是否需要进行弹塑性分析。若进行弹塑性分析，则使用切线刚度法求解。首先把载荷分成很多细份，从零开始逐渐加载。使用切线刚度，算出每一步的位移增量和应力增量，计算每步加载后的位移和应力，同时判断是否有杆进入弹塑性，若有弹塑性变化，则下一次组装刚度阵时要更新。这种增量步的方法把一个非线性的问题线性化，实质上是微分的思路——把复杂的函数简单化，理论上，这种求解方式可以进行任何材料非线性问题的计算。在这个方法中，每一步更新需要前一步的历史位移和应力信息，这些都记录在临时文件里，每一步均更新。
+整个程序的流程图如下。
+\begin{center}
+\includegraphics[width=0.9\textwidth]{plastic3.png}
+\end{center}
+\subsubsection{输入和输出结果}
+\paragraph{}
+在一根杆上加了100000的力，材料的截面性质如下，各输入和输出如下，结果符合理论值。
+\begin{center}
+\includegraphics[width=0.5\textwidth]{plastic2.png}
+\end{center}
+\begin{center}
+\includegraphics[width=0.8\textwidth]{plastic1.png}
+\end{center}
+\begin{center}
+\includegraphics[width=1.0\textwidth]{plastic4.png}
+\end{center}
+\begin{center}
+\includegraphics[width=1.0\textwidth]{plastic5.png}
+\end{center}
+\begin{center}
+\includegraphics[width=1.0\textwidth]{plastic6.png}
+\end{center}
+\subsection{模态分析}
 
 
 \subsection{动力学响应分析}
