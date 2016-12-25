@@ -18,7 +18,7 @@ subroutine HexTriQuad
     integer :: NumberOfElements, NumberOfMaterials, ElementGroupSize, QuadratureOrder=2
     integer :: N(11) !Pointers
     
-    NPAR(5) = 27
+    NPAR(5) = 20
     NPAR(4) = 0
     
     NumberOfElements = NPAR(2)
@@ -65,14 +65,14 @@ subroutine HexTriQuad
     N(:) = N(:) + NFIRST
     NLAST  = N(9)
     
-    call HexTwnSeven (IA(NP(1)),DA(NP(2)),DA(NP(3)),DA(NP(4)),DA(NP(4)),IA(NP(5)),   &
+    call HexTwn (IA(NP(1)),DA(NP(2)),DA(NP(3)),DA(NP(4)),DA(NP(4)),IA(NP(5)),   &
                   A(N(1)),A(N(2)),A(N(3)),A(N(4)),A(N(5)),A(N(6)),A(N(7)),A(N(8)))
     
     !Reuse DA(NP(4)) at Solution Phase 3 as displacement U
     return
 end subroutine HexTriQuad
 
-subroutine HexTwnSeven (ID,X,Y,Z,U,MHT,E, PoissonRatio, Density, Gravity, LM, PositionData, MaterialData, Node)
+subroutine HexTwn (ID,X,Y,Z,U,MHT,E, PoissonRatio, Density, Gravity, LM, PositionData, MaterialData, Node)
     use globals
     use MemAllocate
     use MathKernel
@@ -278,7 +278,7 @@ subroutine HexTwnSeven (ID,X,Y,Z,U,MHT,E, PoissonRatio, Density, Gravity, LM, Po
                 
     END SELECT
 
-end subroutine HexTwnSeven
+end subroutine HexTwn
 
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -288,18 +288,34 @@ subroutine HexN27 (NMatrix, ElementShapeNodes, Transformed)
     implicit none
     integer ::  ElementShapeNodes, i
     real(8) ::  NMatrix(3, 3*ElementShapeNodes), Transformed(3), N(ElementShapeNodes)
+    real(8) :: xi, eta, zta
     
+    xi = Transformed(1)
+    eta = Transformed(2)
+    zta = Transformed(3)
     select case (ElementShapeNodes)
-    case (27)
+    case (20)
     !>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>WORKING PROGRESS
-        N(1) = (1-Transformed(1))*(1-Transformed(2))*(1-Transformed(3))/8
-        N(2) = (1+Transformed(1))*(1-Transformed(2))*(1-Transformed(3))/8
-        N(3) = (1+Transformed(1))*(1+Transformed(2))*(1-Transformed(3))/8
-        N(4) = (1-Transformed(1))*(1+Transformed(2))*(1-Transformed(3))/8
-        N(5) = (1-Transformed(1))*(1-Transformed(2))*(1+Transformed(3))/8
-        N(6) = (1+Transformed(1))*(1-Transformed(2))*(1+Transformed(3))/8
-        N(7) = (1+Transformed(1))*(1+Transformed(2))*(1+Transformed(3))/8
-        N(8) = (1-Transformed(1))*(1+Transformed(2))*(1+Transformed(3))/8
+        N(1) = (1-xi)*(1-eta)*(1-zta)*(-xi-eta-zta-2)/8
+        N(2) = (1+xi)*(1-eta)*(1-zta)*(xi-eta-zta-2)/8
+        N(3) = (1+xi)*(1+eta)*(1-zta)*(+xi+eta-zta-2)/8
+        N(4) = (1-xi)*(1+eta)*(1-zta)*(-xi+eta-zta-2)/8
+        N(5) = (1-xi)*(1-eta)*(1+zta)*(-xi-eta+zta-2)/8
+        N(6) = (1+xi)*(1-eta)*(1+zta)*(xi-eta+zta-2)/8
+        N(7) = (1+xi)*(1+eta)*(1+zta)*(xi+eta+zta-2)/8
+        N(8) = (1-xi)*(1+eta)*(1+zta)*(-xi+eta+zta-2)/8
+        N(9) = (1-xi**2)*(1-eta)*(1-zta)/4
+        N(10) = (1-xi**2)*(1+eta)*(1-zta)/4
+        N(11) = (1-xi**2)*(1+eta)*(1+zta)/4
+        N(12) = (1-xi**2)*(1-eta)*(1+zta)/4
+        N(13) = (1-eta**2)*(1-xi)*(1-zta)/4
+        N(14) = (1-eta**2)*(1+xi)*(1-zta)/4
+        N(15) = (1-eta**2)*(1+xi)*(1+zta)/4
+        N(16) = (1-eta**2)*(1-xi)*(1+zta)/4
+        N(17) = (1-zta**2)*(1-xi)*(1-eta)/4
+        N(18) = (1-zta**2)*(1+xi)*(1-eta)/4
+        N(19) = (1-zta**2)*(1+xi)*(1+eta)/4
+        N(20) = (1-zta**2)*(1-xi)*(1+eta)/4
         NMatrix = reshape((/((/N(i), 0D0, 0D0, 0D0, N(i), 0D0, 0D0, 0D0, N(i)/),i=1,ElementShapeNodes)/), &
                           shape(NMatrix))
     end select
@@ -321,7 +337,7 @@ subroutine HexB27 (BMatrix, DetJ, ElementShapeNodes, Transformed, Original)
     logical ::  OK_Flag
     
     select case (ElementShapeNodes)
-    case (27)
+    case (20)
     !>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>WORKING PROGRESS
         xi      = Transformed(1)
         eta     = Transformed(2)
