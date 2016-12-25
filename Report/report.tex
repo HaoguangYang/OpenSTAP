@@ -164,7 +164,10 @@
 \item VTKElTyp.tmp：存储单元类型信息，在ElCal子程序处写入。
 \end{itemize}
 
-最后在IND=3阶段读取临时文件中的信息，按顺序整合为单一.vtk格式的输出文件。网格形式为UNSTRUCTURED_GRID，格式为ASCII，所记录的数据类型为double，包含三个场量：位移场、应力场和Von Mises应力场。
+最后在IND=3阶段读取临时文件中的信息，按顺序整合为单一.vtk格式的输出文件。网格形式为UNSTRUCTURED_GRID，格式为ASCII，所记录的数据类型为double，包含三个场量：位移场、应力场和Von Mises应力场。以下为通过ParaView渲染生成的桥梁变形及应力分布及局部细节（变形放大倍率100，,着色为Von Mises应力）：
+\includegraphics[width=0.8\textwidth]]{Bridge-3}
+
+\includegraphics[width=0.8\textwidth]{Bridge-3-part}
 
 %-------------------------------------------------------8H--------------------------------------------------%
 \subsection{8H}
@@ -375,7 +378,8 @@ The input files and the results for the patchtest in the folder for the beam.
 \section{高级功能}
 \subsection{弹塑性杆分析}
 
-\subsection{模态分析}
+\subsection{模态分析}  
+
 
 \subsection{动力学响应分析}
 
