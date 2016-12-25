@@ -17,7 +17,7 @@
 \subsection{项目描述}
 桥模型由桥墩（pier），桥面（floor）,支撑梁（support beam），河堤（river bank）和钢缆（cables）五部分组成，其中桥墩和河堤用实体单元建模，桥面用板单元建模，支撑梁用梁单元建模，钢缆用杆单元建模，如图1 所示。\\
 
-\includegraphics[width=\textwidth]{01.png} % Include the image placeholder.png
+\includegraphics[width=0.8\textwidth]{01.png} % Include the image placeholder.png
 
 \textbf{桥墩}：
 
@@ -35,7 +35,7 @@
 \end{center}
 
 
-\includegraphics[width=\textwidth]{02.png}
+\includegraphics[width=0.8\textwidth]{02.png}
 
 \textbf{桥面}：
 
@@ -52,7 +52,7 @@
 \end{tabular}
 \end{center}
 
-\includegraphics[width=\textwidth]{03.png}
+\includegraphics[width=0.8\textwidth]{03.png}
 
 \textbf{河堤}：
 
@@ -84,7 +84,7 @@
 \end{tabular}
 \end{center}
 
-\includegraphics[width=\textwidth]{04.png}
+\includegraphics[width=0.8\textwidth]{04.png}
 
 \textbf{钢缆}：
 
@@ -102,7 +102,7 @@
 \end{center}
 
 \subsection{Abaqus结果}
-\includegraphics[width=\textwidth]{05.png}
+\includegraphics[width=0.8\textwidth]{05.png}
 
 
 %-------------------------这里是各个部分的描述-------------------------------------
@@ -148,10 +148,11 @@
 
 %-------------------------------------------------------8H--------------------------------------------------%
 \subsection{8H}
-\begin{enumerate}
-\item 算法分析
 
 \begin{itemize}
+\item 算法分析
+
+
 \item 位移计算
 
 
@@ -238,7 +239,7 @@ $\Rightarrow\boldsymbol{D}=\begin{bmatrix}2G+\lambda & \lambda & \lambda\\
 
 
 生成单元刚度阵通过Location Matrix进行组装，得到全局的刚度阵，再解$\boldsymbol{Kd=f}$.
-\end{itemize}
+
 
 \item 算法实现
 
