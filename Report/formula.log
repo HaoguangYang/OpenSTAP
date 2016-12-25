@@ -1,0 +1,29 @@
+This is pdfTeX, Version 3.1415926-2.3-1.40.12 (MiKTeX 2.9) (preloaded format=pdflatex 2016.6.10)  25 DEC 2016 20:06
+entering extended mode
+**D:/formula.tex
+(D:/formula.tex
+LaTeX2e <2011/06/27>
+Babel <v3.8m> and hyphenation patterns for loaded.
+! Extra \endgroup.
+\document ->\endgroup 
+                      \ifx \@unusedoptionlist \@empty \else \@latex@warning@...
+l.1 \document
+             {article}
+? 
+! Emergency stop.
+\document ->\endgroup 
+                      \ifx \@unusedoptionlist \@empty \else \@latex@warning@...
+l.1 \document
+             {article}
+End of file on the terminal!
+
+ 
+Here is how much of TeX's memory you used:
+ 7 strings out of 495354
+ 96 string characters out of 3183859
+ 44842 words of memory out of 3000000
+ 3276 multiletter control sequences out of 15000+200000
+ 3640 words of font info for 14 fonts, out of 3000000 for 9000
+ 14 hyphenation exceptions out of 8191
+ 5i,0n,1p,36b,8s stack positions out of 5000i,500n,10000p,200000b,50000s
+!  ==> Fatal error occurred, no output PDF file produced!

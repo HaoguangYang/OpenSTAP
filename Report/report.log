@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.16 (TeX Live 2015/W32TeX) (preloaded format=pdflatex 2016.12.9)  25 DEC 2016 17:45
+This is pdfTeX, Version 3.14159265-2.6-1.40.16 (TeX Live 2015/W32TeX) (preloaded format=pdflatex 2016.12.9)  25 DEC 2016 21:22
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -1241,131 +1241,253 @@ File: beam7.png Graphic file (type png)
 Package pdftex.def Info: beam7.png used on input line 350.
 (pdftex.def)             Requested size: 345.0pt x 87.44543pt.
 
+Overfull \hbox (11.37694pt too wide) in paragraph at lines 358--360
+\C70/rm/m/n/10.53937/5d Ë \C70/rm/m/n/10.53937/59 ' \C70/rm/m/n/10.53937/76 Ñ \
+C70/rm/m/n/10.53937/6a ! \C70/rm/m/n/10.53937/62 ﬂ \C70/rm/m/n/10.53937/51 ∑ \C
+70/rm/m/n/10.53937/53 t \C70/rm/m/n/10.53937/7b ó \C70/rm/m/n/10.53937/6c ’|\C7
+0/rm/m/n/10.53937/ff ^^L| \C70/rm/m/n/10.53937/80 ^^L \C70/rm/m/n/10.53937/66 /
+ \C70/rm/m/n/10.53937/91 « \C70/rm/m/n/10.53937/75 ( \C70/rm/m/n/10.53937/4e Ü 
+\C70/rm/m/n/10.53937/50 O \C70/rm/m/n/10.53937/4e é \C70/rm/m/n/10.53937/7e œ \
+C70/rm/m/n/10.53937/9a å \C70/rm/m/n/10.53937/7c { \C70/rm/m/n/10.53937/76 Ñ \C
+70/rm/m/n/10.53937/7b ó \C70/rm/m/n/10.53937/6c ’|\C70/rm/m/n/10.53937/30 ^^B| 
+\C70/rm/m/n/10.53937/52 † \C70/rm/m/n/10.53937/4e K \C70/rm/m/n/10.53937/4f ^^?
+ \C70/rm/m/n/10.53937/75 (\OT1/cmr/m/n/10.53937 FORTRAN\C70/rm/m/n/10.53937/8b 
+Ì
+ []
+
+
+Overfull \hbox (17.32005pt too wide) in paragraph at lines 358--360
+\C70/rm/m/n/10.53937/8a ^^@ \C70/rm/m/n/10.53937/5b û \C70/rm/m/n/10.53937/73 ∞
+ \C70/rm/m/n/10.53937/56 ˛ \C70/rm/m/n/10.53937/7e ” \C70/rm/m/n/10.53937/67 Ñ 
+\C70/rm/m/n/10.53937/56  \C70/rm/m/n/10.53937/96 æ|\C70/rm/m/n/10.53937/ff ^^L
+| \C70/rm/m/n/10.53937/62 @ \C70/rm/m/n/10.53937/4e Â \C70/rm/m/n/10.53937/53 J
+ \C70/rm/m/n/10.53937/5e & \C70/rm/m/n/10.53937/5b Ω \C70/rm/m/n/10.53937/90 Ë 
+\C70/rm/m/n/10.53937/52 ^^F \C70/rm/m/n/10.53937/90 	 \C70/rm/m/n/10.53937/62 È
+ \C70/rm/m/n/10.53937/57 (\OT1/cmr/m/n/10.53937 stap90\C70/rm/m/n/10.53937/7a 
+ \C70/rm/m/n/10.53937/5e è \C70/rm/m/n/10.53937/4e - \C70/rm/m/n/10.53937/5b û 
+\C70/rm/m/n/10.53937/73 ∞ \C70/rm/m/n/10.53937/67 ^^@ \C70/rm/m/n/10.53937/4e :
+ \C70/rm/m/n/10.53937/53 ü \C70/rm/m/n/10.53937/59 À \C70/rm/m/n/10.53937/76 Ñ\
+OT1/cmr/m/n/10.53937 CM\C70/rm/m/n/10.53937/7b ó
+ []
+
+[16 <./beam7.png>]
+Overfull \hbox (30.0844pt too wide) in paragraph at lines 375--376
+ [] \C70/rm/m/n/10.53937/57 ( \C70/rm/m/n/10.53937/5b û \C70/rm/m/n/10.53937/9a
+ å \C70/rm/m/n/10.53937/4e -|\C70/rm/m/n/10.53937/ff ^^L| \C70/rm/m/n/10.53937/
+62 ^^Q \C70/rm/m/n/10.53937/53 — \C70/rm/m/n/10.53937/73 ∞ \C70/rm/m/n/10.53937
+/75 1 \C70/rm/m/n/10.53937/4e é \C70/rm/m/n/10.53937/51 ≥ \C70/rm/m/n/10.53937/
+5b ö\OT1/cmr/m/n/10.53937 skyline\C70/rm/m/n/10.53937/7b ó \C70/rm/m/n/10.53937
+/6c ’ \C70/rm/m/n/10.53937/65 ˆ \C70/rm/m/n/10.53937/95 Ù \C70/rm/m/n/10.53937/
+76 Ñ \C70/rm/m/n/10.53937/4e ; \C70/rm/m/n/10.53937/89 Å \C70/rm/m/n/10.53937/5
+6 ‡ \C70/rm/m/n/10.53937/7d   \C70/rm/m/n/10.53937/66 /\OT1/cmr/m/n/10.53937 nw
+k|\C70/rm/m/n/10.53937/ff ^^L| \C70/rm/m/n/10.53937/4e _ \C70/rm/m/n/10.53937/5
+c 1 \C70/rm/m/n/10.53937/66 /\OT1/cmr/m/n/10.53937 skyline\C70/rm/m/n/10.53937/
+5b X
+ []
+
+
+Overfull \hbox (2.9162pt too wide) in paragraph at lines 379--382
+[]\C70/rm/m/n/10.53937/99 ñ \C70/rm/m/n/10.53937/51 H \C70/rm/m/n/10.53937/5b ˘
+ \C70/rm/m/n/10.53937/7a ^^@ \C70/rm/m/n/10.53937/75 è \C70/rm/m/n/10.53937/77 
+È \C70/rm/m/n/10.53937/96 5 \C70/rm/m/n/10.53937/8f € \C70/rm/m/n/10.53937/88 L
+ \C70/rm/m/n/10.53937/4e ^^@ õ \C70/rm/m/n/10.53937/7b Ä \C70/rm/m/n/10.53937/5
+3 U \C70/rm/m/n/10.53937/4e À \C70/rm/m/n/10.53937/7e Õ|\C70/rm/m/n/10.53937/30
+ ^^B| \C70/rm/m/n/10.53937/7a ^^@ \C70/rm/m/n/10.53937/75 è \C70/rm/m/n/10.5393
+7/77 È \C70/rm/m/n/10.53937/96 5 \C70/rm/m/n/10.53937/4e ; \C70/rm/m/n/10.53937
+/89 Å \C70/rm/m/n/10.53937/63 ^^G \C70/rm/m/n/10.53937/97 ^ \C70/rm/m/n/10.5393
+7/96 ˆ \C70/rm/m/n/10.53937/51 C \C70/rm/m/n/10.53937/7d   \C70/rm/m/n/10.53937
+/4e :\OT1/cmr/m/n/10.53937 O(n)\C70/rm/m/n/10.53937/76 Ñ
+ []
+
+
+Overfull \hbox (0.95482pt too wide) in paragraph at lines 379--382
+\C70/rm/m/n/10.53937/4e é\OT1/cmr/m/n/10.53937 stap90\C70/rm/m/n/10.53937/4e - 
+\C70/rm/m/n/10.53937/53 ü \C70/rm/m/n/10.53937/67 	 \C70/rm/m/n/10.53937/76 Ñ\O
+T1/cmr/m/n/10.53937 skyline\C70/rm/m/n/10.53937/6c B \C70/rm/m/n/10.53937/89 „ 
+\C70/rm/m/n/10.53937/56 h|\C70/rm/m/n/10.53937/ff ^^L| \OT1/cmr/m/n/10.53937 pa
+rdiso\C70/rm/m/n/10.53937/57 ( \C70/rm/m/n/10.53937/7a z \C70/rm/m/n/10.53937/9
+5 Ù \C70/rm/m/n/10.53937/4e 
+ \C70/rm/m/n/10.53937/67 	 \C70/rm/m/n/10.53937/77 @ \C70/rm/m/n/10.53937/52 £ 
+ø|\C70/rm/m/n/10.53937/30 ^^B| \C70/rm/m/n/10.53937/56 ‡ \C70/rm/m/n/10.53937/4
+e :\OT1/cmr/m/n/10.53937 skyline\C70/rm/m/n/10.53937/6c B
+ []
+
+
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
- [16 <./beam7.png>] [17] <plastic7.png, id=268, 236.38312pt x 208.27812pt>
-File: plastic7.png Graphic file (type png)
+ [17]
+Underfull \vbox (badness 6141) has occurred while \output is active []
 
-<use plastic7.png>
-Package pdftex.def Info: plastic7.png used on input line 401.
+ [18]
+[19] <timoshenko1.png, id=287, 589.70313pt x 352.31625pt>
+File: timoshenko1.png Graphic file (type png)
+
+<use timoshenko1.png>
+Package pdftex.def Info: timoshenko1.png used on input line 422.
+(pdftex.def)             Requested size: 345.0pt x 206.12299pt.
+File: beam2.png Graphic file (type png)
+ <use beam2.png>
+Package pdftex.def Info: beam2.png used on input line 426.
+(pdftex.def)             Requested size: 345.0pt x 64.1703pt.
+File: beam3.png Graphic file (type png)
+ <use beam3.png>
+Package pdftex.def Info: beam3.png used on input line 431.
+(pdftex.def)             Requested size: 345.0pt x 146.62874pt.
+
+Underfull \vbox (badness 10000) has occurred while \output is active []
+
+ [20 <./timoshenko1.png>]
+File: beam4.png Graphic file (type png)
+ <use beam4.png>
+Package pdftex.def Info: beam4.png used on input line 435.
+(pdftex.def)             Requested size: 345.0pt x 65.76729pt.
+File: beam5.png Graphic file (type png)
+ <use beam5.png>
+Package pdftex.def Info: beam5.png used on input line 439.
+(pdftex.def)             Requested size: 345.0pt x 145.0115pt.
+File: beam6.png Graphic file (type png)
+ <use beam6.png>
+Package pdftex.def Info: beam6.png used on input line 443.
+(pdftex.def)             Requested size: 345.0pt x 80.05281pt.
+ [21]
+<timoshenko2.png, id=297, 684.05562pt x 274.02374pt>
+File: timoshenko2.png Graphic file (type png)
+ <use timoshenko2.png>
+Package pdftex.def Info: timoshenko2.png used on input line 450.
+(pdftex.def)             Requested size: 345.0pt x 138.20319pt.
+
+<timoshenko3.png, id=298, 682.04813pt x 150.06062pt>
+File: timoshenko3.png Graphic file (type png)
+ <use timoshenko3.png>
+Package pdftex.def Info: timoshenko3.png used on input line 453.
+(pdftex.def)             Requested size: 345.0pt x 75.9048pt.
+
+Underfull \vbox (badness 10000) has occurred while \output is active []
+
+ [22 <./timoshenko2.png> <./timoshenko3.png>]
+<plastic7.png, id=304, 236.38312pt x 208.27812pt>
+File: plastic7.png Graphic file (type png)
+ <use plastic7.png>
+Package pdftex.def Info: plastic7.png used on input line 480.
 (pdftex.def)             Requested size: 207.0021pt x 182.39545pt.
- <plastic3.png, id=272, 494.34688pt x 511.41063pt>
+ [23 <./plastic7.png>] <plastic3.png, id=315, 494.34688pt x 511.41063pt>
 File: plastic3.png Graphic file (type png)
 
 <use plastic3.png>
-Package pdftex.def Info: plastic3.png used on input line 409.
+Package pdftex.def Info: plastic3.png used on input line 488.
 (pdftex.def)             Requested size: 310.4979pt x 321.21497pt.
- [18 <./plastic7.png>]
-<plastic2.png, id=281, 348.30125pt x 272.51813pt>
+ [24 <./plastic3.png>]
+<plastic2.png, id=321, 348.30125pt x 272.51813pt>
 File: plastic2.png Graphic file (type png)
  <use plastic2.png>
-Package pdftex.def Info: plastic2.png used on input line 415.
+Package pdftex.def Info: plastic2.png used on input line 494.
 (pdftex.def)             Requested size: 172.5pt x 134.9655pt.
 
-<plastic1.png, id=282, 557.58313pt x 82.3075pt>
+<plastic1.png, id=322, 557.58313pt x 82.3075pt>
 File: plastic1.png Graphic file (type png)
  <use plastic1.png>
-Package pdftex.def Info: plastic1.png used on input line 418.
+Package pdftex.def Info: plastic1.png used on input line 497.
 (pdftex.def)             Requested size: 276.00105pt x 40.74295pt.
- [19 <./plastic3.png> <./plastic2.png>] <plastic4.png, id=291, 724.20563pt x 22
-5.34187pt>
+
+<plastic4.png, id=323, 724.20563pt x 225.34187pt>
 File: plastic4.png Graphic file (type png)
-
-<use plastic4.png>
-Package pdftex.def Info: plastic4.png used on input line 421.
+ <use plastic4.png>
+Package pdftex.def Info: plastic4.png used on input line 500.
 (pdftex.def)             Requested size: 345.0pt x 107.35138pt.
- <plastic5.png, id=292, 706.64pt x 431.6125pt>
+
+<plastic5.png, id=324, 706.64pt x 431.6125pt>
 File: plastic5.png Graphic file (type png)
-
-<use plastic5.png>
-Package pdftex.def Info: plastic5.png used on input line 424.
+ <use plastic5.png>
+Package pdftex.def Info: plastic5.png used on input line 503.
 (pdftex.def)             Requested size: 345.0pt x 210.72801pt.
- <plastic6.png, id=293, 709.65125pt x 228.855pt>
+
+Underfull \vbox (badness 10000) has occurred while \output is active []
+
+ [25 <./plastic2.png> <./plastic1.png> <./plastic4.png>]
+<plastic6.png, id=332, 709.65125pt x 228.855pt>
 File: plastic6.png Graphic file (type png)
-
-<use plastic6.png>
-Package pdftex.def Info: plastic6.png used on input line 427.
+ <use plastic6.png>
+Package pdftex.def Info: plastic6.png used on input line 506.
 (pdftex.def)             Requested size: 345.0pt x 111.25993pt.
-
-Underfull \vbox (badness 5970) has occurred while \output is active []
-
- [20 <./plastic1.png> <./plastic4.png> <./plastic5.png> <./plastic6.png>] [21]
-(./report.aux)
+ [26 <./plastic5.png> <./plastic6.png>] (./report.aux)
 
 LaTeX Font Warning: Size substitutions with differences
 (Font)              up to 0.41063pt have occurred.
 
  ) 
 Here is how much of TeX's memory you used:
- 13694 strings out of 493089
- 247340 string characters out of 6138425
- 268854 words of memory out of 5000000
- 16632 multiletter control sequences out of 15000+600000
- 61498 words of font info for 226 fonts, out of 8000000 for 9000
+ 14106 strings out of 493089
+ 252776 string characters out of 6138425
+ 270854 words of memory out of 5000000
+ 17015 multiletter control sequences out of 15000+600000
+ 65278 words of font info for 240 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
  41i,11n,41p,10435b,447s stack positions out of 5000i,500n,10000p,200000b,80000s
 <c:/WINDOWS/fonts/simhei.ttf><c:/WINDOWS/fonts/simsun.ttc><c:/WINDOWS/fonts/s
-imsun.ttc><c:/WINDOWS/fonts/simsun.ttc><c:/WINDOWS/fonts/simsun.ttc><c:/WINDOWS
-/fonts/simsun.ttc><c:/WINDOWS/fonts/simsun.ttc><c:/WINDOWS/fonts/simsun.ttc><c:
-/WINDOWS/fonts/simhei.ttf><c:/WINDOWS/fonts/simhei.ttf><c:/WINDOWS/fonts/simhei
-.ttf><c:/WINDOWS/fonts/simhei.ttf><c:/WINDOWS/fonts/simhei.ttf><c:/WINDOWS/font
-s/simhei.ttf><c:/WINDOWS/fonts/simhei.ttf><c:/WINDOWS/fonts/simhei.ttf><c:/WIND
-OWS/fonts/simhei.ttf><c:/WINDOWS/fonts/simhei.ttf><c:/WINDOWS/fonts/simhei.ttf>
+imhei.ttf><c:/WINDOWS/fonts/simhei.ttf><c:/WINDOWS/fonts/simhei.ttf><c:/WINDOWS
+/fonts/simsun.ttc><c:/WINDOWS/fonts/simsun.ttc><c:/WINDOWS/fonts/simhei.ttf><c:
+/WINDOWS/fonts/simhei.ttf><c:/WINDOWS/fonts/simsun.ttc><c:/WINDOWS/fonts/simhei
+.ttf><c:/WINDOWS/fonts/simhei.ttf><c:/WINDOWS/fonts/simsun.ttc><c:/WINDOWS/font
+s/simhei.ttf><c:/WINDOWS/fonts/simhei.ttf><c:/WINDOWS/fonts/simsun.ttc><c:/WIND
+OWS/fonts/simsun.ttc><c:/WINDOWS/fonts/simsun.ttc><c:/WINDOWS/fonts/simhei.ttf>
 <c:/WINDOWS/fonts/simhei.ttf><c:/WINDOWS/fonts/simhei.ttf><c:/WINDOWS/fonts/sim
 hei.ttf><c:/WINDOWS/fonts/simhei.ttf><c:/WINDOWS/fonts/simsun.ttc><c:/WINDOWS/f
 onts/simsun.ttc><c:/WINDOWS/fonts/simsun.ttc><c:/WINDOWS/fonts/simsun.ttc><c:/W
-INDOWS/fonts/simsun.ttc><c:/WINDOWS/fonts/simsun.ttc><c:/WINDOWS/fonts/simhei.t
-tf><c:/WINDOWS/fonts/simsun.ttc><c:/WINDOWS/fonts/simsun.ttc><c:/WINDOWS/fonts/
-simsun.ttc><c:/WINDOWS/fonts/simsun.ttc><c:/WINDOWS/fonts/simsun.ttc><c:/WINDOW
-S/fonts/simsun.ttc><c:/WINDOWS/fonts/simhei.ttf><c:/WINDOWS/fonts/simhei.ttf><c
-:/WINDOWS/fonts/simhei.ttf><c:/WINDOWS/fonts/simhei.ttf><c:/WINDOWS/fonts/simhe
-i.ttf><c:/WINDOWS/fonts/simhei.ttf><c:/WINDOWS/fonts/simhei.ttf><c:/WINDOWS/fon
-ts/simhei.ttf><c:/WINDOWS/fonts/simhei.ttf><c:/WINDOWS/fonts/simhei.ttf><c:/WIN
-DOWS/fonts/simsun.ttc><c:/WINDOWS/fonts/simsun.ttc><c:/WINDOWS/fonts/simsun.ttc
-><c:/WINDOWS/fonts/simsun.ttc><c:/WINDOWS/fonts/simsun.ttc><c:/WINDOWS/fonts/si
-msun.ttc><c:/WINDOWS/fonts/simsun.ttc><c:/WINDOWS/fonts/simhei.ttf><c:/WINDOWS/
-fonts/simhei.ttf><c:/WINDOWS/fonts/simsun.ttc><c:/WINDOWS/fonts/simhei.ttf><c:/
-WINDOWS/fonts/simsun.ttc><c:/WINDOWS/fonts/simhei.ttf><c:/WINDOWS/fonts/simsun.
+INDOWS/fonts/simsun.ttc><c:/WINDOWS/fonts/simsun.ttc><c:/WINDOWS/fonts/simsun.t
+tc><c:/WINDOWS/fonts/simhei.ttf><c:/WINDOWS/fonts/simhei.ttf><c:/WINDOWS/fonts/
+simhei.ttf><c:/WINDOWS/fonts/simhei.ttf><c:/WINDOWS/fonts/simhei.ttf><c:/WINDOW
+S/fonts/simsun.ttc><c:/WINDOWS/fonts/simsun.ttc><c:/WINDOWS/fonts/simsun.ttc><c
+:/WINDOWS/fonts/simhei.ttf><c:/WINDOWS/fonts/simsun.ttc><c:/WINDOWS/fonts/simsu
+n.ttc><c:/WINDOWS/fonts/simsun.ttc><c:/WINDOWS/fonts/simsun.ttc><c:/WINDOWS/fon
+ts/simsun.ttc><c:/WINDOWS/fonts/simsun.ttc><c:/WINDOWS/fonts/simhei.ttf><c:/WIN
+DOWS/fonts/simhei.ttf><c:/WINDOWS/fonts/simhei.ttf><c:/WINDOWS/fonts/simhei.ttf
+><c:/WINDOWS/fonts/simhei.ttf><c:/WINDOWS/fonts/simhei.ttf><c:/WINDOWS/fonts/si
+mhei.ttf><c:/WINDOWS/fonts/simhei.ttf><c:/WINDOWS/fonts/simhei.ttf><c:/WINDOWS/
+fonts/simhei.ttf><c:/WINDOWS/fonts/simsun.ttc><c:/WINDOWS/fonts/simsun.ttc><c:/
+WINDOWS/fonts/simsun.ttc><c:/WINDOWS/fonts/simsun.ttc><c:/WINDOWS/fonts/simsun.
 ttc><c:/WINDOWS/fonts/simsun.ttc><c:/WINDOWS/fonts/simsun.ttc><c:/WINDOWS/fonts
 /simhei.ttf><c:/WINDOWS/fonts/simhei.ttf><c:/WINDOWS/fonts/simsun.ttc><c:/WINDO
-WS/fonts/simsun.ttc><c:/WINDOWS/fonts/simsun.ttc><c:/WINDOWS/fonts/simsun.ttc><
-c:/WINDOWS/fonts/simsun.ttc><c:/WINDOWS/fonts/simsun.ttc><c:/WINDOWS/fonts/simh
-ei.ttf><c:/WINDOWS/fonts/simhei.ttf><c:/WINDOWS/fonts/simhei.ttf><c:/WINDOWS/fo
-nts/simhei.ttf><c:/WINDOWS/fonts/simsun.ttc><c:/WINDOWS/fonts/simsun.ttc><c:/WI
+WS/fonts/simhei.ttf><c:/WINDOWS/fonts/simsun.ttc><c:/WINDOWS/fonts/simhei.ttf><
+c:/WINDOWS/fonts/simsun.ttc><c:/WINDOWS/fonts/simsun.ttc><c:/WINDOWS/fonts/sims
+un.ttc><c:/WINDOWS/fonts/simhei.ttf><c:/WINDOWS/fonts/simhei.ttf><c:/WINDOWS/fo
+nts/simsun.ttc><c:/WINDOWS/fonts/simsun.ttc><c:/WINDOWS/fonts/simsun.ttc><c:/WI
 NDOWS/fonts/simsun.ttc><c:/WINDOWS/fonts/simsun.ttc><c:/WINDOWS/fonts/simsun.tt
-c><c:/WINDOWS/fonts/simsun.ttc><c:/WINDOWS/fonts/simsun.ttc><c:/WINDOWS/fonts/s
-imsun.ttc><c:/WINDOWS/fonts/simsun.ttc><c:/WINDOWS/fonts/simsun.ttc><c:/WINDOWS
+c><c:/WINDOWS/fonts/simhei.ttf><c:/WINDOWS/fonts/simhei.ttf><c:/WINDOWS/fonts/s
+imhei.ttf><c:/WINDOWS/fonts/simhei.ttf><c:/WINDOWS/fonts/simsun.ttc><c:/WINDOWS
 /fonts/simsun.ttc><c:/WINDOWS/fonts/simsun.ttc><c:/WINDOWS/fonts/simsun.ttc><c:
 /WINDOWS/fonts/simsun.ttc><c:/WINDOWS/fonts/simsun.ttc><c:/WINDOWS/fonts/simsun
 .ttc><c:/WINDOWS/fonts/simsun.ttc><c:/WINDOWS/fonts/simsun.ttc><c:/WINDOWS/font
 s/simsun.ttc><c:/WINDOWS/fonts/simsun.ttc><c:/WINDOWS/fonts/simsun.ttc><c:/WIND
-OWS/fonts/simsun.ttc><c:/WINDOWS/fonts/simsun.ttc><c:/WINDOWS/fonts/simhei.ttf>
-<c:/WINDOWS/fonts/simhei.ttf><c:/WINDOWS/fonts/simsun.ttc><c:/WINDOWS/fonts/sim
+OWS/fonts/simsun.ttc><c:/WINDOWS/fonts/simsun.ttc><c:/WINDOWS/fonts/simsun.ttc>
+<c:/WINDOWS/fonts/simsun.ttc><c:/WINDOWS/fonts/simsun.ttc><c:/WINDOWS/fonts/sim
 sun.ttc><c:/WINDOWS/fonts/simsun.ttc><c:/WINDOWS/fonts/simsun.ttc><c:/WINDOWS/f
 onts/simsun.ttc><c:/WINDOWS/fonts/simsun.ttc><c:/WINDOWS/fonts/simsun.ttc><c:/W
-INDOWS/fonts/simsun.ttc><c:/WINDOWS/fonts/simsun.ttc><c:/WINDOWS/fonts/simsun.t
+INDOWS/fonts/simhei.ttf><c:/WINDOWS/fonts/simhei.ttf><c:/WINDOWS/fonts/simsun.t
 tc><c:/WINDOWS/fonts/simsun.ttc><c:/WINDOWS/fonts/simsun.ttc><c:/WINDOWS/fonts/
 simsun.ttc><c:/WINDOWS/fonts/simsun.ttc><c:/WINDOWS/fonts/simsun.ttc><c:/WINDOW
 S/fonts/simsun.ttc><c:/WINDOWS/fonts/simsun.ttc><c:/WINDOWS/fonts/simsun.ttc><c
 :/WINDOWS/fonts/simsun.ttc><c:/WINDOWS/fonts/simsun.ttc><c:/WINDOWS/fonts/simsu
-n.ttc><c:/WINDOWS/fonts/simsun.ttc><c:/WINDOWS/fonts/simsun.ttc><c:/texlive/201
-5/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx10.pfb><c:/texlive/2015/texmf-d
-ist/fonts/type1/public/amsfonts/cm/cmbx12.pfb><c:/texlive/2015/texmf-dist/fonts
-/type1/public/amsfonts/cm/cmbx7.pfb><c:/texlive/2015/texmf-dist/fonts/type1/pub
-lic/amsfonts/cm/cmex10.pfb><c:/texlive/2015/texmf-dist/fonts/type1/public/amsfo
-nts/cm/cmmi10.pfb><c:/texlive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cm
-mi7.pfb><c:/texlive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmmib10.pfb>
-<c:/texlive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb><c:/texliv
-e/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmr12.pfb><c:/texlive/2015/tex
-mf-dist/fonts/type1/public/amsfonts/cm/cmr5.pfb><c:/texlive/2015/texmf-dist/fon
-ts/type1/public/amsfonts/cm/cmr7.pfb><c:/texlive/2015/texmf-dist/fonts/type1/pu
-blic/amsfonts/cm/cmsl10.pfb><c:/texlive/2015/texmf-dist/fonts/type1/public/amsf
-onts/cm/cmsy10.pfb><c:/texlive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/c
-msy7.pfb>
-Output written on report.pdf (21 pages, 2432761 bytes).
+n.ttc><c:/WINDOWS/fonts/simsun.ttc><c:/WINDOWS/fonts/simsun.ttc><c:/WINDOWS/fon
+ts/simsun.ttc><c:/WINDOWS/fonts/simsun.ttc><c:/WINDOWS/fonts/simsun.ttc><c:/WIN
+DOWS/fonts/simsun.ttc><c:/WINDOWS/fonts/simsun.ttc><c:/WINDOWS/fonts/simsun.ttc
+><c:/WINDOWS/fonts/simsun.ttc><c:/WINDOWS/fonts/simsun.ttc><c:/WINDOWS/fonts/si
+msun.ttc><c:/texlive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx10.pfb>
+<c:/texlive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx12.pfb><c:/texli
+ve/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx7.pfb><c:/texlive/2015/te
+xmf-dist/fonts/type1/public/amsfonts/cm/cmex10.pfb><c:/texlive/2015/texmf-dist/
+fonts/type1/public/amsfonts/cm/cmmi10.pfb><c:/texlive/2015/texmf-dist/fonts/typ
+e1/public/amsfonts/cm/cmmi7.pfb><c:/texlive/2015/texmf-dist/fonts/type1/public/
+amsfonts/cm/cmmib10.pfb><c:/texlive/2015/texmf-dist/fonts/type1/public/amsfonts
+/cm/cmr10.pfb><c:/texlive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmr12.
+pfb><c:/texlive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmr5.pfb><c:/tex
+live/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmr7.pfb><c:/texlive/2015/t
+exmf-dist/fonts/type1/public/amsfonts/cm/cmsl10.pfb><c:/texlive/2015/texmf-dist
+/fonts/type1/public/amsfonts/cm/cmsy10.pfb><c:/texlive/2015/texmf-dist/fonts/ty
+pe1/public/amsfonts/cm/cmsy7.pfb>
+Output written on report.pdf (26 pages, 2669427 bytes).
 PDF statistics:
- 720 PDF objects out of 1000 (max. 8388607)
- 457 compressed objects within 5 object streams
+ 781 PDF objects out of 1000 (max. 8388607)
+ 495 compressed objects within 5 object streams
  0 named destinations out of 1000 (max. 500000)
- 378 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 413 words of extra memory for PDF output out of 10000 (max. 10000000)
 
