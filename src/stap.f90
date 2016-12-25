@@ -180,12 +180,12 @@ IF (DYNANALYSIS .EQV. .TRUE.) call prepare_MassMatrix
      CALL ASSEM (A(NP(11)))
      
      CALL SECOND (TIM(4))
-     IF (DYNANALYSIS .EQV. .TRUE.) CALL EIGENVAL (DA(NP(3)), DA(NP(10)), IA(NP(2)), NEQ, NWK, NEQ1, 2)
+     IF (DYNANALYSIS .EQV. .TRUE.) CALL EIGENVAL (DA(NP(3)), DA(NP(10)), IA(NP(2)), NEQ, NWK, NEQ+1, 2)
      if(pardisodoor) then
         if (.not. DYNANALYSIS) call pardiso_crop(DA(NP(3)), IA(NP(2)), IA(NP(5)))          ! Condensing CSR format sparse matrix storage: deleting zeros
      else
         !    Triangularize stiffness matrix
-        NEQ1=NEQ + 1
+        NEQ1 = NEQ+1
         CALL COLSOL (DA(NP(3)),DA(NP(4)),IA(NP(2)),NEQ,NWK,NEQ1,1)
      end if
      

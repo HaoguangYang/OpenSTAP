@@ -10,6 +10,9 @@ subroutine EIGENVAL(Stiff, Mass, MAXA, NN, NWK2, NNM, NRoot)
     !LANCZOS variables
     integer, parameter :: StiffTmp = 16
     integer :: NC, NNC, NRestart
+    real(8) :: TT(NN),W(NN)
+    REAL(8),allocatable :: VEC(:,:),D(:),RTOLV(:),BUP(:),BLO(:)
+    REAL(8),allocatable :: BUPC(:),AR(:),BR(:),Q(:,:)
     logical :: IFSS, IFPR
     !dfeast_scsrgv variables
     character :: uplo
@@ -27,11 +30,33 @@ subroutine EIGENVAL(Stiff, Mass, MAXA, NN, NWK2, NNM, NRoot)
         REWIND StiffTmp
         WRITE (StiffTmp) Stiff(1:NWK2)
         NNC=NC*(NC+1)/2
+        allocate (AR(NNC),BR(NNC),VEC(NC,NC),D(NC),RTOLV(NC),BUP(NC),BLO(NC),BUPC(NC),Q(NN,NC))
+        TT = 0
+        W = 0
+        AR = 0
+        BR = 0
+        VEC = 0
+        D = 0
+        RTOLV = 0
+        BUP = 0
+        BLO = 0
+        BUPC = 0
+        Q = 0
+        EignVec = 0
+        EignVal = 0
         !THE PARAMETERS NC AND/OR NRestart MUST BE INCREASED IF A SOLUTION HAS NOT CONVERGED
-        call LANCZOS(Stiff, Mass, MAXA, EignVec, EignVal, NN, NNM, NWK2, NWK2, NRoot, RTol, NC, NNC, NRestart, IFSS, IFPR, StiffTmp, IOUT)
+        NRestart = NNC
+        IFSS = .TRUE.
+        IFPR = .FALSE.
+        write (*,*) Stiff
+        write (*,*) Mass
+        write (*,*) MAXA
+        !write(*,*) EignVec, EignVal,TT,W,AR,BR,VEC,D,RTOLV,BUP,BLO,BUPC, NN, NNM, NWK2, NWK2, NRoot, RTol, NC, NNC, NRestart, IFSS, IFPR, StiffTmp, IOUT
+        call LANCZOS(Stiff, Mass, MAXA, EignVec, EignVal,TT,W,AR,BR,VEC,D,RTOLV,BUP,BLO,BUPC, NN, NNM, NWK2, NWK2, NRoot, RTol, NC, NNC, NRestart, IFSS, IFPR, StiffTmp, IOUT,Q)
         REWIND StiffTmp
         READ (StiffTmp) Stiff
         close(StiffTmp)
+        deallocate (AR,BR,VEC,D,RTOLV,BUP,BLO,BUPC,Q)
     else
         !uplo = 'U'
         allocate (res(NC))
