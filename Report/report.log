@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.1415926-2.3-1.40.12 (MiKTeX 2.9) (preloaded format=pdflatex 2016.6.10)  25 DEC 2016 12:02
+This is pdfTeX, Version 3.1415926-2.3-1.40.12 (MiKTeX 2.9) (preloaded format=pdflatex 2016.6.10)  25 DEC 2016 12:21
 entering extended mode
 **D:/School/FEM/CourseProject/Report/report.tex
 (D:/School/FEM/CourseProject/Report/report.tex
@@ -861,19 +861,14 @@ Package CJKpunct Info: punctuation spaces for family 'zhsong' do not exist. Use
 ] [2
 
 ]
-(D:\School\FEM\CourseProject\Report\report.toc
-
-LaTeX Font Warning: Font shape `OMX/cmex/m/n' in size <10.54> not available
-(Font)              size <10.95> substituted on input line 1.
-
-[3])
+(D:\School\FEM\CourseProject\Report\report.toc)
 \tf@toc=\write3
- [4]
+ [3]
 Underfull \hbox (badness 10000) in paragraph at lines 18--19
 
  []
 
-<01.png, id=110, 3011.25pt x 1281.78876pt>
+<01.png, id=79, 3011.25pt x 1281.78876pt>
 File: 01.png Graphic file (type png)
  <use 01.png>
 Package pdftex.def Info: 01.png used on input line 20.
@@ -883,7 +878,11 @@ Overfull \hbox (21.07999pt too wide) in paragraph at lines 20--21
 [][] 
  []
 
-<02.png, id=114, 3011.25pt x 1281.78876pt>
+
+LaTeX Font Warning: Font shape `OMX/cmex/m/n' in size <10.54> not available
+(Font)              size <10.95> substituted on input line 29.
+
+<02.png, id=84, 3011.25pt x 1281.78876pt>
 File: 02.png Graphic file (type png)
  <use 02.png>
 Package pdftex.def Info: 02.png used on input line 38.
@@ -896,12 +895,12 @@ Overfull \hbox (21.07999pt too wide) in paragraph at lines 38--39
 
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
- [5 <D:/School/FEM/CourseProject/Report/01.png
+ [4 <D:/School/FEM/CourseProject/Report/01.png
 
 pdfTeX warning: pdflatex.exe (file D:/School/FEM/CourseProject/Report/01.png): 
 large interlaced PNG might cause out of memory (use non-interlaced PNG to fix t
 his)
->] <03.png, id=138, 3011.25pt x 1281.78876pt>
+>] <03.png, id=121, 3011.25pt x 1281.78876pt>
 File: 03.png Graphic file (type png)
  <use 03.png>
 Package pdftex.def Info: 03.png used on input line 55.
@@ -911,7 +910,7 @@ Overfull \hbox (21.07999pt too wide) in paragraph at lines 55--56
 [][] 
  []
 
-[6 <D:/School/FEM/CourseProject/Report/02.png
+[5 <D:/School/FEM/CourseProject/Report/02.png
 
 pdfTeX warning: pdflatex.exe (file D:/School/FEM/CourseProject/Report/02.png): 
 large interlaced PNG might cause out of memory (use non-interlaced PNG to fix t
@@ -921,7 +920,7 @@ his)
 pdfTeX warning: pdflatex.exe (file D:/School/FEM/CourseProject/Report/03.png): 
 large interlaced PNG might cause out of memory (use non-interlaced PNG to fix t
 his)
->] <04.png, id=149, 3011.25pt x 1281.78876pt>
+>] <04.png, id=136, 3011.25pt x 1281.78876pt>
 File: 04.png Graphic file (type png)
  <use 04.png>
 Package pdftex.def Info: 04.png used on input line 87.
@@ -931,7 +930,7 @@ Overfull \hbox (21.07999pt too wide) in paragraph at lines 87--88
 [][] 
  []
 
-<05.png, id=150, 2935.96875pt x 1249.66875pt>
+<05.png, id=137, 2935.96875pt x 1249.66875pt>
 File: 05.png Graphic file (type png)
  <use 05.png>
 Package pdftex.def Info: 05.png used on input line 105.
@@ -941,82 +940,61 @@ Overfull \hbox (21.07999pt too wide) in paragraph at lines 105--106
 [][] 
  []
 
-[7 <D:/School/FEM/CourseProject/Report/04.png
+[6 <D:/School/FEM/CourseProject/Report/04.png
 
 pdfTeX warning: pdflatex.exe (file D:/School/FEM/CourseProject/Report/04.png): 
 large interlaced PNG might cause out of memory (use non-interlaced PNG to fix t
 his)
 >]
-Underfull \vbox (badness 10000) has occurred while \output is active []
+LaTeX Font Info:    Try loading font information for OMS+cmr on input line 116.
 
- [8 <D:/School/FEM/CourseProject/Report/05.png
+ (D:\CTEX\MiKTeX\tex\latex\base\omscmr.fd
+File: omscmr.fd 1999/05/25 v2.5h Standard LaTeX font definitions
+)
+LaTeX Font Info:    Font shape `OMS/cmr/m/n' in size <10.54> not available
+(Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 116.
+
+Overfull \hbox (40.4126pt too wide) detected at line 125
+[] \OT1/cmr/m/n/10.54 = [] \OML/cmm/m/it/10.54 ;  [] \OT1/cmr/m/n/10.54 = []
+ []
+
+
+Overfull \hbox (1.22621pt too wide) detected at line 131
+[][] \OT1/cmr/m/n/10.54 = [][] \OML/cmm/m/it/10.54 ;  [][] \OT1/cmr/m/n/10.54 =
+ [][]
+ []
+
+[7 <D:/School/FEM/CourseProject/Report/05.png
 
 pdfTeX warning: pdflatex.exe (file D:/School/FEM/CourseProject/Report/05.png): 
 large interlaced PNG might cause out of memory (use non-interlaced PNG to fix t
 his)
 >]
-Overfull \vbox (105.04341pt too high) has occurred while \output is active []
 
+! LaTeX Error: Something's wrong--perhaps a missing \item.
 
-[9] (D:\School\FEM\CourseProject\Report\report.aux)
+See the LaTeX manual or LaTeX Companion for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.149 \begin{enumerate}
+                       
+? 
+! Emergency stop.
+ ...                                              
+                                                  
+l.149 \begin{enumerate}
+                       
+Try typing  <return>  to proceed.
+If that doesn't work, type  X <return>  to quit.
 
-LaTeX Font Warning: Size substitutions with differences
-(Font)              up to 0.41pt have occurred.
-
- ) 
+ 
 Here is how much of TeX's memory you used:
- 10292 strings out of 495354
- 159339 string characters out of 3183859
- 195502 words of memory out of 3000000
- 12981 multiletter control sequences out of 15000+200000
- 52875 words of font info for 181 fonts, out of 3000000 for 9000
+ 10308 strings out of 495354
+ 159053 string characters out of 3183859
+ 198502 words of memory out of 3000000
+ 13020 multiletter control sequences out of 15000+200000
+ 49127 words of font info for 168 fonts, out of 3000000 for 9000
  14 hyphenation exceptions out of 8191
- 40i,6n,28p,874b,1053s stack positions out of 5000i,500n,10000p,200000b,50000s
-<C:/windows/Fonts/simhei.ttf><C:/windows/Fonts/simhei.ttf><C:/windows/Fonts/s
-imhei.ttf><C:/windows/Fonts/simhei.ttf><C:/windows/Fonts/simhei.ttf><C:/windows
-/Fonts/simhei.ttf><C:/windows/Fonts/simhei.ttf><C:/windows/Fonts/simhei.ttf><C:
-/windows/Fonts/simhei.ttf><C:/windows/Fonts/simhei.ttf><C:/windows/Fonts/simhei
-.ttf><C:/windows/Fonts/simhei.ttf><C:/windows/Fonts/simhei.ttf><C:/windows/Font
-s/simhei.ttf><C:/windows/Fonts/simhei.ttf><C:/windows/Fonts/simhei.ttf><C:/wind
-ows/Fonts/simhei.ttf><C:/windows/Fonts/simhei.ttf><C:/windows/Fonts/simhei.ttf>
-<C:/windows/Fonts/simhei.ttf><C:/windows/Fonts/simhei.ttf><C:/windows/Fonts/sim
-hei.ttf><C:/windows/Fonts/simsun.ttc><C:/windows/Fonts/simsun.ttc><C:/windows/F
-onts/simsun.ttc><C:/windows/Fonts/simsun.ttc><C:/windows/Fonts/simsun.ttc><C:/w
-indows/Fonts/simsun.ttc><C:/windows/Fonts/simhei.ttf><C:/windows/Fonts/simhei.t
-tf><C:/windows/Fonts/simhei.ttf><C:/windows/Fonts/simhei.ttf><C:/windows/Fonts/
-simsun.ttc><C:/windows/Fonts/simhei.ttf><C:/windows/Fonts/simhei.ttf><C:/window
-s/Fonts/simsun.ttc><C:/windows/Fonts/simhei.ttf><C:/windows/Fonts/simsun.ttc><C
-:/windows/Fonts/simhei.ttf><C:/windows/Fonts/simsun.ttc><C:/windows/Fonts/simsu
-n.ttc><C:/windows/Fonts/simsun.ttc><C:/windows/Fonts/simhei.ttf><C:/windows/Fon
-ts/simhei.ttf><C:/windows/Fonts/simsun.ttc><C:/windows/Fonts/simsun.ttc><C:/win
-dows/Fonts/simsun.ttc><C:/windows/Fonts/simsun.ttc><C:/windows/Fonts/simsun.ttc
-><C:/windows/Fonts/simsun.ttc><C:/windows/Fonts/simhei.ttf><C:/windows/Fonts/si
-mhei.ttf><C:/windows/Fonts/simhei.ttf><C:/windows/Fonts/simhei.ttf><C:/windows/
-Fonts/simsun.ttc><C:/windows/Fonts/simsun.ttc><C:/windows/Fonts/simsun.ttc><C:/
-windows/Fonts/simsun.ttc><C:/windows/Fonts/simsun.ttc><C:/windows/Fonts/simsun.
-ttc><C:/windows/Fonts/simsun.ttc><C:/windows/Fonts/simsun.ttc><C:/windows/Fonts
-/simsun.ttc><C:/windows/Fonts/simsun.ttc><C:/windows/Fonts/simsun.ttc><C:/windo
-ws/Fonts/simsun.ttc><C:/windows/Fonts/simsun.ttc><C:/windows/Fonts/simsun.ttc><
-C:/windows/Fonts/simsun.ttc><C:/windows/Fonts/simsun.ttc><C:/windows/Fonts/sims
-un.ttc><C:/windows/Fonts/simsun.ttc><C:/windows/Fonts/simsun.ttc><C:/windows/Fo
-nts/simsun.ttc><C:/windows/Fonts/simsun.ttc><C:/windows/Fonts/simsun.ttc><C:/wi
-ndows/Fonts/simsun.ttc><C:/windows/Fonts/simhei.ttf><C:/windows/Fonts/simhei.tt
-f><C:/windows/Fonts/simsun.ttc><C:/windows/Fonts/simsun.ttc><C:/windows/Fonts/s
-imsun.ttc><C:/windows/Fonts/simsun.ttc><C:/windows/Fonts/simsun.ttc><C:/windows
-/Fonts/simsun.ttc><C:/windows/Fonts/simsun.ttc><C:/windows/Fonts/simsun.ttc><C:
-/windows/Fonts/simsun.ttc><C:/windows/Fonts/simsun.ttc><C:/windows/Fonts/simsun
-.ttc><C:/windows/Fonts/simsun.ttc><C:/windows/Fonts/simsun.ttc><C:/windows/Font
-s/simsun.ttc><C:/windows/Fonts/simsun.ttc><C:/windows/Fonts/simsun.ttc><C:/wind
-ows/Fonts/simsun.ttc><C:/windows/Fonts/simsun.ttc><C:/windows/Fonts/simsun.ttc>
-<C:/windows/Fonts/simsun.ttc><C:/windows/Fonts/simsun.ttc><C:/windows/Fonts/sim
-sun.ttc><C:/windows/Fonts/simsun.ttc><D:/CTEX/MiKTeX/fonts/type1/public/amsfont
-s/cm/cmbx12.pfb><D:/CTEX/MiKTeX/fonts/type1/public/amsfonts/cm/cmr10.pfb><D:/CT
-EX/MiKTeX/fonts/type1/public/amsfonts/cm/cmr12.pfb><D:/CTEX/MiKTeX/fonts/type1/
-public/amsfonts/cm/cmsl10.pfb><D:/CTEX/MiKTeX/fonts/type1/public/amsfonts/cm/cm
-sy10.pfb>
-Output written on report.pdf (9 pages, 1315847 bytes).
-PDF statistics:
- 521 PDF objects out of 1000 (max. 8388607)
- 0 named destinations out of 1000 (max. 500000)
- 242 words of extra memory for PDF output out of 10000 (max. 10000000)
-
+ 40i,8n,28p,874b,1066s stack positions out of 5000i,500n,10000p,200000b,50000s
+!  ==> Fatal error occurred, no output PDF file produced!

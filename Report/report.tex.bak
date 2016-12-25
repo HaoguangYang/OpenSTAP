@@ -1,6 +1,7 @@
 \documentclass[UTF8]{ctexbook}
 \usepackage{graphicx}
 \usepackage{amsmath}
+\usepackage{CJK}
 
 \title{桥梁大作业报告}
 \author{组长：贺琪 \\ 组员：陈煜 \ 刘畅武 \ 杨昊光 \ 朱子霖}
@@ -263,10 +264,7 @@ u_{x}=0.001x,\ u_{y}=0.002y,\ u_{z}=0.003z
 测试结果表明，对于线性场，输出误差在机器$\varepsilon$量级，单元设计能精确重构线性位移场，为一阶收敛的。
 
 
-对SPR的测试，其输出结果误差也在机器$\varepsilon$量级，因而从算法设计的角度来说是合理的。
-
-\end{enumerate}
-
+对SPR的测试，其输出结果误差也在机器$\varepsilon$量级，因而从算法设计的角度来说是合理的。\end{enumerate}
 \end{itemize}
 
 \subsection{Beam}
