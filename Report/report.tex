@@ -106,6 +106,7 @@
 \end{center}
 
 \subsection{Abaqus结果}
+
 \begin{center}
 \includegraphics[width=0.6\textwidth]{05.png}
 \end{center}
@@ -179,8 +180,8 @@
 %-------------------------------------------------------8H--------------------------------------------------%
 \subsection{8H}
 
-\subsubsection {算法分析}
-\paragraph{}
+\begin{itemize}
+\item 算法分析
 
 给出一个8H单元，其节点坐标矩阵为$\boldsymbol{X}=\begin{bmatrix}x_{1} & y_{1} & z_{1}\\
 x_{2} & y_{2} & z_{2}\\
@@ -267,16 +268,16 @@ $\Rightarrow\boldsymbol{D}=\begin{bmatrix}2G+\lambda & \lambda & \lambda\\
 生成单元刚度阵通过Location Matrix进行组装，得到全局的刚度阵，再解$\boldsymbol{Kd=f}$.
 
 
-\subsubsection{算法实现}
-\paragraph{}
+\item 算法实现
+
 
 位移计算部分按照变换将坐标变换到$[-1,1]\times[-1,1]\times[-1,1]$后即可得到形函数和各导数。取得高斯点位置，代入$\boldsymbol{D}$矩阵即可以产生单元刚度阵，调用COLHT和ADDBAN生成总刚度矩阵并求解。
 
 
 SPR部分，在前处理时保存单元连接矩阵到临时文件中，在后处理中调取，计算每个节点连接的单元数量和编号，以及用于恢复节点位置的信息，生成为NodeRelationFlag数组。对每个节点，根据该数组选取逼近的阶次，计算$\boldsymbol{A}\text{、}\boldsymbol{S}$矩阵，并传入最小二乘子程序LeastSquare中，得到系数数组，并代入节点位置信息，得到恢复的节点应力。
 
-\subsubsection{算法测试}
-\paragraph{}
+\item 算法测试
+
 
 Patch Test 选取了7单元模型和8单元模型进行测试，测试形状为单位立方体，$E=1000,\ \nu=0.25$，通过内部确定1个或8个点来将其分划为8个或7个单元。施加线性位移场：
 
@@ -295,6 +296,10 @@ u_{x}=0.001x,\ u_{y}=0.002y,\ u_{z}=0.003z
 
 对SPR的测试，其输出结果误差也在机器$\varepsilon$量级，因而从算法设计的角度来说是合理的。
 
+
+
+
+\end{itemize}
 
 
 \subsection{Beam}
@@ -403,9 +408,6 @@ Stap90的实现位于$solvermode.f90$文件中的bdopt函数，C++的实现位�
 \subsection{9Q}
 
 \subsection{4T}
-\subsubsection{N矩阵和B矩阵的形式}
-\paragraph{}
-类似于3T单元，在三维Simplex坐标系中可以用相对体积来作为高斯点的确定依据。
 
 \subsection{铁木辛柯梁}
 \subsubsection{基本原理}
@@ -510,6 +512,7 @@ N自由度无阻尼线性系统作微幅振动，最后可得到振动微分方�
 \subsubsection{算法分析}
 \paragraph{}
 LANCZOS迭代法
+
 
 \subsection{动力学响应分析}
 

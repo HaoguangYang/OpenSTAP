@@ -306,8 +306,16 @@ SUBROUTINE BEAMELE (ID,X,Y,Z,U,MHT,E,G,AREA,Density,I_X,I_Y,I_Z,J_X,J_Y,J_Z,LM,X
         end if
         
         if(pardisodoor) then
+<<<<<<< HEAD
+            if(huge) then
+                call pardiso_addban(stff,IA(NP(2)),columns,S,LM(1,N),ND)
+            else
+                call pardiso_addban(DA(NP(3)),IA(NP(2)),IA(NP(5)),S,LM(1,N),ND)
+            end if
+=======
             call pardiso_addban(DA(NP(3)),IA(NP(2)),IA(NP(5)),S,LM(1,N),ND)
             if (DYNANALYSIS) CALL pardiso_addban(DA(NP(10)),IA(NP(9)), IA(NP(8)),M,LM(:,N),ND)
+>>>>>>> c85d1edd52a173423583b01cc6524492827c80cd
         else
             CALL ADDBAN (DA(NP(3)),IA(NP(2)),S,LM(1,N),ND)
             IF (DYNANALYSIS) CALL ADDBAN (DA(NP(10)),IA(NP(2)),M,LM(:,N),ND)

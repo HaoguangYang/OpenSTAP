@@ -11,17 +11,17 @@
 ! .                                                                       .
 ! . . . . . . . . . . . . . .  . . .  . . . . . . . . . . . . . . . . . . .
 !                                                                         -
-!        9Q element                                                       -
+!        Transition element                                                       -
 !        Qi He,(2016)                                                     -
 !        Tsinghua University                                              -
 !                                                                         -
 !                                                                         -
 !--------------------------------------------------------------------------
 
-SUBROUTINE ELEMENT_9Q
+SUBROUTINE ELEMENT_Transition
 ! . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 ! .                                                                   .
-! .   To set up storage and call the 9Q element subroutine            .
+! .   To set up storage and call the Transition element subroutine            .
 ! .                                                                   .
 ! . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
@@ -36,7 +36,7 @@ NUMMAT = NPAR(3)
 
 ! Allocate storage for element group data
   IF (IND == 1) THEN
-      MM = 2*NUMMAT*ITWO + 19*NUME + 18*NUME*ITWO
+      MM = 2*NUMMAT*ITWO + 11*NUME + 15*NUME*ITWO
       CALL MEMALLOC(11,"ELEGP",MM,1)
   END IF
 
@@ -46,28 +46,28 @@ NUMMAT = NPAR(3)
 ! Calculate the pointer to the arrays in the element group data
 ! N101: E(NUMMAT)
 ! N102: POISSON(NUMMAT)
-! N103: LM(18,NUME)
-! N104: XY(18,NUME)
+! N103: LM(10,NUME)
+! N104: XY(15,NUME)
 ! N105: MTAP(NUME)
   N101=NFIRST
   N102=N101+NUMMAT*ITWO
   N103=N102+NUMMAT*ITWO
-  N104=N103+18*NUME
-  N105=N104+18*NUME*ITWO
+  N104=N103+10*NUME
+  N105=N104+15*NUME*ITWO
   N106=N105+NUME
   NLAST=N106
 
   MIDEST=NLAST - NFIRST
 
-  CALL ELEMENT_9Q_MAIN (IA(NP(1)),DA(NP(2)),DA(NP(3)),DA(NP(4)),DA(NP(4)),IA(NP(5)),   &
+  CALL ELEMENT_Transition_MAIN (IA(NP(1)),DA(NP(2)),DA(NP(3)),DA(NP(4)),DA(NP(4)),IA(NP(5)),   &
        A(N101),A(N102),A(N103),A(N104),A(N105))
 
   RETURN
 
-END SUBROUTINE ELEMENT_9Q
+END SUBROUTINE ELEMENT_Transition
 
 
-SUBROUTINE ELEMENT_9Q_MAIN (ID,X,Y,Z,U,MHT,E,POISSON,LM,XY,MATP)
+SUBROUTINE ELEMENT_Transition_MAIN (ID,X,Y,Z,U,MHT,E,POISSON,LM,XYZ,MATP)
 ! . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 ! .                                                                   .
 ! .   TRUSS element subroutine                                        .
@@ -76,37 +76,39 @@ SUBROUTINE ELEMENT_9Q_MAIN (ID,X,Y,Z,U,MHT,E,POISSON,LM,XY,MATP)
 
   USE GLOBALS
   USE MEMALLOCATE
+  USE MathKernel
 
   IMPLICIT NONE
 
   
   INTERFACE
-    FUNCTION NmatElast9Q(eta,psi)
+    FUNCTION NmatElastTr(eta,psi)
         IMPLICIT NONE
         REAL(8):: eta
         REAL(8):: psi
-        REAL(8):: NmatElast9Q(1,9)
+        REAL(8):: NmatElastTr(2,10)
     END FUNCTION
-    FUNCTION BmatElast9Q(eta,psi,C)
+    FUNCTION BmatElastTr(eta,psi,C)
         IMPLICIT NONE
         REAL(8):: eta,psi
-        REAL(8):: C(9,2)
-        REAL(8):: BmatElast9Q(3,18)
+        REAL(8):: C(5,2)
+        REAL(8):: BmatElastTr(3,10)
     END FUNCTION
   END INTERFACE
   
-  INTEGER :: ID(6,NUMNP),LM(18,NPAR(2)),MATP(NPAR(2)),MHT(NEQ)
-  REAL(8) :: X(NUMNP),Y(NUMNP),Z(NUMNP), &
-             E(NPAR(3)),POISSON(NPAR(3)), XY(18,NPAR(2)),U(NEQ),DST(18,1)
+  INTEGER :: ID(6,NUMNP),LM(10,NPAR(2)),MATP(NPAR(2)),MHT(NEQ)
+  REAL(8) :: X(NUMNP),Y(NUMNP),Z(NUMNP),&
+             E(NPAR(3)),POISSON(NPAR(3)),  &
+             XYZ(15,NPAR(2)),U(NEQ),DST(10,1)
   REAL(8) :: ETA,EPSILON
 
-  INTEGER :: NPAR1, NUME, NUMMAT, ND, I1, I2, I3, I4, I5, I6, I7, I8, I9, L, N, I, J
+  INTEGER :: NPAR1, NUME, NUMMAT, ND, Node(5), L, N, I, J
   INTEGER :: MTYPE, IPRINT
   INTEGER,PARAMETER :: GUASS_N=4
-  REAL(8) :: NMAT(1,9),BMAT(3,18),C(9,2),NA(1,9)
-  REAL(8) :: KE(18,18),DETJ,D(3,3),M(18,18), Rho, Density(NPAR(3))
-  REAL(8) :: X_GUASS(4,2),XY0(1,2)
-  REAL(8) :: STRESS_XX(NPAR(2),4),STRESS_YY(NPAR(2),4),STRESS_XY(NPAR(2),4),STRESS(3,1)
+  REAL(8) :: NMAT(2,10),BMAT(3,10),C(5,2),NA(1,5)
+  REAL(8) :: KE(10,10),DETJ,D(3,3)
+  REAL(8) :: XY_GUASS(1,2)
+  REAL(8) :: STRESS(3,1)
   REAL(8),ALLOCATABLE:: GP(:),W(:)
   COMMON DETJ
   
@@ -137,19 +139,18 @@ SUBROUTINE ELEMENT_9Q_MAIN (ID,X,Y,Z,U,MHT,E,POISSON,LM,XY,MATP)
       W(4) = W(1)
   END IF 
 
-
   NPAR1  = NPAR(1)
   NUME   = NPAR(2)
   NUMMAT = NPAR(3) 
 
-  ND=18
+  ND=10
 
 ! Read and generate element information
   IF (IND .EQ. 1) THEN
 
      WRITE (IOUT,"(' E L E M E N T   D E F I N I T I O N',//,  &
                    ' ELEMENT TYPE ',13(' .'),'( NPAR(1) ) . . =',I10,/,   &
-                   '     EQ.3, 9Q ELEMENTS',//,     &
+                   '     EQ.16, Transition ELEMENTS',/,      &
                    ' NUMBER OF ELEMENTS.',10(' .'),'( NPAR(2) ) . . =',I10,/)") NPAR1,NUME
 
      IF (NUMMAT.EQ.0) NUMMAT=1
@@ -159,73 +160,47 @@ SUBROUTINE ELEMENT_9Q_MAIN (ID,X,Y,Z,U,MHT,E,POISSON,LM,XY,MATP)
                    ' AND CROSS-SECTIONAL  CONSTANTS ',         &
                    4 (' .'),'( NPAR(3) ) . . =',I10,/)") NUMMAT
 
-     WRITE (IOUT,"('  SET       YOUNG''S        POISSON',/,  &
-                   ' NUMBER     MODULUS',9X,'RATIO',/,  &
-                   15 X,'E',14X,'A')")
+     WRITE (IOUT,"('  SET       YOUNG''S        POISSON      DENSITY',/,  &
+                   ' NUMBER     MODULUS',9X,    'RATIO',/,  &
+                   15 X,'E',14X,                  'v', 14X,    '¦Ñ')")
 
      DO I=1,NUMMAT
         READ (IIN,'(I10,2F10.0)') N,E(N),POISSON(N)  ! Read material information
         WRITE (IOUT,"(I10,4X,E12.5,2X,E14.6)") N,E(N),POISSON(N)
      END DO
-
+     
      WRITE (IOUT,"(//,' E L E M E N T   I N F O R M A T I O N',//,  &
-                      ' ELEMENT     NODE     NODE       MATERIAL',/,   &
-                      ' NUMBER-N      I        J       SET NUMBER')")
-
+                      ' ELEMENT    |------------- NODE -------------|    MATERIAL',/,   &
+                      ' NUMBER-N      1        2        3        4      SET NUMBER')")     
+     
      N=0
      DO WHILE (N .NE. NUME)
-        READ (IIN,'(11I10)') N,I1,I2,I3,I4,I5,I6,I7,I8,I9,MTYPE  ! Read in element information
+        READ (IIN,'(7I10)') N, Node(1:5), MTYPE  ! Read in element information
 
 !       Save element information
-        XY(1,N)=X(I1)  ! Coordinates of the element's 1st node
-        XY(2,N)=Y(I1)
-
-        XY(3,N)=X(I2)  ! Coordinates of the element's 2nd node
-        XY(4,N)=Y(I2)
-        
-        XY(5,N)=X(I3)  ! Coordinates of the element's 3th node
-        XY(6,N)=Y(I3)
-        
-        XY(7,N)=X(I4)  ! Coordinates of the element's 4th node
-        XY(8,N)=Y(I4)
-        
-        XY(9,N)=X(I5)  ! Coordinates of the element's 5th node
-        XY(10,N)=Y(I5)
-        
-        XY(11,N)=X(I6)  ! Coordinates of the element's 6th node
-        XY(12,N)=Y(I6)
-        
-        XY(13,N)=X(I7)  ! Coordinates of the element's 7th node
-        XY(14,N)=Y(I7)
-        
-        XY(15,N)=X(I8)  ! Coordinates of the element's 8th node
-        XY(16,N)=Y(I8)
-        
-        XY(17,N)=X(I9)  ! Coordinates of the element's 9th node
-        XY(18,N)=Y(I9)
+        XYZ(1:13:3,N)=X(Node(:))  ! Coordinates of the element's nodes
+        XYZ(2:14:3,N)=Y(Node(:))
+        XYZ(3:15:3,N)=Z(Node(:))
 
         MATP(N)=MTYPE  ! Material type
 
-        DO L=1,8
+        DO L=1,10
            LM(L,N)=0
         END DO
 
         DO L=1,2
-           LM(L,N)=ID(L,I1)     ! Connectivity matrix
-           LM(L+2,N)=ID(L,I2)
-           LM(L+4,N)=ID(L,I3)
-           LM(L+6,N)=ID(L,I4)
-           LM(L+8,N)=ID(L,I5)
-           LM(L+10,N)=ID(L,I6)
-           LM(L+12,N)=ID(L,I7)
-           LM(L+14,N)=ID(L,I8)
-           LM(L+16,N)=ID(L,I9)
+           LM(L  ,N) = ID(L,Node(1))     ! Connectivity matrix
+           LM(L+2,N) = ID(L,Node(2))
+           LM(L+4,N) = ID(L,Node(3))
+           LM(L+6,N) = ID(L,Node(4))
+           LM(L+8,N) = ID(L,Node(5))
         END DO
 
 !       Update column heights and bandwidth
         if (.NOT. PARDISODOOR) CALL COLHT (MHT,ND,LM(1,N))   
 
-        WRITE (IOUT,"(I10,6X,I10,4X,I10,4X,I10,4X,I10,4X,I10,4X,I10,4X,I10,4X,I10,4X,I10,7X,I10)") N,I1,I2,I3,I4,I5,I6,I7,I8,I9,MTYPE
+        WRITE (IOUT,"(I10,6X,I10,4X,I10,4X,I10,4X,I10,4X,I10,7X,I10)") N,Node(1:5),MTYPE
+!        write (VTKNodeTmp) NPAR(5), Node(N,:)-1
 
      END DO
 
@@ -237,12 +212,12 @@ SUBROUTINE ELEMENT_9Q_MAIN (ID,X,Y,Z,U,MHT,E,POISSON,LM,XY,MATP)
      DO N=1,NUME
         MTYPE=MATP(N)
               
-        D(1,:)=E(MTYPE)/(1D0-POISSON(MTYPE)*POISSON(MTYPE))*(/1D0,POISSON(MTYPE),0D0/)
-        D(2,:)=E(MTYPE)/(1D0-POISSON(MTYPE)*POISSON(MTYPE))*(/POISSON(MTYPE),1D0,0D0/)
-        D(3,:)=E(MTYPE)/(1D0-POISSON(MTYPE)*POISSON(MTYPE))*(/0D0,0D0,(1D0-POISSON(MTYPE))/2D0/)
+        D(1,:)=E(MATP(N))/(1D0-POISSON(MATP(N))*POISSON(MATP(N)))*(/1D0,POISSON(MATP(N)),0D0/)
+        D(2,:)=E(MATP(N))/(1D0-POISSON(MATP(N))*POISSON(MATP(N)))*(/POISSON(MATP(N)),1D0,0D0/)
+        D(3,:)=E(MATP(N))/(1D0-POISSON(MATP(N))*POISSON(MATP(N)))*(/0D0,0D0,(1D0-POISSON(MATP(N)))/2D0/)
         
-        DO I=1,9
-            C(I,:)=(/XY(2*I-1,N),XY(2*I,N)/)
+        DO I=1,5
+            C(I,:)=(/XYZ(3*I-2,N),XYZ(3*I-1,N)/)
         END DO
         
         KE = 0
@@ -250,22 +225,25 @@ SUBROUTINE ELEMENT_9Q_MAIN (ID,X,Y,Z,U,MHT,E,POISSON,LM,XY,MATP)
             DO J=1,GUASS_N
                 ETA = GP(I)
                 EPSILON = GP(J)
-                
-                BMAT = BmatElast9Q(ETA,EPSILON,C)
+                BMAT = BmatElastTr(ETA,EPSILON,C)
                 
                 KE = KE + W(I)*W(J)*MATMUL(MATMUL(TRANSPOSE(BMAT),D),BMAT)*abs(DETJ)
                 
             END DO
-        END DO 
+        END DO   
+     
 
+        !CALL ADDBAN (DA(NP(3)),IA(NP(2)),KE,LM(1,N),ND)
         if(pardisodoor) then
             call pardiso_addban(DA(NP(3)),IA(NP(2)),IA(NP(5)),KE,LM(1,N),ND)
         else
             CALL ADDBAN (DA(NP(3)),IA(NP(2)),KE,LM(1,N),ND)
         end if
-     END DO
 
-     RETURN
+     END DO
+        !write (*,*) "--------------------K--------------------"
+        !write (*,*) DA(NP(3): NP(3)+NumberOfMatrixElements-1)
+     !RETURN
 
 ! Stress calculations
   ELSE IF (IND .EQ. 3) THEN
@@ -284,11 +262,14 @@ SUBROUTINE ELEMENT_9Q_MAIN (ID,X,Y,Z,U,MHT,E,POISSON,LM,XY,MATP)
         D(2,:)=E(MATP(N))/(1D0-POISSON(MATP(N))*POISSON(MATP(N)))*(/POISSON(MATP(N)),1D0,0D0/)
         D(3,:)=E(MATP(N))/(1D0-POISSON(MATP(N))*POISSON(MATP(N)))*(/0D0,0D0,(1D0-POISSON(MATP(N)))/2D0/)
         
-        DO I=1,9
-            C(I,:)=(/XY(2*I-1,N),XY(2*I,N)/)
+        DO I=1,5
+            C(I,:)=(/XYZ(3*I-2,N),XYZ(3*I-1,N)/)
         END DO
         
-        DO I=1,18
+        C(:,1) = (/0.0,1.0,1.0,0.0,1.0/)
+        C(:,2) = (/0.0,0.0,1.0,1.0,0.5/)        
+        
+        DO I=1,10
             IF (LM(I,N)==0) THEN
                 DST(I,1)=0
             ELSE
@@ -296,90 +277,91 @@ SUBROUTINE ELEMENT_9Q_MAIN (ID,X,Y,Z,U,MHT,E,POISSON,LM,XY,MATP)
             END IF
         END DO
         
-        
         DO I=1,GUASS_N
             DO J=1,GUASS_N
                 ETA = GP(I)
                 EPSILON = GP(J)
                 
-                NMAT = NmatElast9Q(ETA,EPSILON)
+                NMAT = NmatElastTr(ETA,EPSILON)
                 
-                XY0 = MATMUL(NMAT,C)
-                BMAT = BmatElast9Q(ETA,EPSILON,C)
+                NA(1,:) = (/NMAT(1,1) , NMAT(1,3) , NMAT(1,5) , NMAT(1,7) , NMAT(1,9)/)
+                
+                XY_GUASS = MATMUL(NA,C)
+
+                BMAT = BmatElastTr(ETA,EPSILON,C)
                 STRESS = MATMUL(D,MATMUL(BMAT,DST))
                 
                 
-            WRITE (IOUT,"(1X,I10,4X,E13.6,4X,E13.6,11X,E13.6,4X,E13.6,4X, E13.6)") N, XY0(1,1), &
-                   XY0(1,2),STRESS(1,1),STRESS(2,1),STRESS(3,1)
+            WRITE (IOUT,"(1X,I10,4X,E13.6,4X,E13.6,11X,E13.6,4X,E13.6,4X, E13.6)") N, XY_GUASS(1,1), &
+                   XY_GUASS(1,2),STRESS(1,1),STRESS(2,1),STRESS(3,1)
                 
             END DO
         END DO
-                
+        
+!        I = (N-1)*4+1
+!        J = N*4
+!        GaussianCollection (:,I:J) = transpose(X_GUASS)
      END DO
-
+!     call PostProcessor(NPAR(1), 2, XYZ((/1,2,4,5,7,8,10,11/),:), Node, 4, GaussianCollection, &
+!         TRANSPOSE(reshape((/transpose(STRESS_XX),transpose(STRESS_YY),transpose(STRESS_XY)/),(/4*NPAR(2),3/))), U)
   ELSE 
      STOP "*** ERROR *** Invalid IND value."
   END IF
-  deallocate(GP,W)
-END SUBROUTINE ELEMENT_9Q_MAIN
+
+END SUBROUTINE ELEMENT_Transition_MAIN
     
-FUNCTION NmatElast9Q(eta,psi)
+FUNCTION NmatElastTr(ETA,PSI)
   IMPLICIT NONE
-  REAL(8):: eta
-  REAL(8):: psi
-  REAL(8):: NmatElast9Q(1,9),NMAT(1,9)
-  REAL(8):: N00(3),N11(3)
-  REAL(8):: N1,N2,N3,N4,N5,N6,N7,N8,N9
-  REAL(8):: ZERO=0.0
-  INTEGER:: I
+  REAL(8):: ETA
+  REAL(8):: PSI
+  REAL(8):: NmatElastTr(2,10),N(2,10)
+  REAL(8):: N1,N2,N3,N4,N5
   
-  DO I=1,3
-      N00(1)=0.5*eta*(eta-1.0)
-      N00(2)=1-eta*eta
-      N00(3)=0.5*eta*(eta+1.0)
-  END DO
+  N1 = 0.25*(1.0-ETA)*(1.0-PSI)
+  N2 = -0.25*(1.0+ETA)*(1.0-PSI)*PSI
+  N3 = 0.25*(1.0+ETA)*(1.0+PSI)*PSI
+  N4 = 0.25*(1.0-ETA)*(1.0+PSI)
+  N5 = (1.0-PSI**2)*0.5*(ETA+1.0)
   
-  DO I=1,3
-      N11(1)=0.5*psi*(psi-1.0)
-      N11(2)=1-psi*psi
-      N11(3)=0.5*psi*(psi+1.0)
-  END DO
+  N(1,1)=N1
+  N(1,2)=0.0
+  N(1,3)=N2
+  N(1,4)=0.0
+  N(1,5)=N3
+  N(1,6)=0.0
+  N(1,7)=N4
+  N(1,8)=0.0
+  N(1,9)=N5
+  N(1,10)=0.0  
   
-  N1 = N00(1)*N11(1)
-  N2 = N00(3)*N11(1)
-  N3 = N00(3)*N11(3)
-  N4 = N00(1)*N11(3)
-  N5 = N00(2)*N11(1)
-  N6 = N00(3)*N11(2)
-  N7 = N00(2)*N11(3)
-  N8 = N00(1)*N11(2)
-  N9 = N00(2)*N11(2)
+  N(2,1)=0.0
+  N(2,2)=N1
+  N(2,3)=0.0
+  N(2,4)=N2
+  N(2,5)=0.0
+  N(2,6)=N3
+  N(2,7)=0.0
+  N(2,8)=N4
+  N(2,9)=0.0
+  N(2,10)=N5
   
-  NMAT(1,:) = (/  N1,N2,N3,N4,N5,N6,N7,N8,N9  /)
+  NmatElastTr=N
   
-  NmatElast9Q=NMAT
+END FUNCTION NmatElastTr
   
-END FUNCTION NmatElast9Q
-  
-FUNCTION BmatElast9Q(eta,psi,C)
+FUNCTION BmatElastTr(ETA,PSI,C)
     IMPLICIT NONE
-    REAL(8):: eta,psi
-    REAL(8):: C(9,2) ! ×ø±ê
-    REAL(8):: GN(2,9),J(2,2)
+    REAL(8):: ETA,PSI
+    REAL(8):: C(5,2)
+    REAL(8):: GN(2,5),J(2,2)
     REAL(8):: DETJ,INVJ(2,2)
-    REAL(8):: BB(2,9)
-    REAL(8):: B1x,B2x,B3x,B4x,B5x,B6x,B7x,B8x,B9x,B1y,B2y,B3y,B4y,B5y,B6y,B7y,B8y,B9y
-    REAL(8):: B(3,18),BmatElast9Q(3,18)
-    REAL(8),PARAMETER:: ZERO=0.0
+    REAL(8):: BB(2,5),B1x,B2x,B3x,B4x,B1y,B2y,B3y,B4y,B5x,B5y
+    REAL(8):: B(3,10),BmatElastTr(3,10)
+    REAL(8):: ZERO
     COMMON DETJ
     
-    GN(1,:)=(/0.5*(2*eta-1)*0.5*psi*(psi-1) , 0.5*(2*eta+1)*0.5*psi*(psi-1) , 0.5*(2*eta+1)*0.5*psi*(psi+1), &
-            & 0.5*(2*eta-1)*0.5*psi*(psi+1) , (-2*eta)*0.5*psi*(psi-1) , 0.5*(2*eta+1)*(1-psi**2), &
-            & (-2*eta)*0.5*psi*(psi+1) , 0.5*(2*eta-1)*(1-psi**2) , (-2*eta)*(1-psi**2) /)
-    
-    GN(2,:)=(/0.5*eta*(eta-1)*0.5*(2*psi-1) , 0.5*eta*(eta+1)*0.5*(2*psi-1) , 0.5*eta*(eta+1)*0.5*(2*psi+1), &
-            & 0.5*eta*(eta-1)*0.5*(2*psi+1) , (1-eta**2)*0.5*(2*psi-1) , 0.5*eta*(eta+1)*(-2*psi), &
-            & (1-eta**2)*0.5*(2*psi+1) , 0.5*eta*(eta-1)*(-2*psi) , (1-eta**2)*(-2*psi) /)
+    GN(1,:)=(/-0.25*(1.0-PSI) , -0.25*(1.0-PSI)*PSI , 0.25*(1.0+PSI)*PSI , -0.25*(1.0+PSI) , (1.0-PSI**2)*0.5 /)
+    GN(2,:)=(/-0.25*(1.0-ETA) , -0.25*(1.0+ETA)*(1.0-2*PSI) , 0.25*(1.0+ETA)*(1.0+2*PSI) , 0.25*(1.0-ETA) , (-2*PSI)*0.5*(ETA+1.0) /)
     
     J = MATMUL(GN,C)
     DETJ = J(1,1)*J(2,2)-J(1,2)*J(2,1)
@@ -393,31 +375,19 @@ FUNCTION BmatElast9Q(eta,psi,C)
     B2x     = BB(1,2) 
     B3x     = BB(1,3) 
     B4x     = BB(1,4)
-    B5x     = BB(1,5) 
-    B6x     = BB(1,6)
-    B7x     = BB(1,7) 
-    B8x     = BB(1,8)
-    B9x     = BB(1,9)
-    
+    B5x     = BB(1,5)
     B1y     = BB(2,1) 
     B2y     = BB(2,2) 
     B3y     = BB(2,3) 
     B4y     = BB(2,4)
-    B5y     = BB(2,5) 
-    B6y     = BB(2,6)
-    B7y     = BB(2,7) 
-    B8y     = BB(2,8)
-    B9y     = BB(2,9)
-        
-    B(1,:) = (/B1x   ,   ZERO   ,  B2x  ,   ZERO   ,   B3x  ,  ZERO   ,   B4x   ,  ZERO   ,   B5x   ,&
-               ZERO   ,   B6x   ,  ZERO   ,   B7x   ,  ZERO   ,   B8x   ,  ZERO   ,   B9x   ,  ZERO  /)
-    B(2,:) = (/  ZERO   ,  B1y  ,  ZERO  ,   B2y   ,   ZERO   ,  B3y   ,  ZERO    ,  B4y   ,  ZERO  ,&
-               B5y   ,  ZERO    ,  B6y   ,  ZERO    ,  B7y   ,  ZERO    ,  B8y   ,  ZERO    ,  B9y/)
-    B(3,:) = (/B1y  ,   B1x  ,  B2y  ,  B2x  ,   B3y   , B3x  ,  B4y  ,   B4x  ,  B5y  ,   B5x  ,&
-               B6y  ,   B6x  ,  B7y  ,   B7x  ,  B8y  ,   B8x  ,  B9y  ,   B9x/)
+    B5y     = BB(2,5)
     
-    BmatElast9Q = B
-END FUNCTION BmatElast9Q
+    ZERO    = 0.0
+    
+    B(1,:) = (/B1x   ,   ZERO   ,  B2x  ,  ZERO   ,   B3x  ,  ZERO   ,   B4x   ,  ZERO  ,  B5x  ,  ZERO/)
+    B(2,:) = (/ZERO   ,  B1y  ,  ZERO  ,   B2y   ,   ZERO   ,  B3y   ,  ZERO    ,  B4y  ,  ZERO  ,  B5y/)
+    B(3,:) = (/B1y  ,   B1x  ,  B2y  ,  B2x  ,   B3y   , B3x  ,  B4y  ,   B4x  ,  B5y  ,  B5x/)
+    
+    BmatElastTr = B
+END FUNCTION BmatElastTr
 
-
-  

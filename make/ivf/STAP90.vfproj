@@ -64,6 +64,7 @@
 		<File RelativePath="..\..\src\elements\shell.f90"/>
 		<File RelativePath="..\..\src\elements\shell8Q.f90"/>
 		<File RelativePath="..\..\src\elements\TIMOSHENKO.f90"/>
+		<File RelativePath="..\..\src\elements\Transition.f90"/>
 		<File RelativePath="..\..\src\elements\truss.f90"/></Filter>
 		<Filter Name="Modal">
 		<File RelativePath="..\..\src\modal\jacobi.f90"/>
@@ -79,6 +80,8 @@
 		<File RelativePath="..\..\src\module\pardiso.f90"/>
 		<File RelativePath="..\..\src\module\solver_mode.f90"/>
 		<File RelativePath="..\..\src\module\vector.f90"/></Filter>
+		<Filter Name="plasticity">
+		<File RelativePath="..\..\src\plasticity\plastictruss.f90"/></Filter>
 		<Filter Name="Utils">
 		<File RelativePath="..\..\src\assem.f90"/>
 		<File RelativePath="..\..\src\datain.f90"/>

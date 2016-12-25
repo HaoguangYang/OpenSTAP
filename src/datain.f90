@@ -38,7 +38,7 @@ SUBROUTINE INPUT (ID,X,Y,Z,NUMNP,NEQ)
 
   N = 0
   DO WHILE (N.NE.NUMNP)
-     READ (IIN,"(I10,6I10,3F10.0,I10)") N,(ID(I,N),I=1,6),X(N),Y(N),Z(N)
+     READ (IIN,"(I10,6I10,3F10.0,I5)") N,(ID(I,N),I=1,6),X(N),Y(N),Z(N)
   END DO
 
 ! Write complete nodal data

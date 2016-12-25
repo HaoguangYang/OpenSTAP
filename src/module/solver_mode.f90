@@ -178,7 +178,6 @@ subroutine pardiso_input(ID)
         allocate(columns(nwk))
         CALL assign_columns(vectors, columns)
      else
-        !huge = .false.
         CALL MEMALLOC(3,"STFF ",NWK,ITWO)
         CALL MEMALLOC(4,"R    ",NEQ,ITWO)
         CALL MEMALLOC(5,"columns",NWK,1)
