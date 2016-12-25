@@ -288,6 +288,18 @@ case (2)                                                            !Called in e
         write (VTKElTypTmp) (23,I=1,NPAR(2))
      case (10)
         write (VTKElTypTmp) (5,I=1,NPAR(2))
+     case (11)
+        write (VTKElTypTmp) (25,I=1,NPAR(2))
+     case (12)
+        write (VTKElTypTmp) (3, I = 1,NPAR(2))
+     case (13)
+        write (VTKElTypTmp) (10, I = 1,NPAR(2))
+     case (14)
+        write (VTKElTypTmp) (9,I=1,NPAR(2))
+     case (15)
+        write (VTKElTypTmp) (23,I=1,NPAR(2))
+     case (0)
+        write (VTKElTypTmp) (3,I=1,NPAR(2))
      end select
      
 case (3)                                                            !Called in stap.f90, STAP at solution phase IND=3
