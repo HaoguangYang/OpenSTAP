@@ -54,7 +54,7 @@ module GLOBALS
    
    integer :: MODEX		! Solution mode: 0 - data check only;  1 -  execution                                   
 
-   integer(8) :: TIM(10)		! Timing information
+   integer :: TIM(10)		! Timing information
    character*80 :: HED	! Master heading information for use in labeling the output
 
    integer :: NFIRST
@@ -78,5 +78,4 @@ module GLOBALS
    INTEGER, PARAMETER :: DELTALOAD = 11
    INTEGER, PARAMETER :: PRESENTDISPLACEMENT = 12
    INTEGER, PARAMETER :: PRESENTSTRESS =13
-   
 end module GLOBALS
