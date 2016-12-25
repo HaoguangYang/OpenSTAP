@@ -48,9 +48,9 @@ subroutine EIGENVAL(Stiff, Mass, MAXA, NN, NWK2, NNM, NRoot)
         NRestart = NNC
         IFSS = .TRUE.
         IFPR = .FALSE.
-        write (*,*) Stiff
-        write (*,*) Mass
-        write (*,*) MAXA
+        !write (*,*) Stiff
+        !write (*,*) Mass
+        !write (*,*) MAXA
         !write(*,*) EignVec, EignVal,TT,W,AR,BR,VEC,D,RTOLV,BUP,BLO,BUPC, NN, NNM, NWK2, NWK2, NRoot, RTol, NC, NNC, NRestart, IFSS, IFPR, StiffTmp, IOUT
         call LANCZOS(Stiff, Mass, MAXA, EignVec, EignVal,TT,W,AR,BR,VEC,D,RTOLV,BUP,BLO,BUPC, NN, NNM, NWK2, NWK2, NRoot, RTol, NC, NNC, NRestart, IFSS, IFPR, StiffTmp, IOUT,Q)
         REWIND StiffTmp
@@ -58,7 +58,7 @@ subroutine EIGENVAL(Stiff, Mass, MAXA, NN, NWK2, NNM, NRoot)
         close(StiffTmp)
         deallocate (AR,BR,VEC,D,RTOLV,BUP,BLO,BUPC,Q)
     else
-        !uplo = 'U'
+        uplo = 'U'
         allocate (res(NC))
         !IA(NP(9))      --  Mass Row Index
         !IA(NP(8))      --  Mass Column Indicator
@@ -72,7 +72,7 @@ subroutine EIGENVAL(Stiff, Mass, MAXA, NN, NWK2, NNM, NRoot)
         call pardiso_crop(DA(NP(10)), IA(NP(9)), IA(NP(8)))
         NWK2 = NWK                                          !Renew NWK
         call pardiso_crop(DA(NP(3)), IA(NP(9)), IA(NP(8)))
-        call dfeast_scsrgv('u', NN, Stiff(1:NWK), IA(NP(2)), IA(NP(5)), Mass(1:NWK2), IA(NP(9)), IA(NP(8)), fpm, epsout, loop, &
+        call dfeast_scsrgv(uplo, NN, Stiff(1:NWK), IA(NP(2)), IA(NP(5)), Mass(1:NWK2), IA(NP(9)), IA(NP(8)), fpm, epsout, loop, &
                            emin, emax, NC, EignVal, EignVec, NRoot, res, info)
         write(*,*) "Eigen Values:",EignVal
         write(*,*) "Eigen Vectors:",EignVec
