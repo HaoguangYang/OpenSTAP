@@ -58,7 +58,7 @@ subroutine EIGENVAL(Stiff, Mass, MAXA, NN, NWK2, NNM, NRoot)
         close(StiffTmp)
         deallocate (AR,BR,VEC,D,RTOLV,BUP,BLO,BUPC,Q)
     else
-        uplo = 'U'
+        uplo = 'L'
         allocate (res(NC))
         !IA(NP(9))      --  Mass Row Index
         !IA(NP(8))      --  Mass Column Indicator
