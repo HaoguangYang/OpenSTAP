@@ -23,17 +23,17 @@
     - Plate 8Q
     - Shell 8Q
 
- - Advanced element types:
+  - Advanced element types:
     - Infinite 4Q
     - Plastic truss
  
- - Multiple solver choices
+  - Multiple solver choices
     - Classical Skyline storage and LDLT decomposition solver
     - Intel MKL Pardiso sparse matrix solver
     - LANCZOS eigen value solver (still not completely functional)
     - MKL FEAST eigen value solver (to be tested)
  
- - And am ABAQUS Python plugin for converting the input file of this program.
+  - And am ABAQUS Python plugin for converting the input file of this program.
 
 ##### It works with:
  - Intel MKL
