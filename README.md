@@ -3,7 +3,7 @@
 ### OpenSTAP is a Finite Element Method (FEM) Solver.
 
 #### It is based on:
-  - STAP (KJ Bath, FORTRAN IV)
+  - STAP (KJ Bathe, FORTRAN IV)
   - STAP90 (Prof. Xiong Zhang, Tsinghua University, FORTRAN 90)
 
 #### It includes:
