@@ -33,7 +33,7 @@
     - LANCZOS eigen value solver (still not completely functional)
     - MKL FEAST eigen value solver (to be tested)
  
-  - And am ABAQUS Python plugin for converting the input file of this program.
+  - And an ABAQUS Python plugin for converting the input file of this program.
 
 #### It works with:
  - Intel MKL
@@ -42,7 +42,7 @@
 #### It runs fast
 Minimum RAM requirement: 400MB.
 
-Benchmark of the program on a Intel i7-4790 Processor with 16G of RAM:
+Benchmark of the program on an Intel i7-4790 Processor with 16G of RAM:
  - 4087 nodes with 2884 elements
      - about 3s using classical Skyline
      - about 0.2s using Intel MKL Pardiso
